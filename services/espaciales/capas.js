@@ -1,5 +1,5 @@
 import TipoVia from "../../models/maestros/general/tipoVias.js";
-import CapasMostrar from "../../models/espaciales/capasMostrar.js";
+import CapasMostrar from "../../models/manager/capasMostrar.js";
 import { sequelize } from "../../config/postgres/sequelize.js";
 
 export class CapasService {
