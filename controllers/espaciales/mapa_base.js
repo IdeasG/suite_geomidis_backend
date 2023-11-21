@@ -23,4 +23,24 @@ export class MapaBaseController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async deleteMapaBase(req, res) {
+    const { id_base } = req.params;
+    try {
+      const data = await mapasBaseService.deleteMapaBase(id_base);
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async putMapaBase(req, res) {
+    const { id_base, c_nomb_mapa, c_key, c_imagery_set, c_url} = req.body;
+    try {
+      const data = await mapasBaseService.putMapaBase(id_base, c_nomb_mapa, c_key, c_imagery_set, c_url );
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }

@@ -8,6 +8,8 @@ export const createRouteMapaBase = () => {
 
     MapaBaseRouter.get("/", mapaBaseController.getMapaBase);
     MapaBaseRouter.post("/", mapaBaseController.postMapaBase)
+    MapaBaseRouter.delete("/:id_base", mapaBaseController.deleteMapaBase)
+    MapaBaseRouter.put("/", mapaBaseController.putMapaBase)
 
     return MapaBaseRouter;
 };

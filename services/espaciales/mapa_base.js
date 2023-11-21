@@ -17,8 +17,6 @@ export class MapaBaseService {
 
   async postMapaBase(c_nomb_mapa, c_key, c_imagery_set, c_url, c_img, b_key) {
     try {
-      // const distrito = await SpDistrito.findAll();
-      console.log(c_nomb_mapa, c_key, c_imagery_set, c_url, c_img, b_key);
       const dbResponse = await MapaBase.create({c_nomb_mapa, c_key, c_imagery_set, c_url, c_img, b_key});
       return {
         status: "success",
@@ -26,6 +24,30 @@ export class MapaBaseService {
       };
     } catch (error) {
       throw new Error("Error al registrar mapa base externa.");
+    }
+  }
+
+  async deleteMapaBase(id_base) {
+    try {
+      const dbResponse = await MapaBase.destroy({where:{id_base}});
+      return {
+        status: "success",
+        data: dbResponse,
+      };
+    } catch (error) {
+      throw new Error("Error al registrar mapa base externa.");
+    }
+  }
+
+  async putMapaBase(id_base,c_nomb_mapa, c_key, c_imagery_set, c_url) {
+    try {
+      const dbResponse = await MapaBase.update({c_nomb_mapa, c_key, c_imagery_set, c_url},{where:{id_base}});
+      return {
+        status: "success",
+        data: dbResponse,
+      };
+    } catch (error) {
+      throw new Error("Error al actualizar mapa base externa.");
     }
   }
 }
