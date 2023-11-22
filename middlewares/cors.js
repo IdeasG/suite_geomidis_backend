@@ -1,7 +1,7 @@
 import cors from "cors";
 
 const ACCEPTED_ORIGINS = [
-  "http://localhost:3003",
+  "http://localhost:3000",
   "https://suite.juegodepalabras.com.pe",
   "https://suite-nextjs.vercel.app",
   "https://suite-geomidis-nextjs.vercel.app/",
