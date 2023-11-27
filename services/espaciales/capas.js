@@ -1,34 +1,45 @@
-import TipoVia from "../../models/maestros/general/tipoVias.js";
 import CapasMostrar from "../../models/manager/capasMostrar.js";
 import { sequelize } from "../../config/postgres/sequelize.js";
+import Capas from '../../models/maestros/administracion/capas.js';
+import CapasGrupo from '../../models/maestros/administracion/capasGrupo.js';
+import CapasSuperGrupo from '../../models/maestros/administracion/capasSuperGrupo.js';
+
 
 export class CapasService {
-  async createTipoVia(codTipoVia, nombTipoVia) {
+  async getAllCapasSuperGrupo() {
     try {
-      const tipoVia = await TipoVia.create({
-        cod_tipo_via: codTipoVia,
-        nomb_tipo_via: nombTipoVia,
-      });
-      return tipoVia;
+      const response = await CapasSuperGrupo.findAll();
+      return response;
     } catch (error) {
-      throw new Error("Error al crear el tipo de vía.");
+    throw new Error('Error al obtener los tipos de vía....'+ error);
     }
   }
 
-  async getAllCapas(pageNumber, pageSize) {
+  async getAllTablasEspaciales() {
     try {
-      const offset = (pageNumber - 1) * pageSize;
-      const tipoVias = await sequelize.query(
-        "select * from administracion.tadm_capas_supergrupo"
-      );
-      const totalItems = tipoVias.count;
-      const totalPages = Math.ceil(totalItems / pageSize);
-      return {
-        items: tipoVias.rows,
-        currentPage: parseInt(pageNumber),
-        totalPages,
-        totalItems,
-      };
+      const [results, metadata] = await sequelize.query(`
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema='espaciales'
+      `)
+      return results;
+    } catch {
+
+    }
+  }
+  async getAllCapasGrupos() {
+    try {
+      const response = await CapasGrupo.findAll();
+      return response;
+    } catch (error) {
+    throw new Error('Error al obtener los tipos de vía....'+ error);
+    }
+  }
+
+  async getAllCapas() {
+    try {
+      const response = await Capas.findAll()
+      return response;
     } catch (error) {
       throw new Error("Error al obtener los tipos de vía...." + error);
     }
@@ -40,6 +51,92 @@ export class CapasService {
       return response;
     } catch (error) {
       throw new Error("Error al obtener las capas visibles con el id_capa:" + id_capa + error);
+    }
+  }
+
+  async RegistrarCapas(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa) {
+    try {
+      const response = await Capas.create({id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa})
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener las capas visibles con el id_capa:");
+    }
+  }
+
+  async RegistrarGrupos(id_super_grupo, c_nombre_grupo, b_grupo) {
+    try {
+      const response = await CapasGrupo.create({id_super_grupo, c_nombre_grupo, b_grupo})
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener las capas visibles con el id_capa:");
+    }
+  }
+
+  async RegistrarSupergrupos(c_nombre_super_grupo, b_super_grupo) {
+    console.log('hola');
+    try {
+      const response = await CapasSuperGrupo.create({c_nombre_super_grupo, b_super_grupo})
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener las capas visibles con el id_capa:");
+    }
+  }
+
+  async ActualizarCapas(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa) {
+    try {
+      console.log(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa);
+      const response = await Capas.update({id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa}, {where:{id_capa}})
+      return response;
+    } catch (error) {
+      throw new Error("Error al actualizar capas");
+    }
+  }
+
+  async ActualizarGrupos(id_grupo, id_super_grupo, c_nombre_grupo, b_grupo) {
+    try {
+      const response = await CapasGrupo.create({id_super_grupo, c_nombre_grupo, b_grupo}, {where:{id_grupo}})
+      return response;
+    } catch (error) {
+      throw new Error("Error al actualizar grupos");
+    }
+  }
+
+  async ActualizarSupergrupos(id_super_grupo, c_nombre_super_grupo, b_super_grupo) {
+    console.log('hola');
+    try {
+      const response = await CapasSuperGrupo.create({c_nombre_super_grupo, b_super_grupo}, {where:{id_super_grupo}})
+      return response;
+    } catch (error) {
+      throw new Error("Error al actualizar super grupos");
+    }
+  }
+
+  async EliminarCapas(id_capa) {
+    try {
+      const response = await Capas.destroy({where:{id_capa}})
+      console.log(response);
+      return response;
+    } catch (error) {
+      throw new Error("Error al actualizar capas");
+    }
+  }
+
+  async EliminarGrupos(id_grupo) {
+    try {
+      const response = await CapasGrupo.destroy({where:{id_grupo}})
+      return response;
+    } catch (error) {
+      throw new Error("Error al actualizar grupos");
+    }
+  }
+
+  async EliminarSupergrupos(id_super_grupo) {
+    console.log('hola');
+    try {
+      const response = await CapasSuperGrupo.destroy({where:{id_super_grupo}})
+      return response;
+    } catch (error) {
+      throw new Error("Error al actualizar super grupos");
     }
   }
 

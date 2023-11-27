@@ -18,29 +18,144 @@ export class CapasController {
   constructor() { 
   }
 
-  async getAll(req, res) {
-    const result = validatePagination(req.query); 
-    if (!result.success) {
-      return res.status(400).json({ error: JSON.parse(result.error.message) });
-    }  
-    const { page = 1, pageSize = 5 } = result.data;  
+  async getAllCapasTable (req, res) {
     try {
-      const cacheKey = req.originalUrl;
-      const cachedResponse = await redisClient.get(cacheKey);  
-      if (cachedResponse) {
-        const parsedResponse = JSON.parse(cachedResponse);
-        return res.json(parsedResponse);
-      }
-      const tipoVias = await capasService.getAllCapas(page, pageSize);
-      const cacheExpiry = process.env.REDIS_TIME_CACHE;
-      await redisClient.setex(cacheKey, cacheExpiry, JSON.stringify(tipoVias));
-  
-      res.json(tipoVias);
+      const [response, metadata] = await sequelize.query(`
+      select * from administracion.tadm_capas_supergrupo sg
+      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo`);
+      res.status(200).json({status: 'success', data: response});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapas(req, res) {
+    try {
+      const capas = await capasService.getAllCapas();
+      res.status(200).json(capas);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasGrupos(req, res) {
+    try {
+      const response = await capasService.getAllCapasGrupos();
+      res.status(200).json({status: 'success', data: response});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasSupergrupos(req, res) {
+    try {
+      const response = await capasService.getAllCapasSuperGrupo();
+      res.status(200).json({status: 'success', data: response});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllTablasEspaciales(req, res) {
+    try {
+      const response = await capasService.getAllTablasEspaciales();
+      res.status(200).json({status: 'success', data: response});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasPost(req, res) {
+    const {id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa} = req.body;
+    try {
+      const capas = await capasService.RegistrarCapas(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa);
+      res.status(200).json({status: 'success', data: capas});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
   
+  async getAllCapasGruposPost(req, res) {
+    const {id_super_grupo, c_nombre_grupo, b_grupo} = req.body;
+    try {
+      const capas = await capasService.RegistrarGrupos(id_super_grupo, c_nombre_grupo, b_grupo);
+      res.status(200).json(capas);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasSupergruposPost(req, res) {
+    const {c_nombre_super_grupo, b_super_grupo} = req.body;
+    try {
+      const capas = await capasService.RegistrarSupergrupos(c_nombre_super_grupo, b_super_grupo);
+      res.status(200).json(capas);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasPut(req, res) {
+    const {id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa} = req.body;
+    try {
+      const capas = await capasService.ActualizarCapas(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa);
+      res.status(200).json({status: 'success', data: capas});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  
+  async getAllCapasGruposPut(req, res) {
+    const {id_grupo, id_super_grupo, c_nombre_grupo, b_grupo} = req.body;
+    try {
+      const capas = await capasService.ActualizarGrupos(id_grupo, id_super_grupo, c_nombre_grupo, b_grupo);
+      res.status(200).json({status: 'success', data: capas});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasSupergruposPut(req, res) {
+    const {id_super_grupo, c_nombre_super_grupo, b_super_grupo} = req.body;
+    try {
+      const capas = await capasService.ActualizarSupergrupos(id_super_grupo, c_nombre_super_grupo, b_super_grupo);
+      res.status(200).json({status: 'success', data: capas});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasDelete(req, res) {
+    const {id_capa} = req.params;
+    try {
+      const capas = await capasService.EliminarCapas(id_capa);
+      res.status(200).json({status: 'success', data: capas});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  
+  async getAllCapasGruposDelete(req, res) {
+    const {id_grupo} = req.params;
+    try {
+      const capas = await capasService.EliminarGrupos(id_grupo);
+      res.status(200).json({status: 'success', data: capas});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasSupergruposDelete(req, res) {
+    const {id_super_grupo} = req.params;
+    try {
+      const capas = await capasService.EliminarSupergrupos(id_super_grupo);
+      res.status(200).json({status: 'success', data: capas});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getStructure (req, res) {
     try {
       // redis cache
@@ -88,9 +203,8 @@ export class CapasController {
   }
 
   async putVisibles (req, res) {
-    console.log('hola');
     const {id,c_campo_alias,b_campo} = req.body;
-    console.log(id,c_campo_alias,b_campo);
+    // console.log(id,c_campo_alias,b_campo);
     try {
       await capasService.putCapasVisibles(id,c_campo_alias,b_campo);
       res.status(200).json({status: 'success'});
