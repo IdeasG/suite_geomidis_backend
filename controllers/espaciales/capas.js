@@ -1,55 +1,50 @@
-import 'dotenv/config'
+import "dotenv/config";
 
-import { validatePagination } from '../../schemas/generales/pagination.js'
+import { validatePagination } from "../../schemas/generales/pagination.js";
 
-import { CapasService } from '../../services/espaciales/capas.js';
+import { CapasService } from "../../services/espaciales/capas.js";
 
-import { redisClient } from '../../config/redis/redis.js';
+import { redisClient } from "../../config/redis/redis.js";
 
-import { sequelize } from '../../config/postgres/sequelize.js';
+import { sequelize } from "../../config/postgres/sequelize.js";
 
-import { response } from 'express';
+import { response } from "express";
 
 import excel from "exceljs/dist/es5/index.js";
 
 const capasService = new CapasService();
 
 export class CapasController {
-  constructor() { 
-  }
+  constructor() {}
 
-  async getAllCapasTable (req, res) {
+  async getAllCapasTable(req, res) {
     try {
       const [response, metadata] = await sequelize.query(`
       select * from administracion.tadm_capas_supergrupo sg
       left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'interno' 
-      `);
-      res.status(200).json({status: 'success', data: response});
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo`);
+      res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-
-  async getAllCapasTableExterno (req, res) {
+  async getAtributos(req, res) {
+    const { tabla } = req.params;
     try {
       const [response, metadata] = await sequelize.query(`
-      select * from administracion.tadm_capas_supergrupo sg
-      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'externo' 
+      SELECT column_name, data_type
+      FROM information_schema.columns
+      WHERE table_name = '${tabla}' and table_schema ='espaciales';
       `);
-      res.status(200).json({status: 'success', data: response});
+      res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-
   async getAllCapas(req, res) {
     try {
       const capas = await capasService.getAllCapas();
-      res.status(200).json(capas);
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -58,7 +53,7 @@ export class CapasController {
   async getAllCapasGrupos(req, res) {
     try {
       const response = await capasService.getAllCapasGrupos();
-      res.status(200).json({status: 'success', data: response});
+      res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -67,7 +62,7 @@ export class CapasController {
   async getAllCapasSupergrupos(req, res) {
     try {
       const response = await capasService.getAllCapasSuperGrupo();
-      res.status(200).json({status: 'success', data: response});
+      res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -76,26 +71,42 @@ export class CapasController {
   async getAllTablasEspaciales(req, res) {
     try {
       const response = await capasService.getAllTablasEspaciales();
-      res.status(200).json({status: 'success', data: response});
+      res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
   async getAllCapasPost(req, res) {
-    const {id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio} = req.body;
+    const {
+      id_grupo,
+      c_nombre_tabla_capa,
+      c_nombre_public_capa,
+      c_sql_capa,
+      b_capa,
+    } = req.body;
     try {
-      const capas = await capasService.RegistrarCapas(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio);
-      res.status(200).json({status: 'success', data: capas});
+      const capas = await capasService.RegistrarCapas(
+        id_grupo,
+        c_nombre_tabla_capa,
+        c_nombre_public_capa,
+        c_sql_capa,
+        b_capa
+      );
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-  
+
   async getAllCapasGruposPost(req, res) {
-    const {id_super_grupo, c_nombre_grupo, b_grupo} = req.body;
+    const { id_super_grupo, c_nombre_grupo, b_grupo } = req.body;
     try {
-      const capas = await capasService.RegistrarGrupos(id_super_grupo, c_nombre_grupo, b_grupo);
+      const capas = await capasService.RegistrarGrupos(
+        id_super_grupo,
+        c_nombre_grupo,
+        b_grupo
+      );
       res.status(200).json(capas);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -103,9 +114,12 @@ export class CapasController {
   }
 
   async getAllCapasSupergruposPost(req, res) {
-    const {c_nombre_super_grupo, b_super_grupo} = req.body;
+    const { c_nombre_super_grupo, b_super_grupo } = req.body;
     try {
-      const capas = await capasService.RegistrarSupergrupos(c_nombre_super_grupo, b_super_grupo);
+      const capas = await capasService.RegistrarSupergrupos(
+        c_nombre_super_grupo,
+        b_super_grupo
+      );
       res.status(200).json(capas);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -113,249 +127,302 @@ export class CapasController {
   }
 
   async getAllCapasPut(req, res) {
-    const {id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio} = req.body;
+    const {
+      id_capa,
+      id_grupo,
+      c_nombre_tabla_capa,
+      c_nombre_public_capa,
+      c_sql_capa,
+      b_capa,
+    } = req.body;
     try {
-      const capas = await capasService.ActualizarCapas(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio);
-      res.status(200).json({status: 'success', data: capas});
+      const capas = await capasService.ActualizarCapas(
+        id_capa,
+        id_grupo,
+        c_nombre_tabla_capa,
+        c_nombre_public_capa,
+        c_sql_capa,
+        b_capa
+      );
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-  
+
   async getAllCapasGruposPut(req, res) {
-    const {id_grupo, id_super_grupo, c_nombre_grupo, b_grupo} = req.body;
+    const { id_grupo, id_super_grupo, c_nombre_grupo, b_grupo } = req.body;
     try {
-      const capas = await capasService.ActualizarGrupos(id_grupo, id_super_grupo, c_nombre_grupo, b_grupo);
-      res.status(200).json({status: 'success', data: capas});
+      const capas = await capasService.ActualizarGrupos(
+        id_grupo,
+        id_super_grupo,
+        c_nombre_grupo,
+        b_grupo
+      );
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
   async getAllCapasSupergruposPut(req, res) {
-    const {id_super_grupo, c_nombre_super_grupo, b_super_grupo} = req.body;
+    const { id_super_grupo, c_nombre_super_grupo, b_super_grupo } = req.body;
     try {
-      const capas = await capasService.ActualizarSupergrupos(id_super_grupo, c_nombre_super_grupo, b_super_grupo);
-      res.status(200).json({status: 'success', data: capas});
+      const capas = await capasService.ActualizarSupergrupos(
+        id_super_grupo,
+        c_nombre_super_grupo,
+        b_super_grupo
+      );
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
   async getAllCapasDelete(req, res) {
-    const {id_capa} = req.params;
+    const { id_capa } = req.params;
     try {
       const capas = await capasService.EliminarCapas(id_capa);
-      res.status(200).json({status: 'success', data: capas});
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-  
+
   async getAllCapasGruposDelete(req, res) {
-    const {id_grupo} = req.params;
+    const { id_grupo } = req.params;
     try {
       const capas = await capasService.EliminarGrupos(id_grupo);
-      res.status(200).json({status: 'success', data: capas});
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
   async getAllCapasSupergruposDelete(req, res) {
-    const {id_super_grupo} = req.params;
+    const { id_super_grupo } = req.params;
     try {
       const capas = await capasService.EliminarSupergrupos(id_super_grupo);
-      res.status(200).json({status: 'success', data: capas});
+      res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  async getStructure (req, res) {
+  async getStructure(req, res) {
     try {
       // redis cache
       const cacheKey = req.originalUrl;
-      const cachedResponse = await redisClient.get(cacheKey);  
+      const cachedResponse = await redisClient.get(cacheKey);
       if (cachedResponse) {
         const parsedResponse = JSON.parse(cachedResponse);
         return res.json(parsedResponse);
       }
 
-      const [superGrupos, metadata] = await sequelize.query(`select * from administracion.tadm_capas_supergrupo`);
+      const [superGrupos, metadata] = await sequelize.query(
+        `select * from administracion.tadm_capas_supergrupo`
+      );
       const dbResponse = superGrupos;
       for (let index = 0; index < superGrupos.length; index++) {
-          const element = superGrupos[index];
-          const [grupos, metadata] = await sequelize.query(`select * from administracion.tadm_capas_grupo WHERE id_super_grupo = ${element.id_super_grupo}`);
-          for (let index = 0; index < grupos.length; index++) {
-              const element = grupos[index];
-              const [capas, metadata] = await sequelize.query(`select * from administracion.tadm_capas WHERE id_grupo = ${element.id_grupo}`);
-              element.capas = capas;
-          }    
-          element.grupos = grupos;
+        const element = superGrupos[index];
+        const [grupos, metadata] = await sequelize.query(
+          `select * from administracion.tadm_capas_grupo WHERE id_super_grupo = ${element.id_super_grupo}`
+        );
+        for (let index = 0; index < grupos.length; index++) {
+          const element = grupos[index];
+          const [capas, metadata] = await sequelize.query(
+            `select * from administracion.tadm_capas WHERE id_grupo = ${element.id_grupo}`
+          );
+          element.capas = capas;
+        }
+        element.grupos = grupos;
       }
       // redis cache
       const cacheExpiry = process.env.REDIS_TIME_CACHE;
-      await redisClient.setex(cacheKey, cacheExpiry, JSON.stringify(dbResponse));
-      res.status(200).json({status: 'success', data: dbResponse});
+      await redisClient.setex(
+        cacheKey,
+        cacheExpiry,
+        JSON.stringify(dbResponse)
+      );
+      res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  async getVisibles (req, res) {
-    const {id_capa} = req.params;
+  async getVisibles(req, res) {
+    const { id_capa } = req.params;
     try {
       let dbResponse = await capasService.getCapasVisibles(id_capa);
       if (dbResponse.length == 0) {
         const responseCreate = await capasService.postCapasVisibles(id_capa);
         // console.log(responseCreate);
-        dbResponse = responseCreate
+        dbResponse = responseCreate;
       }
-      res.status(200).json({status: 'success', data: dbResponse});
+      res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  async putVisibles (req, res) {
-    const {id,c_campo_alias,b_campo} = req.body;
+  async putVisibles(req, res) {
+    const { id, c_campo_alias, b_campo } = req.body;
     // console.log(id,c_campo_alias,b_campo);
     try {
-      await capasService.putCapasVisibles(id,c_campo_alias,b_campo);
-      res.status(200).json({status: 'success'});
+      await capasService.putCapasVisibles(id, c_campo_alias, b_campo);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
   async descargarExcel(req, res) {
-    const { table,datosCapas } = req.body;
+    const { table, datosCapas } = req.body;
     try {
       let exportarTemp = [];
       table.forEach((item) => {
-          exportarTemp.push({
+        exportarTemp.push({
           1: item.grupo,
           2: item.titulo,
-          3: item.cantidad
-          });
+          3: item.cantidad,
+        });
       });
-  
+
       let workbook = new excel.Workbook();
       let worksheet = workbook.addWorksheet("Reporte general");
 
       worksheet.columns = [
-          { header: "Nombre Grupo", key: "1", width: 30 },
-          { header: "Nombre Titulo", key: "2", width: 50 },
-          { header: "Cantidad", key: "3", width: 50 }
+        { header: "Nombre Grupo", key: "1", width: 30 },
+        { header: "Nombre Titulo", key: "2", width: 50 },
+        { header: "Cantidad", key: "3", width: 50 },
       ];
-  
-      worksheet.getCell('A1').fill = {type: 'pattern',pattern:'solid',fgColor:{argb:'A3E4D7'}};
-      worksheet.getCell('B1').fill = {type: 'pattern',pattern:'solid',fgColor:{argb:'A3E4D7'}};
-      worksheet.getCell('C1').fill = {type: 'pattern',pattern:'solid',fgColor:{argb:'A3E4D7'}};
-  
+
+      worksheet.getCell("A1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "A3E4D7" },
+      };
+      worksheet.getCell("B1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "A3E4D7" },
+      };
+      worksheet.getCell("C1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "A3E4D7" },
+      };
+
       // Add Array Rows
       worksheet.addRows(exportarTemp);
 
-      datosCapas.forEach(element => {
-        let worksheet = workbook.addWorksheet(element.grupo + ' ' + element.capa);
-        const data = element.rows
-        const columnas = element.campos
-        const exportarTempo = []
+      datosCapas.forEach((element) => {
+        let worksheet = workbook.addWorksheet(
+          element.grupo + " " + element.capa
+        );
+        const data = element.rows;
+        const columnas = element.campos;
+        const exportarTempo = [];
         for (let index in data) {
-            // console.log('rows : ', data[index]);
-            const newData = {}
-            for (let index2 in columnas) {
-                // console.log(columnas[index2]);
-                const field = columnas[index2]
-                const index3 = parseInt(index2)+1
-                newData[index3] = data[index][field]
-            }
-            // console.log('newdata', newData);
-            exportarTempo.push(newData)
+          // console.log('rows : ', data[index]);
+          const newData = {};
+          for (let index2 in columnas) {
+            // console.log(columnas[index2]);
+            const field = columnas[index2];
+            const index3 = parseInt(index2) + 1;
+            newData[index3] = data[index][field];
+          }
+          // console.log('newdata', newData);
+          exportarTempo.push(newData);
         }
 
-        const columns = []
+        const columns = [];
         for (let index in columnas) {
-            const element = columnas[index];
-            const newColumns = {}
-            newColumns.header = element
-            newColumns.key = (parseInt(index)+1).toString()
-            newColumns.width = 30
-            columns.push(newColumns)
+          const element = columnas[index];
+          const newColumns = {};
+          newColumns.header = element;
+          newColumns.key = (parseInt(index) + 1).toString();
+          newColumns.width = 30;
+          columns.push(newColumns);
         }
-        worksheet.columns = columns
+        worksheet.columns = columns;
 
         const pintado = [
-          {cantidad:1 , celda:'A1'},
-          {cantidad:2 , celda:'B1'},
-          {cantidad:3 , celda:'C1'},
-          {cantidad:4 , celda:'D1'},
-          {cantidad:5 , celda:'E1'},
-          {cantidad:6 , celda:'F1'},
-          {cantidad:7 , celda:'G1'},
-          {cantidad:8 , celda:'H1'},
-          {cantidad:9 , celda:'I1'},
-          {cantidad:10 , celda:'J1'},
-          {cantidad:11 , celda:'K1'},
-          {cantidad:12 , celda:'L1'},
-          {cantidad:13 , celda:'M1'},
-          {cantidad:14 , celda:'N1'},
-          {cantidad:15 , celda:'O1'},
-          {cantidad:16 , celda:'P1'},
-          {cantidad:17 , celda:'Q1'},
-          {cantidad:18 , celda:'R1'},
-          {cantidad:19 , celda:'S1'},
-          {cantidad:20 , celda:'T1'},
-          {cantidad:21 , celda:'U1'},
-          {cantidad:22 , celda:'V1'},
-          {cantidad:23 , celda:'W1'},
-          {cantidad:24 , celda:'X1'},
-          {cantidad:25 , celda:'Y1'},
-          {cantidad:26 , celda:'Z1'},
-          {cantidad:27 , celda:'AA1'},
-          {cantidad:28 , celda:'AB1'},
-          {cantidad:29 , celda:'AC1'},
-          {cantidad:30 , celda:'AD1'},
-          {cantidad:31 , celda:'AE1'},
-          {cantidad:32 , celda:'AF1'},
-          {cantidad:33 , celda:'AG1'},
-          {cantidad:34 , celda:'AH1'},
-          {cantidad:35 , celda:'AI1'},
-          {cantidad:36 , celda:'AJ1'},
-          {cantidad:37 , celda:'AK1'},
-          {cantidad:38 , celda:'AL1'},
-          {cantidad:39 , celda:'AM1'},
-        ]
+          { cantidad: 1, celda: "A1" },
+          { cantidad: 2, celda: "B1" },
+          { cantidad: 3, celda: "C1" },
+          { cantidad: 4, celda: "D1" },
+          { cantidad: 5, celda: "E1" },
+          { cantidad: 6, celda: "F1" },
+          { cantidad: 7, celda: "G1" },
+          { cantidad: 8, celda: "H1" },
+          { cantidad: 9, celda: "I1" },
+          { cantidad: 10, celda: "J1" },
+          { cantidad: 11, celda: "K1" },
+          { cantidad: 12, celda: "L1" },
+          { cantidad: 13, celda: "M1" },
+          { cantidad: 14, celda: "N1" },
+          { cantidad: 15, celda: "O1" },
+          { cantidad: 16, celda: "P1" },
+          { cantidad: 17, celda: "Q1" },
+          { cantidad: 18, celda: "R1" },
+          { cantidad: 19, celda: "S1" },
+          { cantidad: 20, celda: "T1" },
+          { cantidad: 21, celda: "U1" },
+          { cantidad: 22, celda: "V1" },
+          { cantidad: 23, celda: "W1" },
+          { cantidad: 24, celda: "X1" },
+          { cantidad: 25, celda: "Y1" },
+          { cantidad: 26, celda: "Z1" },
+          { cantidad: 27, celda: "AA1" },
+          { cantidad: 28, celda: "AB1" },
+          { cantidad: 29, celda: "AC1" },
+          { cantidad: 30, celda: "AD1" },
+          { cantidad: 31, celda: "AE1" },
+          { cantidad: 32, celda: "AF1" },
+          { cantidad: 33, celda: "AG1" },
+          { cantidad: 34, celda: "AH1" },
+          { cantidad: 35, celda: "AI1" },
+          { cantidad: 36, celda: "AJ1" },
+          { cantidad: 37, celda: "AK1" },
+          { cantidad: 38, celda: "AL1" },
+          { cantidad: 39, celda: "AM1" },
+        ];
 
-        for (let index = 1; index < columns.length+1; index++) {
-            const celda = pintado.filter(elements => elements.cantidad === parseInt(index))
-            if (celda[0].celda) {
-                // console.log(celda[0].celda);
-                worksheet.getCell(celda[0].celda).fill = {type: 'pattern',pattern:'solid',fgColor:{argb:'A3E4D7'}};
-            }
+        for (let index = 1; index < columns.length + 1; index++) {
+          const celda = pintado.filter(
+            (elements) => elements.cantidad === parseInt(index)
+          );
+          if (celda[0].celda) {
+            // console.log(celda[0].celda);
+            worksheet.getCell(celda[0].celda).fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "A3E4D7" },
+            };
+          }
         }
 
         worksheet.addRows(exportarTempo);
       });
 
       res.setHeader(
-          "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       );
       res.setHeader(
-          "Content-Disposition",
-          "attachment; filename=" + "Reporte filtro.xlsx"
+        "Content-Disposition",
+        "attachment; filename=" + "Reporte filtro.xlsx"
       );
-  
+
       return workbook.xlsx.write(res).then(function () {
-          res.status(200).end();
+        res.status(200).end();
       });
-      } catch (error) {
-          res.json({
-          status: 'error',
-          message: 'Error en el servidor ' + error
-          })
-      }
+    } catch (error) {
+      res.json({
+        status: "error",
+        message: "Error en el servidor " + error,
+      });
+    }
   }
 }
