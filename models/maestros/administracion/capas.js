@@ -16,8 +16,7 @@ const capasGrupo = sequelize.define('tadm_capas', {
   },
   c_nombre_tabla_capa: {
     type: DataTypes.STRING, 
-    allowNull: false,
-    primaryKey: true
+    allowNull: true,
   },
   //ss
   c_nombre_public_capa: {
@@ -26,11 +25,23 @@ const capasGrupo = sequelize.define('tadm_capas', {
   },
   c_sql_capa: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   b_capa: {
     type: DataTypes.BOOLEAN,
-    allowNull: false
+    allowNull: true
+  },
+  c_url: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  c_tipo: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  c_servicio: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   schema: 'administracion',
