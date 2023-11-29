@@ -54,9 +54,11 @@ export class CapasService {
     }
   }
 
-  async RegistrarCapas(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa) {
+  async RegistrarCapas(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio) {
     try {
-      const response = await Capas.create({id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa})
+      // console.log(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url);
+      const response = await Capas.create({id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio})
+      // console.log(response);
       return response;
     } catch (error) {
       throw new Error("Error al obtener las capas visibles con el id_capa:");
@@ -73,7 +75,7 @@ export class CapasService {
   }
 
   async RegistrarSupergrupos(c_nombre_super_grupo, b_super_grupo) {
-    console.log('hola');
+    // console.log('hola');
     try {
       const response = await CapasSuperGrupo.create({c_nombre_super_grupo, b_super_grupo})
       return response;
@@ -82,10 +84,9 @@ export class CapasService {
     }
   }
 
-  async ActualizarCapas(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa) {
+  async ActualizarCapas(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio) {
     try {
-      console.log(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa);
-      const response = await Capas.update({id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa}, {where:{id_capa}})
+      const response = await Capas.update({id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa:'1', b_capa, c_tipo, c_url, c_servicio}, {where:{id_capa}})
       return response;
     } catch (error) {
       throw new Error("Error al actualizar capas");
@@ -102,7 +103,7 @@ export class CapasService {
   }
 
   async ActualizarSupergrupos(id_super_grupo, c_nombre_super_grupo, b_super_grupo) {
-    console.log('hola');
+    // console.log('hola');
     try {
       const response = await CapasSuperGrupo.create({c_nombre_super_grupo, b_super_grupo}, {where:{id_super_grupo}})
       return response;
@@ -114,7 +115,7 @@ export class CapasService {
   async EliminarCapas(id_capa) {
     try {
       const response = await Capas.destroy({where:{id_capa}})
-      console.log(response);
+      // console.log(response);
       return response;
     } catch (error) {
       throw new Error("Error al actualizar capas");
@@ -131,7 +132,7 @@ export class CapasService {
   }
 
   async EliminarSupergrupos(id_super_grupo) {
-    console.log('hola');
+    // console.log('hola');
     try {
       const response = await CapasSuperGrupo.destroy({where:{id_super_grupo}})
       return response;

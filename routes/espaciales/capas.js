@@ -9,6 +9,7 @@ export const createRouteCapas = () => {
     const capasController = new CapasController();
     // obtener capas
     CapaRouter.get('/table', cacheMiddleware,  capasController.getAllCapasTable);
+    CapaRouter.get('/table/externo', cacheMiddleware,  capasController.getAllCapasTableExterno);
     CapaRouter.get('/', cacheMiddleware,  capasController.getAllCapas);
     CapaRouter.get('/grupos', cacheMiddleware,  capasController.getAllCapasGrupos);
     CapaRouter.get('/supergrupos', cacheMiddleware,  capasController.getAllCapasSupergrupos);

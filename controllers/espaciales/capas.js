@@ -23,7 +23,23 @@ export class CapasController {
       const [response, metadata] = await sequelize.query(`
       select * from administracion.tadm_capas_supergrupo sg
       left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo`);
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'interno' 
+      `);
+      res.status(200).json({status: 'success', data: response});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasTableExterno (req, res) {
+    try {
+      const [response, metadata] = await sequelize.query(`
+      select * from administracion.tadm_capas_supergrupo sg
+      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'externo' 
+      `);
       res.status(200).json({status: 'success', data: response});
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -67,9 +83,9 @@ export class CapasController {
   }
 
   async getAllCapasPost(req, res) {
-    const {id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa} = req.body;
+    const {id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio} = req.body;
     try {
-      const capas = await capasService.RegistrarCapas(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa);
+      const capas = await capasService.RegistrarCapas(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio);
       res.status(200).json({status: 'success', data: capas});
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -97,9 +113,9 @@ export class CapasController {
   }
 
   async getAllCapasPut(req, res) {
-    const {id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa} = req.body;
+    const {id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio} = req.body;
     try {
-      const capas = await capasService.ActualizarCapas(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa);
+      const capas = await capasService.ActualizarCapas(id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio);
       res.status(200).json({status: 'success', data: capas});
     } catch (error) {
       res.status(500).json({ error: error.message });
