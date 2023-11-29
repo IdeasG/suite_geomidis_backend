@@ -4,6 +4,7 @@ const ACCEPTED_ORIGINS = [
   "http://localhost:3000",
   // "https://suite.juegodepalabras.com.pe",
   // "https://suite-nextjs.vercel.app",
+  "https://geomidis.ideasg.org",
   "https://suite-geomidis-nextjs.vercel.app",
   // "https://glgissuite.ideasg.org",
   // "https://www.glgissuite.ideasg.org",
