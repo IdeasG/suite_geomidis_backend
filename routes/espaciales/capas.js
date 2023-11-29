@@ -9,63 +9,24 @@ export const createRouteCapas = () => {
   const capasController = new CapasController();
   // obtener capas
   CapaRouter.get("/table", cacheMiddleware, capasController.getAllCapasTable);
+  CapaRouter.get('/table/externo', cacheMiddleware,  capasController.getAllCapasTableExterno);
   CapaRouter.get("/", cacheMiddleware, capasController.getAllCapas);
-  CapaRouter.get(
-    "/atributos/:tabla",
-    cacheMiddleware,
-    capasController.getAtributos
-  );
+  CapaRouter.get("/atributos/:tabla",cacheMiddleware,capasController.getAtributos);
   CapaRouter.get("/grupos", cacheMiddleware, capasController.getAllCapasGrupos);
-  CapaRouter.get(
-    "/supergrupos",
-    cacheMiddleware,
-    capasController.getAllCapasSupergrupos
-  );
-  CapaRouter.get(
-    "/tablas/esquema",
-    cacheMiddleware,
-    capasController.getAllTablasEspaciales
-  );
+  CapaRouter.get("/supergrupos",cacheMiddleware,capasController.getAllCapasSupergrupos);
+  CapaRouter.get('/tablas/esquema', cacheMiddleware,  capasController.getAllTablasEspaciales);
   // registrar capas
-  CapaRouter.post("/", cacheMiddleware, capasController.getAllCapasPost);
-  CapaRouter.post(
-    "/grupos",
-    cacheMiddleware,
-    capasController.getAllCapasGruposPost
-  );
-  CapaRouter.post(
-    "/supergrupos",
-    cacheMiddleware,
-    capasController.getAllCapasSupergruposPost
-  );
+  CapaRouter.post('/', cacheMiddleware,  capasController.getAllCapasPost);
+  CapaRouter.post('/grupos', cacheMiddleware,  capasController.getAllCapasGruposPost);
+  CapaRouter.post('/supergrupos', cacheMiddleware,  capasController.getAllCapasSupergruposPost);
   // actualizar capas
-  CapaRouter.put("/", cacheMiddleware, capasController.getAllCapasPut);
-  CapaRouter.put(
-    "/grupos",
-    cacheMiddleware,
-    capasController.getAllCapasGruposPut
-  );
-  CapaRouter.put(
-    "/supergrupos",
-    cacheMiddleware,
-    capasController.getAllCapasSupergruposPut
-  );
+  CapaRouter.put('/', cacheMiddleware,  capasController.getAllCapasPut);
+  CapaRouter.put('/grupos', cacheMiddleware,  capasController.getAllCapasGruposPut);
+  CapaRouter.put('/supergrupos', cacheMiddleware,  capasController.getAllCapasSupergruposPut);
   // eliminar capas
-  CapaRouter.delete(
-    "/:id_capa",
-    cacheMiddleware,
-    capasController.getAllCapasDelete
-  );
-  CapaRouter.delete(
-    "/grupos/:id_grupo",
-    cacheMiddleware,
-    capasController.getAllCapasGruposDelete
-  );
-  CapaRouter.delete(
-    "/supergrupos/:id_supergrupo",
-    cacheMiddleware,
-    capasController.getAllCapasSupergruposDelete
-  );
+  CapaRouter.delete('/:id_capa', cacheMiddleware,  capasController.getAllCapasDelete);
+    CapaRouter.delete('/grupos/:id_grupo', cacheMiddleware,  capasController.getAllCapasGruposDelete);
+    CapaRouter.delete('/supergrupos/:id_supergrupo', cacheMiddleware,  capasController.getAllCapasSupergruposDelete);
 
   CapaRouter.get("/estructura", cacheMiddleware, capasController.getStructure);
   CapaRouter.get("/visible/:id_capa", capasController.getVisibles);

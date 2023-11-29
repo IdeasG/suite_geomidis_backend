@@ -28,6 +28,21 @@ export class CapasController {
       res.status(500).json({ error: error.message });
     }
   }
+  
+  async getAllCapasTableExterno (req, res) {
+    try {
+      const [response, metadata] = await sequelize.query(`
+      select * from administracion.tadm_capas_supergrupo sg
+      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'externo' 
+      `);
+      res.status(200).json({status: 'success', data: response});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getAtributos(req, res) {
     const { tabla } = req.params;
     try {
