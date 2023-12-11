@@ -280,6 +280,36 @@ export class CapasController {
     }
   }
 
+  async getVistas(req, res) {
+    // const { id_capa } = req.params;
+    try {
+      let dbResponse = await capasService.getVistas();
+      res.status(200).json({ status: "success", data: dbResponse });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteVistas(req, res) {
+    const { id_vista } = req.params;
+    try {
+      let dbResponse = await capasService.deleteVistas(id_vista);
+      res.status(200).json({ status: "success", data: dbResponse });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async postVistas(req, res) {
+    const { c_extent,c_capas,c_mapa_base,c_nombre } = req.body;
+    try {
+      let dbResponse = await capasService.postVistas(c_extent,c_capas,c_mapa_base,c_nombre);
+      res.status(200).json({ status: "success", data: dbResponse });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async putVisibles(req, res) {
     const { id, c_campo_alias, b_campo } = req.body;
     // console.log(id,c_campo_alias,b_campo);

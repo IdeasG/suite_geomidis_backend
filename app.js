@@ -6,6 +6,7 @@ import { createUbicacionPredioRouter } from "./routes/fichas/individual/ubicacio
 import { createServicioPredioRouter } from "./routes/fichas/individual/servicioPredio.js";
 
 import { setupMaestroRoutes } from "./setup/routeMaestroSetup.js";
+import { setupMapfishRoutes } from "./setup/routerImpresionMapfish.js";
 import { setupPruebasRoutes } from "./setup/routePruebasSetup.js";
 import { setupEspacialesRoutes } from "./setup/routeEspacialesSetup.js";
 import { createObservacionPredioRouter } from "./routes/fichas/individual/observacionPredio.js";
@@ -36,6 +37,7 @@ setupPruebasRoutes(app);
 setupMaestroRoutes(app);
 setupEspacialesRoutes(app);
 setupGlgisRoutes(app);
+setupMapfishRoutes(app)
 //ficha economica
 // setupFuecoRoutes(app);
 // app.use("/capas/grupos", createCapasGrupoRouter());

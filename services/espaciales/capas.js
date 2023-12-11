@@ -3,6 +3,7 @@ import { sequelize } from "../../config/postgres/sequelize.js";
 import Capas from '../../models/maestros/administracion/capas.js';
 import CapasGrupo from '../../models/maestros/administracion/capasGrupo.js';
 import CapasSuperGrupo from '../../models/maestros/administracion/capasSuperGrupo.js';
+import Vistas from "../../models/manager/vistas.js";
 
 
 export class CapasService {
@@ -42,6 +43,33 @@ export class CapasService {
       return response;
     } catch (error) {
       throw new Error("Error al obtener los tipos de vía...." + error);
+    }
+  }
+
+  async getVistas() {
+    try {
+      const response = await Vistas.findAll()
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener las vistas.");
+    }
+  }
+
+  async deleteVistas(id_vistas) {
+    try {
+      const response = await Vistas.destroy({where:{id_vistas}})
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener las vistas.");
+    }
+  }
+
+  async postVistas(c_extent,c_capas,c_mapa_base,c_nombre) {
+    try {
+      const response = await Vistas.create({c_extent,c_capas,c_mapa_base,c_nombre})
+      return response;
+    } catch (error) {
+      throw new Error("Error al registar la nueva vista.");
     }
   }
 

@@ -25,9 +25,12 @@ export const createRouteCapas = () => {
   CapaRouter.put('/supergrupos', cacheMiddleware,  capasController.getAllCapasSupergruposPut);
   // eliminar capas
   CapaRouter.delete('/:id_capa', cacheMiddleware,  capasController.getAllCapasDelete);
-    CapaRouter.delete('/grupos/:id_grupo', cacheMiddleware,  capasController.getAllCapasGruposDelete);
-    CapaRouter.delete('/supergrupos/:id_supergrupo', cacheMiddleware,  capasController.getAllCapasSupergruposDelete);
+  CapaRouter.delete('/grupos/:id_grupo', cacheMiddleware,  capasController.getAllCapasGruposDelete);
+  CapaRouter.delete('/supergrupos/:id_supergrupo', cacheMiddleware,  capasController.getAllCapasSupergruposDelete);
 
+  CapaRouter.get("/vistas", cacheMiddleware, capasController.getVistas);
+  CapaRouter.delete("/vistas/:id_vista", cacheMiddleware, capasController.deleteVistas);
+  CapaRouter.post("/vistas", cacheMiddleware, capasController.postVistas);
   CapaRouter.get("/estructura", cacheMiddleware, capasController.getStructure);
   CapaRouter.get("/visible/:id_capa", capasController.getVisibles);
   CapaRouter.put("/actualizar/visible", capasController.putVisibles);
