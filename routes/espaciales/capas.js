@@ -35,6 +35,6 @@ export const createRouteCapas = () => {
   CapaRouter.get("/visible/:id_capa", capasController.getVisibles);
   CapaRouter.put("/actualizar/visible", capasController.putVisibles);
   CapaRouter.post("/excel", capasController.descargarExcel);
-
+ 
   return CapaRouter;
 };
