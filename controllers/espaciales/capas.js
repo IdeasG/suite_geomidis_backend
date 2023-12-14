@@ -22,7 +22,9 @@ export class CapasController {
       const [response, metadata] = await sequelize.query(`
       select * from administracion.tadm_capas_supergrupo sg
       left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo`);
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'interno' 
+      `);
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -94,19 +96,11 @@ export class CapasController {
 
   async getAllCapasPost(req, res) {
     const {
-      id_grupo,
-      c_nombre_tabla_capa,
-      c_nombre_public_capa,
-      c_sql_capa,
-      b_capa,
+      id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio
     } = req.body;
     try {
       const capas = await capasService.RegistrarCapas(
-        id_grupo,
-        c_nombre_tabla_capa,
-        c_nombre_public_capa,
-        c_sql_capa,
-        b_capa
+        id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
@@ -143,22 +137,12 @@ export class CapasController {
 
   async getAllCapasPut(req, res) {
     const {
-      id_capa,
-      id_grupo,
-      c_nombre_tabla_capa,
-      c_nombre_public_capa,
-      c_sql_capa,
-      b_capa,
+      id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio
     } = req.body;
     try {
       const capas = await capasService.ActualizarCapas(
-        id_capa,
-        id_grupo,
-        c_nombre_tabla_capa,
-        c_nombre_public_capa,
-        c_sql_capa,
-        b_capa
-      );
+      id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio
+    );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -224,15 +208,49 @@ export class CapasController {
     }
   }
 
+  // async getStructure(req, res) {
+  //   try {
+  //     // redis cache
+  //     const cacheKey = req.originalUrl;
+  //     const cachedResponse = await redisClient.get(cacheKey);
+  //     if (cachedResponse) {
+  //       const parsedResponse = JSON.parse(cachedResponse);
+  //       return res.json(parsedResponse);
+  //     }
+
+  //     const [superGrupos, metadata] = await sequelize.query(
+  //       `select * from administracion.tadm_capas_supergrupo`
+  //     );
+  //     const dbResponse = superGrupos;
+  //     for (let index = 0; index < superGrupos.length; index++) {
+  //       const element = superGrupos[index];
+  //       const [grupos, metadata] = await sequelize.query(
+  //         `select * from administracion.tadm_capas_grupo WHERE id_super_grupo = ${element.id_super_grupo}`
+  //       );
+  //       for (let index = 0; index < grupos.length; index++) {
+  //         const element = grupos[index];
+  //         const [capas, metadata] = await sequelize.query(
+  //           `select * from administracion.tadm_capas WHERE id_grupo = ${element.id_grupo}`
+  //         );
+  //         element.capas = capas;
+  //       }
+  //       element.grupos = grupos;
+  //     }
+  //     // redis cache
+  //     const cacheExpiry = process.env.REDIS_TIME_CACHE;
+  //     await redisClient.setex(
+  //       cacheKey,
+  //       cacheExpiry,
+  //       JSON.stringify(dbResponse)
+  //     );
+  //     res.status(200).json({ status: "success", data: dbResponse });
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // }
+
   async getStructure(req, res) {
     try {
-      // redis cache
-      const cacheKey = req.originalUrl;
-      const cachedResponse = await redisClient.get(cacheKey);
-      if (cachedResponse) {
-        const parsedResponse = JSON.parse(cachedResponse);
-        return res.json(parsedResponse);
-      }
 
       const [superGrupos, metadata] = await sequelize.query(
         `select * from administracion.tadm_capas_supergrupo`
@@ -252,13 +270,6 @@ export class CapasController {
         }
         element.grupos = grupos;
       }
-      // redis cache
-      const cacheExpiry = process.env.REDIS_TIME_CACHE;
-      await redisClient.setex(
-        cacheKey,
-        cacheExpiry,
-        JSON.stringify(dbResponse)
-      );
       res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       res.status(500).json({ error: error.message });

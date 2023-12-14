@@ -31,7 +31,8 @@ export const createRouteCapas = () => {
   CapaRouter.get("/vistas", cacheMiddleware, capasController.getVistas);
   CapaRouter.delete("/vistas/:id_vista", cacheMiddleware, capasController.deleteVistas);
   CapaRouter.post("/vistas", cacheMiddleware, capasController.postVistas);
-  CapaRouter.get("/estructura", cacheMiddleware, capasController.getStructure);
+  // CapaRouter.get("/estructura", cacheMiddleware, capasController.getStructure);
+  CapaRouter.get("/estructura", capasController.getStructure);
   CapaRouter.get("/visible/:id_capa", capasController.getVisibles);
   CapaRouter.put("/actualizar/visible", capasController.putVisibles);
   CapaRouter.post("/excel", capasController.descargarExcel);
