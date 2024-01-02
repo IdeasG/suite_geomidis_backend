@@ -23,7 +23,7 @@ export class CapasController {
       select * from administracion.tadm_capas_supergrupo sg
       left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
       left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'interno' 
+      where c_tipo = 'interno'
       `);
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
@@ -327,6 +327,17 @@ export class CapasController {
     try {
       await capasService.putCapasVisibles(id, c_campo_alias, b_campo);
       res.status(200).json({ status: "success" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  
+  async busquedaAvanzada(req,res) {
+    const { simbolo, column, layer, inputBt} = req.body;
+    console.log(simbolo, column, layer, inputBt);
+    try {
+      const respuesta = await capasService.busquedaAvanzada(simbolo, column, layer, inputBt);
+      res.status(200).json({ status: "success" , data: respuesta});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -25,7 +25,7 @@ export class CapasService {
       `)
       return results;
     } catch {
-
+      throw new Error('Error al obtener los resultados...'+ error);
     }
   }
   async getAllCapasGrupos() {
@@ -175,6 +175,22 @@ export class CapasService {
       return;
     } catch (error) {
       throw new Error("Error al obtener las capas visibles con el id_capa:" + id_capa + error);
+    }
+  }
+
+  async busquedaAvanzada(simbolo, column, layer, inputBt) {
+    try {
+      console.log(`
+        SELECT * FROM espaciales.${layer}
+        WHERE ${column} ${simbolo} ${inputBt}
+      `);
+      const [results, metadata] = await sequelize.query(`
+        SELECT * FROM espaciales.${layer}
+        WHERE ${column} ${simbolo} ${inputBt}
+      `)
+      return results;
+    } catch {
+      throw new Error('Error al obtener los resultados...'+ error);
     }
   }
 
