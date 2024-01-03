@@ -334,7 +334,7 @@ export class CapasController {
   
   async busquedaAvanzada(req,res) {
     const { simbolo, column, layer, inputBt} = req.body;
-    console.log(simbolo, column, layer, inputBt);
+    // console.log(simbolo, column, layer, inputBt);
     try {
       const respuesta = await capasService.busquedaAvanzada(simbolo, column, layer, inputBt);
       res.status(200).json({ status: "success" , data: respuesta});
