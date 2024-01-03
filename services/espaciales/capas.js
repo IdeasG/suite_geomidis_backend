@@ -180,10 +180,10 @@ export class CapasService {
 
   async busquedaAvanzada(simbolo, column, layer, inputBt) {
     try {
-      console.log(`
-        SELECT * FROM espaciales.${layer}
-        WHERE ${column} ${simbolo} ${inputBt}
-      `);
+      // console.log(`
+      //   SELECT * FROM espaciales.${layer}
+      //   WHERE ${column} ${simbolo} ${inputBt}
+      // `);
       const [results, metadata] = await sequelize.query(`
         SELECT * FROM espaciales.${layer}
         WHERE ${column} ${simbolo} ${inputBt}
