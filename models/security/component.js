@@ -12,11 +12,11 @@ const Component = sequelize.define(
     component_name: {
       type: DataTypes.STRING,
     },
-    map_value: {
-      type: DataTypes.STRING,
-    },
     props: {
       type: DataTypes.JSONB,
+    },
+    description: {
+      type: DataTypes.STRING,
     },
   },
   {
