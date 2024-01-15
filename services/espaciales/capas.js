@@ -4,8 +4,7 @@ import Capas from '../../models/maestros/administracion/capas.js';
 import CapasGrupo from '../../models/maestros/administracion/capasGrupo.js';
 import CapasSuperGrupo from '../../models/maestros/administracion/capasSuperGrupo.js';
 import Vistas from "../../models/manager/vistas.js";
-
-
+import InformacionRegistro from "../../models/manager/informacionRegistros.js";
 export class CapasService {
   async getAllCapasSuperGrupo() {
     try {
@@ -169,12 +168,51 @@ export class CapasService {
     }
   }
 
-  async putCapasVisibles(id,c_campo_alias,b_campo) {
+  async putCapasVisibles(campos) {
     try {
-      await CapasMostrar.update({c_campo_alias,b_campo},{where:{id}})
+      for (let index in campos) {
+        const element = campos[index];
+        await CapasMostrar.update({c_campo_alias:element.c_campo_alias,b_campo:element.b_campo},{where:{id:element.id}})
+      }
       return;
     } catch (error) {
       throw new Error("Error al obtener las capas visibles con el id_capa:" + id_capa + error);
+    }
+  }
+
+  async validacionData() {
+    try {
+      const response = await InformacionRegistro.findAll({
+        attributes: ['id', 'c_programa', 'c_capa', 'd_registro'],
+        order: [['d_registro','DESC']],
+        raw: true })
+      // Formatear el campo 'd_registro' en cada registro
+      const registrosFormateados = response.map(registro => ({
+        ...registro,
+        d_registro: registro.d_registro.toISOString().split('T')[0],
+      }));
+      return registrosFormateados;
+    } catch (error) {
+      throw new Error("Error al obtener las capas visibles con el id_capa:" + id_capa + error);
+    }
+  }
+
+  async jsonFallido(id) {
+    try {
+      const response = await InformacionRegistro.findAll({
+        attributes: ['id', 'c_programa', 'c_capa', 'd_registro', 'a_registros_fallidos'],
+        order: [['d_registro','DESC']],
+        raw: true,
+        where: {id:id}
+      })
+      // Formatear el campo 'd_registro' en cada registro
+      const registrosFormateados = response.map(registro => ({
+        ...registro,
+        d_registro: registro.d_registro.toISOString().split('T')[0],
+      }));
+      return registrosFormateados;
+    } catch (error) {
+      throw new Error("Error al obtener el json:" + error);
     }
   }
 

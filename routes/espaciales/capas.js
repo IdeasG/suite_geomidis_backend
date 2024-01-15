@@ -41,5 +41,10 @@ export const createRouteCapas = () => {
   CapaRouter.post("/busquedaavanzada", capasController.busquedaAvanzada);
   CapaRouter.post("/archivoshape", capasController.archivoShape);
 
+  CapaRouter.get("/validaciondata", capasController.validacionData);
+  CapaRouter.get("/json/fallido/:id", capasController.jsonFallido);
+  CapaRouter.post("/archivojson", capasController.archivoJson);
+
+
   return CapaRouter;
 };

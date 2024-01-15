@@ -321,10 +321,9 @@ export class CapasController {
   }
 
   async putVisibles(req, res) {
-    const { id, c_campo_alias, b_campo } = req.body;
-    // console.log(id,c_campo_alias,b_campo);
+    const { campos } = req.body;
     try {
-      await capasService.putCapasVisibles(id, c_campo_alias, b_campo);
+      await capasService.putCapasVisibles(campos);
       res.status(200).json({ status: "success" });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -374,8 +373,43 @@ export class CapasController {
       res.status(500).json({ error: error.message });
     }
   }
-  
 
+  async archivoJson(req,res) {
+    // console.log(simbolo, column, layer, inputBt);
+    const { jsonData } = req.body;
+    try {
+      // Configurar cabeceras para indicar que se envía un archivo JSON
+      res.setHeader('Content-Disposition', 'attachment; filename=datos.json');
+      res.setHeader('Content-Type', 'application/json');
+
+      // Convertir el objeto JSON a una cadena JSON y enviarlo en el cuerpo de la respuesta
+      res.send(JSON.stringify(jsonData, null, 2));
+  
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  
+  async validacionData(req,res) {
+    // const { simbolo, column, layer, inputBt} = req.body;
+    // console.log(simbolo, column, layer, inputBt);
+    try {
+      const respuesta = await capasService.validacionData();
+      res.status(200).json({ status: "success" , data: respuesta});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async jsonFallido(req,res) {
+    const { id } = req.params;
+    try {
+      const respuesta = await capasService.jsonFallido(id);
+      res.status(200).json({ status: "success" , data: respuesta});
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 
   async descargarExcel(req, res) {
     const { table, datosCapas } = req.body;
@@ -526,7 +560,7 @@ export class CapasController {
       });
     }
   }
-  
+
   async descargarExcelSoloCapas(req, res) {
     const { layer } = req.body;
     try {
