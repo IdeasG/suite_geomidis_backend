@@ -8,6 +8,7 @@ import ToolsAdmin from "../../models/security/toolsAdmin.js";
 import { Op } from "sequelize";
 import HerramientaRoles from "../../models/security/herramientaSistema.js";
 import TiSisClienteD from "../../models/manager/tiSisClienteDetail.js";
+import Component from "../../models/security/component.js";
 
 export class AuthenticateService {
   async signIn(c_usuario, c_contrasena) {
@@ -178,6 +179,16 @@ export class AuthenticateService {
 
       const data = transformedData;
       return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getComp() {
+    try {
+      const roles = await Component.findAll();
+      return roles;
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");

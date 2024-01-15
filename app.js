@@ -37,7 +37,7 @@ setupPruebasRoutes(app);
 setupMaestroRoutes(app);
 setupEspacialesRoutes(app);
 setupGlgisRoutes(app);
-setupMapfishRoutes(app)
+setupMapfishRoutes(app);
 //ficha economica
 // setupFuecoRoutes(app);
 // app.use("/capas/grupos", createCapasGrupoRouter());
