@@ -45,6 +45,15 @@ export class CapasService {
     }
   }
 
+  async getAllCapasInternas() {
+    try {
+      const response = await Capas.findAll({where:{c_tipo: 'interno'}})
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener los tipos de vía...." + error);
+    }
+  }
+
   async getVistas() {
     try {
       const response = await Vistas.findAll()

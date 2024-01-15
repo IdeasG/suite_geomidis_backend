@@ -57,9 +57,19 @@ export class CapasController {
       res.status(500).json({ error: error.message });
     }
   }
+
   async getAllCapas(req, res) {
     try {
       const capas = await capasService.getAllCapas();
+      res.status(200).json({ status: "success", data: capas });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllCapasInternas(req, res) {
+    try {
+      const capas = await capasService.getAllCapasInternas();
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });

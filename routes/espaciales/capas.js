@@ -11,6 +11,7 @@ export const createRouteCapas = () => {
   CapaRouter.get("/table", cacheMiddleware, capasController.getAllCapasTable);
   CapaRouter.get('/table/externo', cacheMiddleware,  capasController.getAllCapasTableExterno);
   CapaRouter.get("/", cacheMiddleware, capasController.getAllCapas);
+  CapaRouter.get("/interno", cacheMiddleware, capasController.getAllCapasInternas);
   CapaRouter.get("/atributos/:tabla",cacheMiddleware,capasController.getAtributos);
   CapaRouter.get("/grupos", cacheMiddleware, capasController.getAllCapasGrupos);
   CapaRouter.get("/supergrupos",cacheMiddleware,capasController.getAllCapasSupergrupos);
