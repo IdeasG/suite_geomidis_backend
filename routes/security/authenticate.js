@@ -40,7 +40,11 @@ export const createAuthenticateRouter = () => {
   );
   AuthenticateRouter.delete("/rol/:id", authenticateController.deleteRol);
 
-  AuthenticateRouter.get("/componentes", authenticateController.getComp);
+  AuthenticateRouter.get(
+    "/componentes",
+    validarToken,
+    authenticateController.getComp
+  );
 
   return AuthenticateRouter;
 };

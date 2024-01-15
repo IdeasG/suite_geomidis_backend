@@ -40,8 +40,6 @@ export class AuthenticateService {
       }
 
       const accessToken = generarToken(data, "1d");
-
-      console.log(isSuiteUser, accessToken);
       return { isSuiteUser, backendTokens: accessToken };
     } catch (error) {
       console.error(error);

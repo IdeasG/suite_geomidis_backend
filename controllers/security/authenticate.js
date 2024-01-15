@@ -41,6 +41,7 @@ export class AuthenticateController {
   }
 
   async getComp(req, res) {
+    console.log(req.user);
     try {
       const data = await authenticateService.getComp();
       res.status(200).json(data);
