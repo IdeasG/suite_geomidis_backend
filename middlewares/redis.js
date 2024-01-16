@@ -1,5 +1,4 @@
-
-import { redisClient } from '../config/redis/redis.js'; 
+import { redisClient } from "../config/redis/redis.js";
 
 export const cacheMiddleware = async (req, res, next) => {
   const cacheKey = req.originalUrl;
@@ -11,7 +10,7 @@ export const cacheMiddleware = async (req, res, next) => {
       next();
     }
   } catch (error) {
-    console.error('Error de caché:', error);
+    console.error("Error de caché:", error);
     next();
   }
 };

@@ -18,6 +18,7 @@ import SuperGrupo from "../../models/manager/superGrupos.js";
 import GrupoCapa from "../../models/manager/gruposCapa.js";
 import Capa from "../../models/manager/capas.js";
 import CapaByRol from "../../models/manager/capasByRol.js";
+import Geoportal from "../../models/manager/geoportal.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -203,7 +204,7 @@ export class ManagerService {
 
   async getSistemas() {
     try {
-      const data = await Sistemas.findAll();
+      const data = await Geoportal.findAll();
       return data;
     } catch (error) {
       console.log(error);
@@ -447,6 +448,41 @@ export class ManagerService {
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async saveGeoportales(nombre, color_primary, logo_bs, descripcion) {
+    try {
+      if (logo_bs && logo_bs.length > 0) {
+        const ahora = Date.now();
+        const currentDir = __dirname;
+        const desiredDir = path.join(currentDir, "..", "..");
+        let ruta_archivo1 = `/public/logos/${ahora}.png`;
+
+        const data = await Geoportal.create({
+          name: nombre,
+          title: descripcion,
+          background: color_primary,
+          logo: ruta_archivo1,
+        });
+
+        const binaryData1 = this.base64ToBinary(logo_bs);
+
+        await fsp.writeFile(desiredDir + ruta_archivo1, binaryData1);
+
+        return data;
+      } else {
+        const data = await Cliente.create({
+          name: nombre,
+          title: descripcion,
+          background: color_primary,
+          logo: "",
+        });
+        return data;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio: " + error);
     }
   }
 
