@@ -223,13 +223,26 @@ export class ManagerController {
   }
 
   async saveGeoportales(req, res) {
-    const { nombre, color_primary, logo_bs, descripcion } = req.body;
+    const {
+      nombre,
+      color_primary,
+      logo_bs,
+      descripcion,
+      componentsIzquierda,
+      componentsDerecha,
+      componentsMenu,
+      componentsArriba,
+    } = req.body;
     try {
       const data = await managerService.saveGeoportales(
         nombre,
         color_primary,
         logo_bs,
-        descripcion
+        descripcion,
+        componentsIzquierda,
+        componentsDerecha,
+        componentsMenu,
+        componentsArriba
       );
       res.status(200).json(data);
     } catch (error) {

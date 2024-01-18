@@ -41,9 +41,9 @@ export class AuthenticateController {
   }
 
   async getComp(req, res) {
-    console.log(req.user);
+    const { id } = req.params;
     try {
-      const data = await authenticateService.getComp();
+      const data = await authenticateService.getComp(id);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });

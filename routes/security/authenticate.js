@@ -41,7 +41,7 @@ export const createAuthenticateRouter = () => {
   AuthenticateRouter.delete("/rol/:id", authenticateController.deleteRol);
 
   AuthenticateRouter.get(
-    "/componentes",
+    "/componentes/:id",
     validarToken,
     authenticateController.getComp
   );
