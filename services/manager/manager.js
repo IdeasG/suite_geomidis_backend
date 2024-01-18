@@ -590,6 +590,21 @@ export class ManagerService {
     }
   }
 
+  async deleteGeoportales(id) {
+    try {
+      await Geoportal.destroy({
+        where: { id: id },
+      });
+      await GeoportalComponent.destroy({
+        where: { fk_geoportal: id },
+      });
+      return true;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
   base64ToBinary(base64) {
     const matches = base64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
     if (matches.length !== 3) {

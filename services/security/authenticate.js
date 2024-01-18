@@ -8,9 +8,8 @@ import ToolsAdmin from "../../models/security/toolsAdmin.js";
 import { Op } from "sequelize";
 import HerramientaRoles from "../../models/security/herramientaSistema.js";
 import TiSisClienteD from "../../models/manager/tiSisClienteDetail.js";
-import Component from "../../models/security/component.js";
 import { sequelize } from "../../config/postgres/sequelize.js";
-
+import Component from "../../models/security/component.js";
 export class AuthenticateService {
   async signIn(c_usuario, c_contrasena) {
     try {
@@ -184,9 +183,8 @@ export class AuthenticateService {
     }
   }
 
-  async getComp(id) {
+  async getComponentesByGeoportal(id) {
     try {
-      // const roles = await Component.findAll();
       const [izquierda] = await sequelize.query(
         `select cm.*
         from administracion.geoportales_component gc
@@ -219,7 +217,16 @@ export class AuthenticateService {
         order by gc.orden ASC`
       );
       return { izquierda, derecha, menu, arriba };
-      // return roles;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getComp(id) {
+    try {
+      const roles = await Component.findAll();
+      return roles;
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");

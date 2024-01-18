@@ -250,6 +250,16 @@ export class ManagerController {
     }
   }
 
+  async deleteGeoportales(req, res) {
+    const { id } = req.params;
+    try {
+      const data = await managerService.deleteGeoportales(id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async deleteSistemasByCliente(req, res) {
     const { id_cliente, id } = req.params;
     try {
