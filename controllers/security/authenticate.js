@@ -60,6 +60,30 @@ export class AuthenticateController {
     }
   }
 
+  async getUsuariosByGeoportal(req, res) {
+    const { id } = req.params;
+    try {
+      const data = await authenticateService.getUsuariosByGeoportal(id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async createUsuariosByGeoportal(req, res) {
+    const { id, usuario, contrasena } = req.body;
+    try {
+      const data = await authenticateService.createUsuariosByGeoportal(
+        id,
+        usuario,
+        contrasena
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getProfile(req, res) {
     const { id, id_cliente } = req.user;
     try {

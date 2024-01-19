@@ -590,6 +590,159 @@ export class ManagerService {
     }
   }
 
+  async editGeoportales(
+    id,
+    nombre,
+    color_primary,
+    logo_bs,
+    descripcion,
+    componentsIzquierda,
+    componentsDerecha,
+    componentsMenu,
+    componentsArriba
+  ) {
+    try {
+      if (logo_bs && logo_bs.length > 0) {
+        const ahora = Date.now();
+        const currentDir = __dirname;
+        const desiredDir = path.join(currentDir, "..", "..");
+        let ruta_archivo1 = `/public/logos/${ahora}.png`;
+
+        const data = await Geoportal.update(
+          {
+            name: nombre,
+            title: descripcion,
+            background: color_primary,
+            logo: ruta_archivo1,
+          },
+          {
+            where: {
+              id: id,
+            },
+          }
+        );
+        if (data) {
+          await GeoportalComponent.destroy({ where: { fk_geoportal: id } });
+          if (componentsIzquierda.length > 0) {
+            for (let index = 0; index < componentsIzquierda.length; index++) {
+              const element = componentsIzquierda[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 1,
+                orden: index,
+              });
+            }
+          }
+          if (componentsDerecha.length > 0) {
+            for (let index = 0; index < componentsDerecha.length; index++) {
+              const element = componentsDerecha[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 2,
+                orden: index,
+              });
+            }
+          }
+          if (componentsMenu.length > 0) {
+            for (let index = 0; index < componentsMenu.length; index++) {
+              const element = componentsMenu[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 3,
+                orden: index,
+              });
+            }
+          }
+          if (componentsArriba.length > 0) {
+            for (let index = 0; index < componentsArriba.length; index++) {
+              const element = componentsArriba[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 4,
+                orden: index,
+              });
+            }
+          }
+          const binaryData1 = this.base64ToBinary(logo_bs);
+          await fsp.writeFile(desiredDir + ruta_archivo1, binaryData1);
+          return data;
+        } else {
+          throw new Error("No se pudo registrar");
+        }
+      } else {
+        const data = await Geoportal.update(
+          {
+            name: nombre,
+            title: descripcion,
+            background: color_primary,
+          },
+          {
+            where: {
+              id: id,
+            },
+          }
+        );
+        if (data) {
+          await GeoportalComponent.destroy({ where: { fk_geoportal: id } });
+          if (componentsIzquierda.length > 0) {
+            for (let index = 0; index < componentsIzquierda.length; index++) {
+              const element = componentsIzquierda[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 1,
+                orden: index,
+              });
+            }
+          }
+          if (componentsDerecha.length > 0) {
+            for (let index = 0; index < componentsDerecha.length; index++) {
+              const element = componentsDerecha[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 2,
+                orden: index,
+              });
+            }
+          }
+          if (componentsMenu.length > 0) {
+            for (let index = 0; index < componentsMenu.length; index++) {
+              const element = componentsMenu[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 3,
+                orden: index,
+              });
+            }
+          }
+          if (componentsArriba.length > 0) {
+            for (let index = 0; index < componentsArriba.length; index++) {
+              const element = componentsArriba[index];
+              await GeoportalComponent.create({
+                fk_geoportal: id,
+                fk_componente: element.id,
+                position: 4,
+                orden: index,
+              });
+            }
+          }
+          return data;
+        } else {
+          throw new Error("No se pudo registrar");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio: " + error);
+    }
+  }
+
   async deleteGeoportales(id) {
     try {
       await Geoportal.destroy({

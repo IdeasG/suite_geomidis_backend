@@ -1,5 +1,8 @@
 import { generarToken, refreshTokenUser } from "../../helpers/auth.js";
-import { comparePassword } from "../../helpers/comparePassword.js";
+import {
+  comparePassword,
+  generatePasswordHash,
+} from "../../helpers/comparePassword.js";
 import Authenticate from "../../models/security/authenticate.js";
 import IntAuthenticate from "../../models/security/intAuthenticate.js";
 import ToolsDetail from "../../models/security/tools.js";
@@ -10,6 +13,7 @@ import HerramientaRoles from "../../models/security/herramientaSistema.js";
 import TiSisClienteD from "../../models/manager/tiSisClienteDetail.js";
 import { sequelize } from "../../config/postgres/sequelize.js";
 import Component from "../../models/security/component.js";
+import Geoportal from "../../models/manager/geoportal.js";
 export class AuthenticateService {
   async signIn(c_usuario, c_contrasena) {
     try {
@@ -185,38 +189,53 @@ export class AuthenticateService {
 
   async getComponentesByGeoportal(id) {
     try {
-      const [izquierda] = await sequelize.query(
-        `select cm.*
-        from administracion.geoportales_component gc
-        inner join administracion.components_map cm on gc.fk_componente=cm.id
-        where fk_geoportal=${id} and position=1
+      const geoportal = await Geoportal.findOne({
+        where: {
+          id: id,
+        },
+      });
+      const [data] = await sequelize.query(
+        `select cm.*, case when position is null then 0 else position end as position 
+          from administracion.components_map cm
+          left join administracion.geoportales_component gc on cm.id=gc.fk_componente and fk_geoportal=${id}
         order by gc.orden ASC`
       );
 
-      const [derecha] = await sequelize.query(
-        `select cm.*
-        from administracion.geoportales_component gc
-        inner join administracion.components_map cm on gc.fk_componente=cm.id
-        where fk_geoportal=${id} and position=2
-        order by gc.orden ASC`
-      );
+      const izquierda = data.filter((item) => item.position === 1);
+      const derecha = data.filter((item) => item.position === 2);
+      const menu = data.filter((item) => item.position === 3);
+      const arriba = data.filter((item) => item.position === 4);
+      const general = data.filter((item) => item.position === 0);
 
-      const [menu] = await sequelize.query(
-        `select cm.*
-        from administracion.geoportales_component gc
-        inner join administracion.components_map cm on gc.fk_componente=cm.id
-        where fk_geoportal=${id} and position=3
-        order by gc.orden ASC`
-      );
+      return { izquierda, derecha, menu, arriba, general, geoportal };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
 
-      const [arriba] = await sequelize.query(
-        `select cm.*
-        from administracion.geoportales_component gc
-        inner join administracion.components_map cm on gc.fk_componente=cm.id
-        where fk_geoportal=${id} and position=4
-        order by gc.orden ASC`
-      );
-      return { izquierda, derecha, menu, arriba };
+  async getUsuariosByGeoportal(id) {
+    try {
+      const data = await Authenticate.findAll({
+        where: {
+          id_cliente: id,
+        },
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async createUsuariosByGeoportal(id, usuario, contrasena) {
+    try {
+      const data = await Authenticate.create({
+        id_cliente: id,
+        c_usuario: usuario,
+        c_contrasena: generatePasswordHash(contrasena),
+      });
+      return data;
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");

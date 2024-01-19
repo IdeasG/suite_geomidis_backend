@@ -52,5 +52,17 @@ export const createAuthenticateRouter = () => {
     authenticateController.getComponentesByGeoportal
   );
 
+  AuthenticateRouter.get(
+    "/geoportal/usuarios/:id",
+    validarToken,
+    authenticateController.getUsuariosByGeoportal
+  );
+
+  AuthenticateRouter.post(
+    "/geoportal/usuarios",
+    validarToken,
+    authenticateController.createUsuariosByGeoportal
+  );
+
   return AuthenticateRouter;
 };

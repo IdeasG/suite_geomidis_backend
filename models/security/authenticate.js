@@ -8,6 +8,7 @@ const Authenticate = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
     },
     id_cliente: {
       type: DataTypes.INTEGER,
