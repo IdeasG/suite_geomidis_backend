@@ -2,35 +2,19 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../../config/postgres/sequelize.js";
 
 const SuperGrupo = sequelize.define(
-  "supergrupos",
+  "tadm_capas_supergrupo",
   {
-    id: {
+    id_super_grupo: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },
-    pk_sistema: {
+    c_nombre_super_grupo: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    fk_cliente: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    c_modulo: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    c_descripcion: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    icono: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    estado: {
+    b_super_grupo: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },

@@ -2,23 +2,17 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../../config/postgres/sequelize.js";
 
 const Rol = sequelize.define(
-  "roles",
+  "tseg_roles",
   {
-    id: {
+    id_rol: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    fk_sistema: {
+    id_cliente: {
       type: DataTypes.INTEGER,
     },
-    fk_cliente: {
-      type: DataTypes.INTEGER,
-    },
-    nombre: {
-      type: DataTypes.STRING,
-    },
-    descripcion: {
+    c_nombre_rol: {
       type: DataTypes.STRING,
     },
     b_rol: {
@@ -26,7 +20,7 @@ const Rol = sequelize.define(
     },
   },
   {
-    schema: "administracion",
+    schema: "seguridad",
     timestamps: false,
   }
 );

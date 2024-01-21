@@ -51,9 +51,14 @@ export class AuthenticateController {
   }
 
   async getComponentesByGeoportal(req, res) {
-    const { id } = req.params;
+    const { id_geoportal, isadmin } = req.params;
+    const { id } = req.user;
     try {
-      const data = await authenticateService.getComponentesByGeoportal(id);
+      const data = await authenticateService.getComponentesByGeoportal(
+        id_geoportal,
+        isadmin,
+        id
+      );
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -64,6 +69,21 @@ export class AuthenticateController {
     const { id } = req.params;
     try {
       const data = await authenticateService.getUsuariosByGeoportal(id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getUsuariosInternoByGeoportal(req, res) {
+    const { id_cliente } = req.user;
+    const { page = 1, pageSize = 5 } = req.query;
+    try {
+      const data = await authenticateService.getUsuariosInternoByGeoportal(
+        id_cliente,
+        page,
+        pageSize
+      );
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -84,6 +104,70 @@ export class AuthenticateController {
     }
   }
 
+  async createUsuariosInternoByGeoportal(req, res) {
+    const { id_cliente } = req.user;
+    const {
+      dni,
+      nombres,
+      ape_paterno,
+      ape_materno,
+      correo,
+      celular,
+      tipo_usuario,
+      id_rol,
+    } = req.body;
+    try {
+      const data = await authenticateService.createUsuarioInternosByGeoportal(
+        dni,
+        nombres,
+        ape_paterno,
+        ape_materno,
+        correo,
+        celular,
+        tipo_usuario,
+        id_rol,
+        id_cliente
+      );
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Error: " + error });
+    }
+  }
+
+  async createComponentByRol(req, res) {
+    const {
+      componentsIzquierda,
+      componentsDerecha,
+      componentsMenu,
+      componentsArriba,
+      id_rol,
+    } = req.body;
+    const { id_cliente } = req.user;
+    try {
+      const data = await authenticateService.createComponentByRol(
+        id_cliente,
+        componentsIzquierda,
+        componentsDerecha,
+        componentsMenu,
+        componentsArriba,
+        id_rol
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteUsuariosByGeoportal(req, res) {
+    const { id } = req.params;
+    try {
+      const data = await authenticateService.deleteUsuariosByGeoportal(id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getProfile(req, res) {
     const { id, id_cliente } = req.user;
     try {
@@ -95,8 +179,9 @@ export class AuthenticateController {
   }
 
   async getRol(req, res) {
+    const { id_cliente } = req.user;
     try {
-      const data = await authenticateService.getRol();
+      const data = await authenticateService.getRol(id_cliente);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -114,14 +199,10 @@ export class AuthenticateController {
   }
 
   async saveRol(req, res) {
-    const { fk_sistema, fk_cliente, nombre, descripcion } = req.body;
+    const { nombre } = req.body;
+    const { id_cliente } = req.user;
     try {
-      const data = await authenticateService.saveRol(
-        fk_sistema,
-        fk_cliente,
-        nombre,
-        descripcion
-      );
+      const data = await authenticateService.saveRol(nombre, id_cliente);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });

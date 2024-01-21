@@ -1,7 +1,5 @@
 import { Router } from "express";
-
 import { AuthenticateController } from "../../controllers/security/authenticate.js";
-
 import { validarRefreshToken, validarToken } from "../../middlewares/auth.js";
 
 export const createAuthenticateRouter = () => {
@@ -27,12 +25,12 @@ export const createAuthenticateRouter = () => {
   );
 
   //ROLES
-  AuthenticateRouter.get("/rol", authenticateController.getRol);
+  AuthenticateRouter.get("/rol", validarToken, authenticateController.getRol);
   AuthenticateRouter.get(
     "/rol/tools/:id",
     authenticateController.getToolsByRol
   );
-  AuthenticateRouter.post("/rol", authenticateController.saveRol);
+  AuthenticateRouter.post("/rol", validarToken, authenticateController.saveRol);
   AuthenticateRouter.post("/rol/tools", authenticateController.saveRolTools);
   AuthenticateRouter.delete(
     "/rol/tools/:id_rol/:fk_modulo/:fk_grupo/:fk_menu",
@@ -47,7 +45,7 @@ export const createAuthenticateRouter = () => {
   );
 
   AuthenticateRouter.get(
-    "/geoportal/:id",
+    "/geoportales/:id_geoportal/:isadmin",
     validarToken,
     authenticateController.getComponentesByGeoportal
   );
@@ -62,6 +60,30 @@ export const createAuthenticateRouter = () => {
     "/geoportal/usuarios",
     validarToken,
     authenticateController.createUsuariosByGeoportal
+  );
+
+  AuthenticateRouter.delete(
+    "/geoportal/usuarios/:id",
+    validarToken,
+    authenticateController.deleteUsuariosByGeoportal
+  );
+
+  AuthenticateRouter.get(
+    "/geoportal/internos",
+    validarToken,
+    authenticateController.getUsuariosInternoByGeoportal
+  );
+
+  AuthenticateRouter.post(
+    "/geoportal/internos",
+    validarToken,
+    authenticateController.createUsuariosInternoByGeoportal
+  );
+
+  AuthenticateRouter.post(
+    "/geoportal/rol",
+    validarToken,
+    authenticateController.createComponentByRol
   );
 
   return AuthenticateRouter;

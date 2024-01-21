@@ -2,35 +2,27 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../../config/postgres/sequelize.js";
 
 const Capa = sequelize.define(
-  "capas",
+  "tadm_capas",
   {
-    id: {
+    id_capa: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },
-    pk_sistema: {
+    id_grupo: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    pk_grupo: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    fk_cliente: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    c_nombre: {
+    c_nombre_tabla_capa: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    c_tabla: {
+    c_nombre_public_capa: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    icono: {
+    c_sql_capa: {
       type: DataTypes.STRING,
       allowNull: true,
     },

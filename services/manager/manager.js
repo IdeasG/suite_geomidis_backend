@@ -79,11 +79,7 @@ export class ManagerService {
   ) {
     try {
       const data = await SuperGrupo.create({
-        pk_sistema,
-        fk_cliente,
-        c_modulo,
-        c_descripcion,
-        icono,
+        c_nombre_super_grupo: c_modulo,
       });
       return data;
     } catch (error) {
@@ -95,10 +91,8 @@ export class ManagerService {
   async saveGrupoCapasSistema(pk_sistema, pk_modulo, fk_cliente, c_nombre) {
     try {
       const data = await GrupoCapa.create({
-        pk_sistema,
-        pk_modulo,
-        fk_cliente,
-        c_nombre,
+        id_super_grupo: pk_modulo,
+        c_nombre_grupo: c_nombre,
       });
       return data;
     } catch (error) {
@@ -117,12 +111,10 @@ export class ManagerService {
   ) {
     try {
       const data = await Capa.create({
-        pk_sistema,
-        pk_grupo,
-        fk_cliente,
-        c_nombre,
-        c_tabla,
-        icono,
+        id_grupo: pk_grupo,
+        c_nombre_tabla_capa: c_tabla,
+        c_nombre_public_capa: c_nombre,
+        c_sql_capa: "1",
       });
       return data;
     } catch (error) {
@@ -244,31 +236,16 @@ export class ManagerService {
 
   async getCapasById(id) {
     try {
-      const data = await Sistemas.findOne({
-        where: {
-          id: id,
-        },
-      });
-      const perfiles = await Perfil.findAll({
-        where: {
-          pk_sistema: id,
-        },
-      });
-
-      const modulos = await SuperGrupo.findAll({
-        where: {
-          pk_sistema: id,
-        },
-      });
-
+      const modulos = await SuperGrupo.findAll();
       const grupos = await GrupoCapa.findAll();
       const menu = await Capa.findAll();
-
       const rol_capas = await CapaByRol.findAll({
-        where: { fk_rol: 1 },
+        where: {
+          fk_rol: id,
+        },
       });
 
-      return { data, perfiles, modulos, grupos, menu, rol_capas };
+      return { modulos, grupos, menu, rol_capas };
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
