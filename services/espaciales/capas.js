@@ -192,7 +192,7 @@ export class CapasService {
   async validacionData() {
     try {
       const response = await InformacionRegistro.findAll({
-        attributes: ['id', 'c_programa', 'c_capa', 'd_registro'],
+        attributes: ['id', 'c_programa', 'a_conteo_registros_fallidos' ,'c_capa', 'd_registro'],
         order: [['d_registro','DESC']],
         raw: true })
       // Formatear el campo 'd_registro' en cada registro

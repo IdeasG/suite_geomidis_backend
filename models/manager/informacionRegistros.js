@@ -13,6 +13,10 @@ const InformacionRegistro = sequelize.define(
         type: DataTypes.STRING,
         allowNull: false
         },
+        a_conteo_registros_fallidos: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
         c_programa: {
         type: DataTypes.STRING,
         allowNull: false
