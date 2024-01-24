@@ -1,40 +1,36 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../config/postgres/sequelize.js";
 
-const Capa = sequelize.define(
-  "tadm_capas",
+const Geoportal = sequelize.define(
+  "geoportales",
   {
-    id_capa: {
-      type: DataTypes.BIGINT,
+    id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },
-    id_grupo: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    c_nombre_tabla_capa: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    c_nombre_public_capa: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    c_sql_capa: {
+    title: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    b_capa: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    logo: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    background: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
-    schema: "administracion",
     timestamps: false,
+    schema: "administracion",
   }
 );
 
-export default Capa;
+export default Geoportal;

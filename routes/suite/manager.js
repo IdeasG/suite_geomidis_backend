@@ -62,5 +62,10 @@ export const createManagerRouter = () => {
 
   managerRouter.delete("/clientes/:id", managerController.deleteCliente);
 
+  //GEOPORTALES
+  managerRouter.post("/geoportales", managerController.saveGeoportales);
+  managerRouter.put("/geoportales/:id", managerController.editGeoportales);
+  managerRouter.delete("/geoportales/:id", managerController.deleteGeoportales);
+
   return managerRouter;
 };

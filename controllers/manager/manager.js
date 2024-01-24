@@ -222,6 +222,74 @@ export class ManagerController {
     }
   }
 
+  async saveGeoportales(req, res) {
+    const {
+      nombre,
+      color_primary,
+      logo_bs,
+      descripcion,
+      componentsIzquierda,
+      componentsDerecha,
+      componentsMenu,
+      componentsArriba,
+    } = req.body;
+    try {
+      const data = await managerService.saveGeoportales(
+        nombre,
+        color_primary,
+        logo_bs,
+        descripcion,
+        componentsIzquierda,
+        componentsDerecha,
+        componentsMenu,
+        componentsArriba
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async editGeoportales(req, res) {
+    const {
+      nombre,
+      color_primary,
+      logo_bs,
+      descripcion,
+      componentsIzquierda,
+      componentsDerecha,
+      componentsMenu,
+      componentsArriba,
+    } = req.body;
+    const { id } = req.params;
+    try {
+      const data = await managerService.editGeoportales(
+        id,
+        nombre,
+        color_primary,
+        logo_bs,
+        descripcion,
+        componentsIzquierda,
+        componentsDerecha,
+        componentsMenu,
+        componentsArriba
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteGeoportales(req, res) {
+    const { id } = req.params;
+    try {
+      const data = await managerService.deleteGeoportales(id);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async deleteSistemasByCliente(req, res) {
     const { id_cliente, id } = req.params;
     try {

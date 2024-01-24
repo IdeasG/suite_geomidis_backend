@@ -2,27 +2,19 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../../config/postgres/sequelize.js";
 
 const GrupoCapa = sequelize.define(
-  "grupos_capa",
+  "tadm_capas_grupo",
   {
-    id: {
+    id_grupo: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },
-    pk_sistema: {
+    id_super_grupo: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    pk_modulo: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    fk_cliente: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    c_nombre: {
+    c_nombre_grupo: {
       type: DataTypes.STRING,
       allowNull: false,
     },

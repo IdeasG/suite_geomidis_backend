@@ -77,7 +77,7 @@ const TgUsuario = sequelize.define(
       allowNull: true,
     },
     id_cliente: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
   },
