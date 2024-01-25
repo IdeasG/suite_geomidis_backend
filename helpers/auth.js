@@ -5,6 +5,7 @@ export function generarToken(usuario, expiredIn = "1d") {
   const payload = {
     id: usuario.id_usuario,
     id_cliente: usuario.id_cliente,
+    id_rol: usuario.rol_id ?? 0,
   };
 
   const opciones = {
@@ -30,6 +31,7 @@ export function refreshTokenUser(usuario, expiredIn = "7d") {
   const payload = {
     id: usuario.id_usuario,
     id_cliente: usuario.id_cliente,
+    id_rol: usuario.rol_id ?? 0,
   };
 
   const opciones = {

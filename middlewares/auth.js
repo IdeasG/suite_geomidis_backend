@@ -16,6 +16,7 @@ export function validarToken(req, res, next) {
     req.user = {
       id: decoded.id,
       id_cliente: decoded.id_cliente,
+      id_rol: decoded.rol_id ?? 0,
     };
     next();
   } catch (error) {
@@ -37,6 +38,7 @@ export function validarRefreshToken(req, res, next) {
     req.user = {
       id: decoded.id,
       id_cliente: decoded.id_cliente,
+      id_rol: decoded.rol_id,
     };
     next();
   } catch (error) {

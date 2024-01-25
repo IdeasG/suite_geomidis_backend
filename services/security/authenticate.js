@@ -23,6 +23,8 @@ export class AuthenticateService {
         where: { c_usuario },
       });
 
+      data.dataValues.rol_id = 0;
+
       let isPasswordCorrect = false;
       let isSuiteUser = false;
 
@@ -44,9 +46,7 @@ export class AuthenticateService {
       if (!isPasswordCorrect) {
         throw new Error("Contraseña incorrecta.");
       }
-
       const accessToken = generarToken(data, "1d");
-      console.log(isSuiteUser);
       return { isSuiteUser, backendTokens: accessToken };
     } catch (error) {
       console.error(error);

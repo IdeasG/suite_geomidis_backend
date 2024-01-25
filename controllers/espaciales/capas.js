@@ -29,8 +29,8 @@ export class CapasController {
       res.status(500).json({ error: error.message });
     }
   }
-  
-  async getAllCapasTableExterno (req, res) {
+
+  async getAllCapasTableExterno(req, res) {
     try {
       const [response, metadata] = await sequelize.query(`
       select * from administracion.tadm_capas_supergrupo sg
@@ -38,7 +38,7 @@ export class CapasController {
       left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
       where c_tipo = 'externo' 
       `);
-      res.status(200).json({status: 'success', data: response});
+      res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -105,11 +105,25 @@ export class CapasController {
 
   async getAllCapasPost(req, res) {
     const {
-      id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio
+      id_grupo,
+      c_nombre_tabla_capa,
+      c_nombre_public_capa,
+      c_sql_capa,
+      b_capa,
+      c_tipo,
+      c_url,
+      c_servicio,
     } = req.body;
     try {
       const capas = await capasService.RegistrarCapas(
-        id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url, c_servicio
+        id_grupo,
+        c_nombre_tabla_capa,
+        c_nombre_public_capa,
+        c_sql_capa,
+        b_capa,
+        c_tipo,
+        c_url,
+        c_servicio
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
@@ -146,12 +160,26 @@ export class CapasController {
 
   async getAllCapasPut(req, res) {
     const {
-      id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio
+      id_capa,
+      id_grupo,
+      c_nombre_tabla_capa,
+      c_nombre_public_capa,
+      b_capa,
+      c_tipo,
+      c_url,
+      c_servicio,
     } = req.body;
     try {
       const capas = await capasService.ActualizarCapas(
-      id_capa, id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, b_capa, c_tipo, c_url, c_servicio
-    );
+        id_capa,
+        id_grupo,
+        c_nombre_tabla_capa,
+        c_nombre_public_capa,
+        b_capa,
+        c_tipo,
+        c_url,
+        c_servicio
+      );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -259,27 +287,62 @@ export class CapasController {
   // }
 
   async getStructure(req, res) {
+    const { id_rol } = req.user;
+    console.log(id_rol);
     try {
-
-      const [superGrupos, metadata] = await sequelize.query(
-        `select * from administracion.tadm_capas_supergrupo`
-      );
-      const dbResponse = superGrupos;
-      for (let index = 0; index < superGrupos.length; index++) {
-        const element = superGrupos[index];
-        const [grupos, metadata] = await sequelize.query(
-          `select * from administracion.tadm_capas_grupo WHERE id_super_grupo = ${element.id_super_grupo}`
+      if (id_rol == 0 || id_rol == undefined) {
+        const [superGrupos, metadata] = await sequelize.query(
+          `select * from administracion.tadm_capas_supergrupo`
         );
-        for (let index = 0; index < grupos.length; index++) {
-          const element = grupos[index];
-          const [capas, metadata] = await sequelize.query(
-            `select * from administracion.tadm_capas WHERE id_grupo = ${element.id_grupo}`
+        const dbResponse = superGrupos;
+        for (let index = 0; index < superGrupos.length; index++) {
+          const element = superGrupos[index];
+          const [grupos, metadata] = await sequelize.query(
+            `select * from administracion.tadm_capas_grupo WHERE id_super_grupo = ${element.id_super_grupo}`
           );
-          element.capas = capas;
+          for (let index = 0; index < grupos.length; index++) {
+            const element = grupos[index];
+            const [capas, metadata] = await sequelize.query(
+              `select * from administracion.tadm_capas WHERE id_grupo = ${element.id_grupo}`
+            );
+            element.capas = capas;
+          }
+          element.grupos = grupos;
         }
-        element.grupos = grupos;
+        res.status(200).json({ status: "success", data: dbResponse });
+      } else {
+        const [superGrupos, metadata] = await sequelize.query(
+          `select distinct sp.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=1`
+        );
+        const dbResponse = superGrupos;
+        for (let index = 0; index < superGrupos.length; index++) {
+          const element = superGrupos[index];
+          const [grupos, metadata] = await sequelize.query(
+            `select distinct cp.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=1 and cp.id_super_grupo = ${element.id_super_grupo}`
+          );
+          for (let index = 0; index < grupos.length; index++) {
+            const element = grupos[index];
+            const [capas, metadata] = await sequelize.query(
+              `select distinct tc.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=1 and tc.id_grupo =  ${element.id_grupo}`
+            );
+            element.capas = capas;
+          }
+          element.grupos = grupos;
+        }
+        res.status(200).json({ status: "success", data: dbResponse });
       }
-      res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -321,9 +384,14 @@ export class CapasController {
   }
 
   async postVistas(req, res) {
-    const { c_extent,c_capas,c_mapa_base,c_nombre } = req.body;
+    const { c_extent, c_capas, c_mapa_base, c_nombre } = req.body;
     try {
-      let dbResponse = await capasService.postVistas(c_extent,c_capas,c_mapa_base,c_nombre);
+      let dbResponse = await capasService.postVistas(
+        c_extent,
+        c_capas,
+        c_mapa_base,
+        c_nombre
+      );
       res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -339,83 +407,101 @@ export class CapasController {
       res.status(500).json({ error: error.message });
     }
   }
-  
-  async busquedaAvanzada(req,res) {
-    const { simbolo, column, layer, inputBt} = req.body;
+
+  async busquedaAvanzada(req, res) {
+    const { simbolo, column, layer, inputBt } = req.body;
     // console.log(simbolo, column, layer, inputBt);
     try {
-      const respuesta = await capasService.busquedaAvanzada(simbolo, column, layer, inputBt);
-      res.status(200).json({ status: "success" , data: respuesta});
+      const respuesta = await capasService.busquedaAvanzada(
+        simbolo,
+        column,
+        layer,
+        inputBt
+      );
+      res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  async archivoShape(req,res) {
+  async archivoShape(req, res) {
     // console.log(simbolo, column, layer, inputBt);
-    const { geoserver,workspace,layer,simbolo, column, inputBt} = req.body;
+    const { geoserver, workspace, layer, simbolo, column, inputBt } = req.body;
     try {
-      let url = ''
-      if (simbolo!='' && column!='' && inputBt!='') {
-        url = geoserver+'?request=GetFeature&service=WFS&version=1.1.0&typeName='+workspace+':'+layer+'&outputFormat=application/json&CQL_FILTER='+ column+simbolo+inputBt
+      let url = "";
+      if (simbolo != "" && column != "" && inputBt != "") {
+        url =
+          geoserver +
+          "?request=GetFeature&service=WFS&version=1.1.0&typeName=" +
+          workspace +
+          ":" +
+          layer +
+          "&outputFormat=application/json&CQL_FILTER=" +
+          column +
+          simbolo +
+          inputBt;
       } else {
-        url = geoserver+'?request=GetFeature&service=WFS&version=1.1.0&typeName='+workspace+':'+layer+'&outputFormat=application/json'
+        url =
+          geoserver +
+          "?request=GetFeature&service=WFS&version=1.1.0&typeName=" +
+          workspace +
+          ":" +
+          layer +
+          "&outputFormat=application/json";
       }
       console.log(url);
       const response = await axios.get(url);
       const geojson = response.data;
       // console.log(geojson);
       const options = {
-        folder: 'myshapes',
+        folder: "myshapes",
         types: {
-          point: 'mypoints',
-          polygon: 'mypolygons',
-          polyline: 'mylines',
+          point: "mypoints",
+          polygon: "mypolygons",
+          polyline: "mylines",
         },
       };
-    // Convertir GeoJSON a formato Shapefile
-    var content = zip(geojson, options);
-    res.set('Content-Type', 'application/zip');
-    res.set('Content-Disposition', 'attachment; filename=archivo.zip');
-    res.send(Buffer.from(content, 'base64'));
-  
+      // Convertir GeoJSON a formato Shapefile
+      var content = zip(geojson, options);
+      res.set("Content-Type", "application/zip");
+      res.set("Content-Disposition", "attachment; filename=archivo.zip");
+      res.send(Buffer.from(content, "base64"));
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  async archivoJson(req,res) {
+  async archivoJson(req, res) {
     // console.log(simbolo, column, layer, inputBt);
     const { jsonData } = req.body;
     try {
       // Configurar cabeceras para indicar que se envía un archivo JSON
-      res.setHeader('Content-Disposition', 'attachment; filename=datos.json');
-      res.setHeader('Content-Type', 'application/json');
+      res.setHeader("Content-Disposition", "attachment; filename=datos.json");
+      res.setHeader("Content-Type", "application/json");
 
       // Convertir el objeto JSON a una cadena JSON y enviarlo en el cuerpo de la respuesta
       res.send(JSON.stringify(jsonData, null, 2));
-  
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-  
-  async validacionData(req,res) {
+
+  async validacionData(req, res) {
     // const { simbolo, column, layer, inputBt} = req.body;
     // console.log(simbolo, column, layer, inputBt);
     try {
       const respuesta = await capasService.validacionData();
-      res.status(200).json({ status: "success" , data: respuesta});
+      res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  async jsonFallido(req,res) {
+  async jsonFallido(req, res) {
     const { id } = req.params;
     try {
       const respuesta = await capasService.jsonFallido(id);
-      res.status(200).json({ status: "success" , data: respuesta});
+      res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -577,15 +663,15 @@ export class CapasController {
       const [response, metadata] = await sequelize.query(
         `select * from espaciales.${layer}`
       );
-      const titulo = layer
-      const data = response
-      const columnas = []
-      if ( response.length > 0 ) {
+      const titulo = layer;
+      const data = response;
+      const columnas = [];
+      if (response.length > 0) {
         for (let index in response[0]) {
-          columnas.push(index)          
+          columnas.push(index);
         }
       }
-  
+
       let workbook = new excel.Workbook();
       let worksheet = workbook.addWorksheet(titulo);
 
@@ -679,7 +765,7 @@ export class CapasController {
       );
       res.setHeader(
         "Content-Disposition",
-        "attachment; filename=" + titulo+".xlsx"
+        "attachment; filename=" + titulo + ".xlsx"
       );
 
       return workbook.xlsx.write(res).then(function () {
@@ -697,7 +783,6 @@ export class CapasController {
     const { data, columnas, titulo } = req.body;
     // console.log(columnas);
     try {
-
       let workbook = new excel.Workbook();
       let worksheet = workbook.addWorksheet(titulo);
 
@@ -791,7 +876,7 @@ export class CapasController {
       );
       res.setHeader(
         "Content-Disposition",
-        "attachment; filename=" + titulo+".xlsx"
+        "attachment; filename=" + titulo + ".xlsx"
       );
 
       return workbook.xlsx.write(res).then(function () {
@@ -804,5 +889,4 @@ export class CapasController {
       });
     }
   }
-  
 }
