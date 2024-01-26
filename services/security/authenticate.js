@@ -23,7 +23,9 @@ export class AuthenticateService {
         where: { c_usuario },
       });
 
-      data.dataValues.rol_id = 0;
+      if (data) {
+        data.dataValues.rol_id = 0;
+      }
 
       let isPasswordCorrect = false;
       let isSuiteUser = false;
@@ -190,16 +192,15 @@ export class AuthenticateService {
     }
   }
 
-  async getComponentesByGeoportal(id_geoportal, isadmin, id_usuario) {
+  async getComponentesByGeoportal(id, id_rol, id_cliente, id_geoportal) {
     try {
       const geoportal = await Geoportal.findOne({
         where: {
           id: id_geoportal,
         },
       });
-
       let data = [];
-      if (isadmin == "true") {
+      if (id_rol == "0") {
         const [componets] = await sequelize.query(
           `select cm.*, case when position is null then 0 else position end as position 
           from administracion.components_map cm
@@ -209,13 +210,55 @@ export class AuthenticateService {
         data = componets;
       } else {
         const rol = await TgUsuario.findOne({
-          where: { id_usuario: id_usuario },
+          where: { id_usuario: id },
         });
-        console.log(rol);
         const [componets] = await sequelize.query(
           `select cm.*, case when position is null then 0 else position end as position 
           from administracion.components_map cm
-          left join administracion.geoportales_component_rol gc on cm.id=gc.fk_componente and fk_geoportal=${id_geoportal} and fk_rol=${rol.rol_id}
+          left join administracion.geoportales_component_rol gc on cm.id=gc.fk_componente and fk_geoportal=${id_cliente} and fk_rol=${rol.rol_id}
+        order by gc.orden ASC`
+        );
+        data = componets;
+      }
+
+      const izquierda = data.filter((item) => item.position === 1);
+      const derecha = data.filter((item) => item.position === 2);
+      const menu = data.filter((item) => item.position === 3);
+      const arriba = data.filter((item) => item.position === 4);
+      const general = data.filter((item) => item.position === 0);
+
+      return { izquierda, derecha, menu, arriba, general, geoportal };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getComponentesByGeoportalI(id, id_rol, id_cliente) {
+    try {
+      const geoportal = await Geoportal.findOne({
+        where: {
+          id: id_cliente,
+        },
+      });
+
+      let data = [];
+      if (id_rol == "0") {
+        const [componets] = await sequelize.query(
+          `select cm.*, case when position is null then 0 else position end as position 
+          from administracion.components_map cm
+          left join administracion.geoportales_component gc on cm.id=gc.fk_componente and fk_geoportal=${id_cliente}
+        order by gc.orden ASC`
+        );
+        data = componets;
+      } else {
+        const rol = await TgUsuario.findOne({
+          where: { id_usuario: id_usuario },
+        });
+        const [componets] = await sequelize.query(
+          `select cm.*, case when position is null then 0 else position end as position 
+          from administracion.components_map cm
+          left join administracion.geoportales_component_rol gc on cm.id=gc.fk_componente and fk_geoportal=${id_cliente} and fk_rol=${rol.rol_id}
         order by gc.orden ASC`
         );
         data = componets;
