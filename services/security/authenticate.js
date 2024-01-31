@@ -333,6 +333,31 @@ export class AuthenticateService {
     }
   }
 
+  async updateUsuariosInternoByGeoportal(id_usuario, id_rol) {
+    try {
+      const usuario = await TgUsuario.update(
+        {
+          rol_id: id_rol,
+        },
+        { where: { id_usuario: id_usuario } }
+      );
+      return usuario;
+    } catch (error) {
+      throw new Error("Error: " + error);
+    }
+  }
+
+  async deleteUsuariosInternoByGeoportal(id_usuario) {
+    try {
+      const usuario = await TgUsuario.destroy({
+        where: { id_usuario: id_usuario },
+      });
+      return usuario;
+    } catch (error) {
+      throw new Error("Error: " + error);
+    }
+  }
+
   async createUsuarioInternosByGeoportal(
     dni,
     nombres,
