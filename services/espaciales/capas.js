@@ -321,7 +321,7 @@ export class CapasService {
         WHERE ${column} ${simbolo} ${inputBt}
       `);
       return results;
-    } catch {
+    } catch (error) {
       throw new Error("Error al obtener los resultados..." + error);
     }
   }
