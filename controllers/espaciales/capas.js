@@ -292,7 +292,7 @@ export class CapasController {
     try {
       if (id_rol == 0 || id_rol == undefined) {
         const [superGrupos, metadata] = await sequelize.query(
-          `select * from administracion.tadm_capas_supergrupo`
+          `select * from administracion.tadm_capas_supergrupo order by n_orden asc`
         );
         const dbResponse = superGrupos;
         for (let index = 0; index < superGrupos.length; index++) {
@@ -508,6 +508,15 @@ export class CapasController {
   }
 
   async descargarExcel(req, res) {
+    
+    function acortarTexto(texto, longitudMaxima) {
+      if (texto.length > longitudMaxima) {
+          return texto.substring(0, longitudMaxima - 3) + "...";
+      } else {
+          return texto;
+      }
+    }
+    console.log('prueba');
     const { table, datosCapas } = req.body;
     try {
       let exportarTemp = [];
@@ -547,10 +556,27 @@ export class CapasController {
       // Add Array Rows
       worksheet.addRows(exportarTemp);
 
+      let nombresExistentes = []
+      function nombreUnico(nombresExistentes,titulo) {
+        for (let i = 2; ; i++) {
+          const sufijo = `_${i}`;
+          const nuevoNombreConSufijo = acortarTexto(titulo, 31 - sufijo.length) + sufijo;
+          if (!nombresExistentes.includes(nuevoNombreConSufijo)) {
+              return nuevoNombreConSufijo;
+          }
+        }
+      }
       datosCapas.forEach((element) => {
-        let worksheet = workbook.addWorksheet(
-          element.grupo + " " + element.capa
-        );
+        let titulo = element.grupo + " " + element.capa
+        titulo = acortarTexto(titulo,31)
+        if (nombresExistentes.includes(titulo)) {
+          titulo = nombreUnico(nombresExistentes,titulo)
+          nombresExistentes.push(titulo)
+        } else {
+          nombresExistentes.push(titulo)
+        }
+        // console.log(nombresExistentes);
+        let worksheet = workbook.addWorksheet(titulo);
         const data = element.rows;
         const columnas = element.campos;
         const exportarTempo = [];
