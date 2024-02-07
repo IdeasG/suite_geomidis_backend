@@ -119,6 +119,33 @@ export class AuthenticateController {
     }
   }
 
+  async updateUsuariosInternoByGeoportal(req, res) {
+    const { id_cliente } = req.user;
+    const { id_usuario } = req.params;
+    const { id_rol } = req.body;
+    try {
+      const data = await authenticateService.updateUsuariosInternoByGeoportal(
+        id_usuario,
+        id_rol
+      );
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Error: " + error });
+    }
+  }
+
+  async deleteUsuariosInternoByGeoportal(req, res) {
+    const { id_usuario } = req.params;
+    try {
+      const data = await authenticateService.deleteUsuariosInternoByGeoportal(
+        id_usuario
+      );
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Error: " + error });
+    }
+  }
+
   async createUsuariosInternoByGeoportal(req, res) {
     const { id_cliente } = req.user;
     const {

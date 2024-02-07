@@ -80,6 +80,18 @@ export const createAuthenticateRouter = () => {
     authenticateController.getUsuariosInternoByGeoportal
   );
 
+  AuthenticateRouter.put(
+    "/geoportal/internos/:id_usuario",
+    validarToken,
+    authenticateController.updateUsuariosInternoByGeoportal
+  );
+
+  AuthenticateRouter.delete(
+    "/geoportal/internos/:id_usuario",
+    validarToken,
+    authenticateController.deleteUsuariosInternoByGeoportal
+  );
+
   AuthenticateRouter.post(
     "/geoportal/internos",
     validarToken,
