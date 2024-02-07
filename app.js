@@ -9,6 +9,7 @@ import { setupMaestroRoutes } from "./setup/routeMaestroSetup.js";
 import { setupMapfishRoutes } from "./setup/routerImpresionMapfish.js";
 import { setupPruebasRoutes } from "./setup/routePruebasSetup.js";
 import { setupEspacialesRoutes } from "./setup/routeEspacialesSetup.js";
+import { setupAuditoriaRoutes } from "./setup/routeAuditoriaSetup.js";
 import { createObservacionPredioRouter } from "./routes/fichas/individual/observacionPredio.js";
 import { createEvaluacionPredioRouter } from "./routes/fichas/individual/evaluacionPredio.js";
 import { createUnicatRouter } from "./routes/fichas/unicat.js";
@@ -35,6 +36,7 @@ setupMaestroRoutes(app);
 setupEspacialesRoutes(app);
 setupGlgisRoutes(app);
 setupMapfishRoutes(app);
+setupAuditoriaRoutes(app);
 
 app.use("/fcuin/ubicacion_predio", createUbicacionPredioRouter());
 app.use("/tibc/servicio_predio", createServicioPredioRouter());
