@@ -86,9 +86,9 @@ export class CapasService {
     }
   }
 
-  async getCapasVisibles(id_capa) {
+  async getCapasVisibles(id_capa,id_rol) {
     try {
-      const response = await CapasMostrar.findAll({ where: { id_capa } });
+      const response = await CapasMostrar.findAll({ where: { id_capa, id_rol } });
       return response;
     } catch (error) {
       throw new Error(
@@ -242,15 +242,12 @@ export class CapasService {
     }
   }
 
-  async putCapasVisibles(campos) {
+  async putCapasVisibles(id, c_array_campos) {
     try {
-      for (let index in campos) {
-        const element = campos[index];
-        await CapasMostrar.update(
-          { c_campo_alias: element.c_campo_alias, b_campo: element.b_campo },
-          { where: { id: element.id } }
-        );
-      }
+      await CapasMostrar.update(
+        { c_array_campos },
+        { where: { id } }
+      );
       return;
     } catch (error) {
       throw new Error(
@@ -326,7 +323,7 @@ export class CapasService {
     }
   }
 
-  async postCapasVisibles(id_capa) {
+  async postCapasVisibles(id_capa,id_rol) {
     try {
       const [results, metadata] = await sequelize.query(
         `select * from administracion.tadm_capas where id_capa = ${id_capa}`
@@ -339,16 +336,21 @@ export class CapasService {
       for (let index in results2) {
         const element = results2[index].column_name;
         if (element !== "IDEASG") {
-          const registrados = await CapasMostrar.create({
-            id_capa,
+          const registrados = {
             c_campo_original: element,
             c_campo_alias: element,
             b_campo: false,
-          });
+          }
           nuevasColumnas.push(registrados);
         }
       }
-      return nuevasColumnas;
+      nuevasColumnas = JSON.stringify(nuevasColumnas)
+      const registrado = await CapasMostrar.create({
+        id_capa,
+        c_array_campos:nuevasColumnas,
+        id_rol
+      })
+      return [registrado];
     } catch (error) {
       throw new Error(
         "Error al obtener las capas visibles con el id_capa:" + id_capa + error

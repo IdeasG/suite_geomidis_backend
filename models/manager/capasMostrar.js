@@ -13,16 +13,12 @@ const CamposMostrar = sequelize.define(
         type: DataTypes.INTEGER,
         allowNull: false
         },
-        c_campo_original: {
+        c_array_campos: {
         type: DataTypes.STRING,
         allowNull: false
         },
-        c_campo_alias: {
-        type: DataTypes.STRING,
-        allowNull: false
-        },
-        b_campo: {
-        type: DataTypes.BOOLEAN,
+        id_rol: {
+        type: DataTypes.INTEGER,
         allowNull: true
         }
     },

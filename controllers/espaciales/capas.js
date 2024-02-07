@@ -349,11 +349,11 @@ export class CapasController {
   }
 
   async getVisibles(req, res) {
-    const { id_capa } = req.params;
+    const { id_capa, id_rol = null } = req.params;
     try {
-      let dbResponse = await capasService.getCapasVisibles(id_capa);
+      let dbResponse = await capasService.getCapasVisibles(id_capa,id_rol);
       if (dbResponse.length == 0) {
-        const responseCreate = await capasService.postCapasVisibles(id_capa);
+        const responseCreate = await capasService.postCapasVisibles(id_capa,id_rol);
         // console.log(responseCreate);
         dbResponse = responseCreate;
       }
@@ -399,9 +399,9 @@ export class CapasController {
   }
 
   async putVisibles(req, res) {
-    const { campos } = req.body;
+    const { id, c_array_campos } = req.body;
     try {
-      await capasService.putCapasVisibles(campos);
+      await capasService.putCapasVisibles(id, c_array_campos);
       res.status(200).json({ status: "success" });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -516,7 +516,6 @@ export class CapasController {
           return texto;
       }
     }
-    console.log('prueba');
     const { table, datosCapas } = req.body;
     try {
       let exportarTemp = [];
