@@ -111,6 +111,8 @@ export class AuthenticateService {
         attributes: ["rol_id"],
       });
 
+      console.log(usuario);
+
       const tools = await ToolsDetail.findAll({
         where: { fk_rol: usuario.dataValues.rol_id },
       });
@@ -199,10 +201,16 @@ export class AuthenticateService {
           id: id_geoportal,
         },
       });
+
       let data = [];
-      if (id_rol == "0") {
+
+      const rol = await TgUsuario.findOne({
+        where: { id_usuario: id, id_cliente: id_geoportal },
+      });
+
+      if (!rol) {
         const [componets] = await sequelize.query(
-          `select cm.*, case when position is null then 0 else position end as position 
+          `select cm.*, case when position is null then 0 else position end as position
           from administracion.components_map cm
           left join administracion.geoportales_component gc on cm.id=gc.fk_componente and fk_geoportal=${id_geoportal}
         order by gc.orden ASC`
@@ -210,10 +218,10 @@ export class AuthenticateService {
         data = componets;
       } else {
         const rol = await TgUsuario.findOne({
-          where: { id_usuario: id },
+          where: { id_usuario: id, id_cliente: id_geoportal },
         });
         const [componets] = await sequelize.query(
-          `select cm.*, case when position is null then 0 else position end as position 
+          `select cm.*, case when position is null then 0 else position end as position
           from administracion.components_map cm
           left join administracion.geoportales_component_rol gc on cm.id=gc.fk_componente and fk_geoportal=${id_cliente} and fk_rol=${rol.rol_id}
         order by gc.orden ASC`
