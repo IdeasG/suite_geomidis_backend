@@ -281,7 +281,41 @@ export class AuthenticateService {
     }
   }
 
+  async getComponentesByGeoportalByRol(id_rol, id_cliente) {
+    try {
+      const geoportal = await Geoportal.findOne({
+        where: {
+          id: id_cliente,
+        },
+      });
+
+      let data = [];
+      const [componets] = await sequelize.query(
+        `select f.id, f.component_name, f.props, f.description, case when gcr.position is null then 0 else gcr.position end as position from (
+          select cm.*, position 
+          from administracion.components_map cm
+          left join administracion.geoportales_component gc on cm.id=gc.fk_componente and fk_geoportal=${id_cliente}
+          where position is not null) as f
+          left join administracion.geoportales_component_rol gcr on f.id=gcr.fk_componente and gcr.fk_geoportal=${id_cliente} and gcr.fk_rol=${id_rol}
+          order by gcr.orden ASC`
+      );
+
+      data = componets;
+      const izquierda = data.filter((item) => item.position === 1);
+      const derecha = data.filter((item) => item.position === 2);
+      const menu = data.filter((item) => item.position === 3);
+      const arriba = data.filter((item) => item.position === 4);
+      const general = data.filter((item) => item.position === 0);
+
+      return { izquierda, derecha, menu, arriba, general, geoportal };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
   async getComponentesByGeoportalI(id, id_rol, id_cliente) {
+    console.log(id, id_rol, id_cliente);
     try {
       const geoportal = await Geoportal.findOne({
         where: {
@@ -661,10 +695,22 @@ export class AuthenticateService {
 
   async deleteRol(id) {
     try {
-      const data = await Rol.destroy({
-        where: { id: id },
+      const data = await TgUsuario.findOne({
+        where: { rol_id: id },
       });
-      return data;
+
+      if (data) {
+        return false;
+      } else {
+        await Rol.destroy({
+          where: { id: id },
+        });
+        await ComponentByRol.destroy({
+          where: { fk_rol: id },
+        });
+
+        return true;
+      }
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");

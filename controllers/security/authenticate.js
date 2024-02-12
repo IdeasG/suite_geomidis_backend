@@ -92,6 +92,20 @@ export class AuthenticateController {
     }
   }
 
+  async getComponentesByGeoportalByRol(req, res) {
+    const { id_cliente } = req.user;
+    const { id_rol } = req.params;
+    try {
+      const data = await authenticateService.getComponentesByGeoportalByRol(
+        id_rol,
+        id_cliente
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getUsuariosByGeoportal(req, res) {
     const { id } = req.params;
     try {

@@ -32,11 +32,12 @@ export const createAuthenticateRouter = () => {
   );
   AuthenticateRouter.post("/rol", validarToken, authenticateController.saveRol);
   AuthenticateRouter.post("/rol/tools", authenticateController.saveRolTools);
+
+  AuthenticateRouter.delete("/erol/:id", authenticateController.deleteRol);
   AuthenticateRouter.delete(
     "/rol/tools/:id_rol/:fk_modulo/:fk_grupo/:fk_menu",
     authenticateController.deleteRolTools
   );
-  AuthenticateRouter.delete("/rol/:id", authenticateController.deleteRol);
 
   AuthenticateRouter.get(
     "/componentes/:id",
@@ -59,6 +60,12 @@ export const createAuthenticateRouter = () => {
     "/geoportales",
     validarToken,
     authenticateController.getComponentesByGeoportalI
+  );
+
+  AuthenticateRouter.get(
+    "/gestion/herramientas/:id_rol",
+    validarToken,
+    authenticateController.getComponentesByGeoportalByRol
   );
 
   AuthenticateRouter.get(

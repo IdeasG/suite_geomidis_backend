@@ -11,6 +11,8 @@ import excel from "exceljs/dist/es5/index.js";
 import zip from "shp-write/src/zip.js";
 import axios from "axios";
 import TgUsuario from "../../models/security/tgUsuario.js";
+import { Sequelize } from "sequelize";
+import Rol from "../../models/security/rol.js";
 
 const capasService = new CapasService();
 
@@ -286,6 +288,54 @@ export class CapasController {
   //     res.status(500).json({ error: error.message });
   //   }
   // }
+
+  async getStructureInvitado(req, res) {
+    const { id_geoportal } = req.params;
+    try {
+      const rol = await Rol.findOne({
+        where: {
+          id_cliente: id_geoportal,
+          c_nombre_rol: { [Sequelize.Op.iLike]: "%invitado%" },
+        },
+        attributes: ["id_rol"],
+        limit: 1,
+      });
+
+      const [superGrupos, metadata] = await sequelize.query(
+        `select distinct sp.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=${rol.id_rol}`
+      );
+      const dbResponse = superGrupos;
+      for (let index = 0; index < superGrupos.length; index++) {
+        const element = superGrupos[index];
+        const [grupos, metadata] = await sequelize.query(
+          `select distinct cp.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=${rol.id_rol} and cp.id_super_grupo = ${element.id_super_grupo}`
+        );
+        for (let index = 0; index < grupos.length; index++) {
+          const element = grupos[index];
+          const [capas, metadata] = await sequelize.query(
+            `select distinct tc.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=${rol.id_rol} and tc.id_grupo = ${element.id_grupo}`
+          );
+          element.capas = capas;
+        }
+        element.grupos = grupos;
+      }
+      res.status(200).json({ status: "success", data: dbResponse });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 
   async getStructure(req, res) {
     const { id, id_rol, id_cliente } = req.user;
