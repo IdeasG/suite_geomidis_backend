@@ -51,6 +51,11 @@ export const createAuthenticateRouter = () => {
   );
 
   AuthenticateRouter.get(
+    "/geoportales/invitado/:id_geoportal",
+    authenticateController.getComponentesByGeoportalInvitado
+  );
+
+  AuthenticateRouter.get(
     "/geoportales",
     validarToken,
     authenticateController.getComponentesByGeoportalI
