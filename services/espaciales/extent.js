@@ -16,13 +16,14 @@ export class ExtentService {
     async getExtentTable(tabla) {
         try {
         // const distrito = await SpDistrito.findAll();
-        console.log(`SELECT CAST(ST_Extent(ST_Transform("IDEASG" , 3857)) AS VARCHAR) as bextent from espaciales.${tabla})`);
+        // console.log(`SELECT CAST(ST_Extent(ST_Transform("IDEASG" , 3857)) AS VARCHAR) as bextent from espaciales.${tabla})`);
+        let nombreGeometria = ''
         if (tabla == 'sp_departamentos' || tabla == 'sp_provincias' || tabla == 'sp_distritos') {
-            nombGeometria = 'geom'
+            nombreGeometria = 'geom'
         } else {
-            nombGeometria = 'IDEASG'
+            nombreGeometria = '"IDEASG"'
         }
-        const dbResponse = await sequelize.query(`SELECT CAST(ST_Extent(ST_Transform("IDEASG" , 3857)) AS VARCHAR) as bextent from espaciales.${tabla}`);
+        const dbResponse = await sequelize.query(`SELECT CAST(ST_Extent(ST_Transform(`+nombreGeometria+` , 3857)) AS VARCHAR) as bextent from espaciales.${tabla}`);
         return dbResponse;
         } catch (error) {
         throw new Error("Error al obtener la extensión.");
