@@ -17,6 +17,11 @@ export class ExtentService {
         try {
         // const distrito = await SpDistrito.findAll();
         console.log(`SELECT CAST(ST_Extent(ST_Transform("IDEASG" , 3857)) AS VARCHAR) as bextent from espaciales.${tabla})`);
+        if (tabla == 'sp_departamentos' || tabla == 'sp_provincias' || tabla == 'sp_distritos') {
+            nombGeometria = 'geom'
+        } else {
+            nombGeometria = 'IDEASG'
+        }
         const dbResponse = await sequelize.query(`SELECT CAST(ST_Extent(ST_Transform("IDEASG" , 3857)) AS VARCHAR) as bextent from espaciales.${tabla}`);
         return dbResponse;
         } catch (error) {
