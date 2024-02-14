@@ -66,11 +66,37 @@ export class AuthenticateController {
     }
   }
 
+  async getComponentesByGeoportalInvitado(req, res) {
+    const { id_geoportal } = req.params;
+    try {
+      const data = await authenticateService.getComponentesByGeoportalInvitado(
+        id_geoportal
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getComponentesByGeoportalI(req, res) {
     const { id, id_rol, id_cliente } = req.user;
     try {
       const data = await authenticateService.getComponentesByGeoportalI(
         id,
+        id_rol,
+        id_cliente
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getComponentesByGeoportalByRol(req, res) {
+    const { id_cliente } = req.user;
+    const { id_rol } = req.params;
+    try {
+      const data = await authenticateService.getComponentesByGeoportalByRol(
         id_rol,
         id_cliente
       );

@@ -10,6 +10,9 @@ import { sequelize } from "../../config/postgres/sequelize.js";
 import excel from "exceljs/dist/es5/index.js";
 import zip from "shp-write/src/zip.js";
 import axios from "axios";
+import TgUsuario from "../../models/security/tgUsuario.js";
+import { Sequelize } from "sequelize";
+import Rol from "../../models/security/rol.js";
 
 const capasService = new CapasService();
 
@@ -286,11 +289,62 @@ export class CapasController {
   //   }
   // }
 
-  async getStructure(req, res) {
-    const { id_rol } = req.user;
-    console.log(id_rol);
+  async getStructureInvitado(req, res) {
+    const { id_geoportal } = req.params;
     try {
-      if (id_rol == 0 || id_rol == undefined) {
+      const rol = await Rol.findOne({
+        where: {
+          id_cliente: id_geoportal,
+          c_nombre_rol: { [Sequelize.Op.iLike]: "%invitado%" },
+        },
+        attributes: ["id_rol"],
+        limit: 1,
+      });
+
+      const [superGrupos, metadata] = await sequelize.query(
+        `select distinct sp.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=${rol.id_rol}`
+      );
+      const dbResponse = superGrupos;
+      for (let index = 0; index < superGrupos.length; index++) {
+        const element = superGrupos[index];
+        const [grupos, metadata] = await sequelize.query(
+          `select distinct cp.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=${rol.id_rol} and cp.id_super_grupo = ${element.id_super_grupo}`
+        );
+        for (let index = 0; index < grupos.length; index++) {
+          const element = grupos[index];
+          const [capas, metadata] = await sequelize.query(
+            `select distinct tc.* from administracion.tadm_capas_supergrupo sp
+        inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+        inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+        inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+        where fk_rol=${rol.id_rol} and tc.id_grupo = ${element.id_grupo}`
+          );
+          element.capas = capas;
+        }
+        element.grupos = grupos;
+      }
+      res.status(200).json({ status: "success", data: dbResponse });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getStructure(req, res) {
+    const { id, id_rol, id_cliente } = req.user;
+    try {
+      const rol = await TgUsuario.findOne({
+        where: { id_usuario: id, id_cliente: id_cliente },
+      });
+
+      if (!rol) {
         const [superGrupos, metadata] = await sequelize.query(
           `select * from administracion.tadm_capas_supergrupo order by n_orden asc`
         );
@@ -311,12 +365,16 @@ export class CapasController {
         }
         res.status(200).json({ status: "success", data: dbResponse });
       } else {
+        const rol = await TgUsuario.findOne({
+          where: { id_usuario: id, id_cliente: id_cliente },
+        });
+
         const [superGrupos, metadata] = await sequelize.query(
           `select distinct sp.* from administracion.tadm_capas_supergrupo sp
         inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
         inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
         inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
-        where fk_rol=1`
+        where fk_rol=${rol.rol_id}`
         );
         const dbResponse = superGrupos;
         for (let index = 0; index < superGrupos.length; index++) {
@@ -326,7 +384,7 @@ export class CapasController {
         inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
         inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
         inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
-        where fk_rol=1 and cp.id_super_grupo = ${element.id_super_grupo}`
+        where fk_rol=${rol.rol_id} and cp.id_super_grupo = ${element.id_super_grupo}`
           );
           for (let index = 0; index < grupos.length; index++) {
             const element = grupos[index];
@@ -335,7 +393,7 @@ export class CapasController {
         inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
         inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
         inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
-        where fk_rol=1 and tc.id_grupo =  ${element.id_grupo}`
+        where fk_rol=${rol.rol_id} and tc.id_grupo = ${element.id_grupo}`
             );
             element.capas = capas;
           }
@@ -351,9 +409,12 @@ export class CapasController {
   async getVisibles(req, res) {
     const { id_capa, id_rol = null } = req.params;
     try {
-      let dbResponse = await capasService.getCapasVisibles(id_capa,id_rol);
+      let dbResponse = await capasService.getCapasVisibles(id_capa, id_rol);
       if (dbResponse.length == 0) {
-        const responseCreate = await capasService.postCapasVisibles(id_capa,id_rol);
+        const responseCreate = await capasService.postCapasVisibles(
+          id_capa,
+          id_rol
+        );
         // console.log(responseCreate);
         dbResponse = responseCreate;
       }
@@ -449,7 +510,6 @@ export class CapasController {
           layer +
           "&outputFormat=application/json";
       }
-      console.log(url);
       const response = await axios.get(url);
       const geojson = response.data;
       // console.log(geojson);
@@ -508,12 +568,11 @@ export class CapasController {
   }
 
   async descargarExcel(req, res) {
-    
     function acortarTexto(texto, longitudMaxima) {
       if (texto.length > longitudMaxima) {
-          return texto.substring(0, longitudMaxima - 3) + "...";
+        return texto.substring(0, longitudMaxima - 3) + "...";
       } else {
-          return texto;
+        return texto;
       }
     }
     const { table, datosCapas } = req.body;
@@ -555,24 +614,25 @@ export class CapasController {
       // Add Array Rows
       worksheet.addRows(exportarTemp);
 
-      let nombresExistentes = []
-      function nombreUnico(nombresExistentes,titulo) {
+      let nombresExistentes = [];
+      function nombreUnico(nombresExistentes, titulo) {
         for (let i = 2; ; i++) {
           const sufijo = `_${i}`;
-          const nuevoNombreConSufijo = acortarTexto(titulo, 31 - sufijo.length) + sufijo;
+          const nuevoNombreConSufijo =
+            acortarTexto(titulo, 31 - sufijo.length) + sufijo;
           if (!nombresExistentes.includes(nuevoNombreConSufijo)) {
-              return nuevoNombreConSufijo;
+            return nuevoNombreConSufijo;
           }
         }
       }
       datosCapas.forEach((element) => {
-        let titulo = element.grupo + " " + element.capa
-        titulo = acortarTexto(titulo,31)
+        let titulo = element.grupo + " " + element.capa;
+        titulo = acortarTexto(titulo, 31);
         if (nombresExistentes.includes(titulo)) {
-          titulo = nombreUnico(nombresExistentes,titulo)
-          nombresExistentes.push(titulo)
+          titulo = nombreUnico(nombresExistentes, titulo);
+          nombresExistentes.push(titulo);
         } else {
-          nombresExistentes.push(titulo)
+          nombresExistentes.push(titulo);
         }
         // console.log(nombresExistentes);
         let worksheet = workbook.addWorksheet(titulo);

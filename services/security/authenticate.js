@@ -8,7 +8,7 @@ import IntAuthenticate from "../../models/security/intAuthenticate.js";
 import ToolsDetail from "../../models/security/tools.js";
 import Rol from "../../models/security/rol.js";
 import ToolsAdmin from "../../models/security/toolsAdmin.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import HerramientaRoles from "../../models/security/herramientaSistema.js";
 import TiSisClienteD from "../../models/manager/tiSisClienteDetail.js";
 import { sequelize } from "../../config/postgres/sequelize.js";
@@ -111,6 +111,8 @@ export class AuthenticateService {
         attributes: ["rol_id"],
       });
 
+      console.log(usuario);
+
       const tools = await ToolsDetail.findAll({
         where: { fk_rol: usuario.dataValues.rol_id },
       });
@@ -187,7 +189,6 @@ export class AuthenticateService {
       const data = transformedData;
       return data;
     } catch (error) {
-      console.log(error);
       throw new Error("Error al obtener el servicio.");
     }
   }
@@ -199,10 +200,16 @@ export class AuthenticateService {
           id: id_geoportal,
         },
       });
+
       let data = [];
-      if (id_rol == "0") {
+
+      const rol = await TgUsuario.findOne({
+        where: { id_usuario: id, id_cliente: id_geoportal },
+      });
+
+      if (!rol) {
         const [componets] = await sequelize.query(
-          `select cm.*, case when position is null then 0 else position end as position 
+          `select cm.*, case when position is null then 0 else position end as position
           from administracion.components_map cm
           left join administracion.geoportales_component gc on cm.id=gc.fk_componente and fk_geoportal=${id_geoportal}
         order by gc.orden ASC`
@@ -210,10 +217,10 @@ export class AuthenticateService {
         data = componets;
       } else {
         const rol = await TgUsuario.findOne({
-          where: { id_usuario: id },
+          where: { id_usuario: id, id_cliente: id_geoportal },
         });
         const [componets] = await sequelize.query(
-          `select cm.*, case when position is null then 0 else position end as position 
+          `select cm.*, case when position is null then 0 else position end as position
           from administracion.components_map cm
           left join administracion.geoportales_component_rol gc on cm.id=gc.fk_componente and fk_geoportal=${id_cliente} and fk_rol=${rol.rol_id}
         order by gc.orden ASC`
@@ -234,7 +241,81 @@ export class AuthenticateService {
     }
   }
 
+  async getComponentesByGeoportalInvitado(id_geoportal) {
+    try {
+      const geoportal = await Geoportal.findOne({
+        where: {
+          id: id_geoportal,
+        },
+      });
+
+      let data = [];
+
+      const rol = await Rol.findOne({
+        where: {
+          id_cliente: id_geoportal,
+          c_nombre_rol: { [Sequelize.Op.iLike]: "%invitado%" },
+        },
+        attributes: ["id_rol"],
+        limit: 1,
+      });
+
+      const [componets] = await sequelize.query(
+        `select cm.*, case when position is null then 0 else position end as position
+          from administracion.components_map cm
+          left join administracion.geoportales_component_rol gc on cm.id=gc.fk_componente and fk_geoportal=${id_geoportal} and fk_rol=${rol.id_rol}
+        order by gc.orden ASC`
+      );
+      data = componets;
+
+      const izquierda = data.filter((item) => item.position === 1);
+      const derecha = data.filter((item) => item.position === 2);
+      const menu = data.filter((item) => item.position === 3);
+      const arriba = data.filter((item) => item.position === 4);
+      const general = data.filter((item) => item.position === 0);
+
+      return { izquierda, derecha, menu, arriba, general, geoportal };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getComponentesByGeoportalByRol(id_rol, id_cliente) {
+    try {
+      const geoportal = await Geoportal.findOne({
+        where: {
+          id: id_cliente,
+        },
+      });
+
+      let data = [];
+      const [componets] = await sequelize.query(
+        `select f.id, f.component_name, f.props, f.description, case when gcr.position is null then 0 else gcr.position end as position from (
+          select cm.*, position 
+          from administracion.components_map cm
+          left join administracion.geoportales_component gc on cm.id=gc.fk_componente and fk_geoportal=${id_cliente}
+          where position is not null) as f
+          left join administracion.geoportales_component_rol gcr on f.id=gcr.fk_componente and gcr.fk_geoportal=${id_cliente} and gcr.fk_rol=${id_rol}
+          order by gcr.orden ASC`
+      );
+
+      data = componets;
+      const izquierda = data.filter((item) => item.position === 1);
+      const derecha = data.filter((item) => item.position === 2);
+      const menu = data.filter((item) => item.position === 3);
+      const arriba = data.filter((item) => item.position === 4);
+      const general = data.filter((item) => item.position === 0);
+
+      return { izquierda, derecha, menu, arriba, general, geoportal };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
   async getComponentesByGeoportalI(id, id_rol, id_cliente) {
+    console.log(id, id_rol, id_cliente);
     try {
       const geoportal = await Geoportal.findOne({
         where: {
@@ -614,10 +695,22 @@ export class AuthenticateService {
 
   async deleteRol(id) {
     try {
-      const data = await Rol.destroy({
-        where: { id: id },
+      const data = await TgUsuario.findOne({
+        where: { rol_id: id },
       });
-      return data;
+
+      if (data) {
+        return false;
+      } else {
+        await Rol.destroy({
+          where: { id: id },
+        });
+        await ComponentByRol.destroy({
+          where: { fk_rol: id },
+        });
+
+        return true;
+      }
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
