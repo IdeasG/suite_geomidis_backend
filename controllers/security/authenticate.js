@@ -160,6 +160,22 @@ export class AuthenticateController {
     }
   }
 
+  async updatePasswordUsuariosInternoByGeoportal(req, res) {
+    // console.log('123');
+    const { id } = req.user;
+    // const { id_usuario } = req.params;
+    const { password } = req.body;
+    try {
+      await authenticateService.updatePasswordUsuariosInternoByGeoportal(
+        id,
+        password
+      );
+      res.status(201).json({message: "Contraseña actualizada."});
+    } catch (error) {
+      res.status(500).json({ error: "Error: " + error });
+    }
+  }
+
   async deleteUsuariosInternoByGeoportal(req, res) {
     const { id_usuario } = req.params;
     try {

@@ -428,6 +428,20 @@ export class AuthenticateService {
     }
   }
 
+  async updatePasswordUsuariosInternoByGeoportal(id_usuario, password) {
+    try {
+      const usuario = await TgUsuario.update(
+        {
+          clave: generatePasswordHash(password),
+        },
+        { where: { id_usuario } }
+      );
+      return usuario;
+    } catch (error) {
+      throw new Error("Error: " + error);
+    }
+  }
+
   async deleteUsuariosInternoByGeoportal(id_usuario) {
     try {
       const usuario = await TgUsuario.destroy({
