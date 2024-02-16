@@ -170,7 +170,7 @@ export class AuthenticateController {
         id,
         password
       );
-      res.status(201).json({message: "Contraseña actualizada.", id: id});
+      res.status(200).json({message: "Contraseña actualizada."});
     } catch (error) {
       res.status(500).json({ error: "Error: " + error });
     }
