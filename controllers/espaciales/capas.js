@@ -546,6 +546,16 @@ export class CapasController {
     }
   }
 
+  async cruceInformacion(req, res) {
+    const body = req.body.capas;
+    try {
+      const respuesta = await capasService.cruceInformacion(body);
+      res.send(JSON.stringify(jsonData, null, 2));
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async validacionData(req, res) {
     // const { simbolo, column, layer, inputBt} = req.body;
     // console.log(simbolo, column, layer, inputBt);

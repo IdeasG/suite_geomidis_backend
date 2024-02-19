@@ -256,6 +256,30 @@ export class CapasService {
     }
   }
 
+  async cruceInformacion(body) {
+    // select * from espaciales.spg_fcd_ushakwin
+    // inner join espaciales.spg_fcd_usdemiab on espaciales.spg_fcd_ushakwin."DNJEHO" = espaciales.spg_fcd_usdemiab."NDJEHO"
+    try {
+      // console.log(body)
+      let consulta = ''
+      for (let index in body) {
+        const element = body[index];
+        console.log(element, index);
+        if (index == '0') {
+          consulta = consulta + 'select * from espaciales.' + element.value + ' '
+        }
+        else {
+          consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'" = espaciales.' + element.value + '."'+ element.campo+'" '
+        }
+      }
+      console.log('consulta',consulta);
+      const [results, metadata] = await sequelize.query(consulta);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener el json:" + error);
+    }
+  }
+
   async validacionData() {
     try {
       const response = await InformacionRegistro.findAll({

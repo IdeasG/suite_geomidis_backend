@@ -430,13 +430,13 @@ export class AuthenticateService {
 
   async updatePasswordUsuariosInternoByGeoportal(id_usuario, password) {
     try {
-      const usuario = await TgUsuario.update(
+      await TgUsuario.update(
         {
           clave: generatePasswordHash(password),
         },
         { where: { id_usuario } }
       );
-      return usuario;
+      return;
     } catch (error) {
       throw new Error("Error: " + error);
     }
