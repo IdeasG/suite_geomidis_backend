@@ -98,7 +98,7 @@ export const createAuthenticateRouter = () => {
     authenticateController.updateUsuariosInternoByGeoportal
   );
 
-  AuthenticateRouter.put(
+  AuthenticateRouter.post(
     "/geoportal/internos/ps",
     validarToken,
     authenticateController.updatePasswordUsuariosInternoByGeoportal
