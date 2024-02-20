@@ -180,12 +180,12 @@ export class AuthenticateController {
 
   async getNombreRol(req, res) {
     // console.log('123');
-    const { id_rol } = req.user;
+    const { id_rol, id } = req.user;
     try {
       const response = await authenticateService.getNombreRol(
-        id_rol        
+        id_rol, id        
       );
-      res.status(200).json({ status: "success", nombreRol: response});
+      res.status(200).json({ status: "success", nombreRol: response.nombreRol, nombreUsuario: response.nombreUsuario});
     } catch (error) {
       res.status(500).json({ error: "Error: " + error });
     }

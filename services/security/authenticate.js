@@ -453,19 +453,30 @@ export class AuthenticateService {
     }
   }
 
-  async getNombreRol(id_rol) {
+  async getNombreRol(id_rol,id_usuario) {
     try {
       let nombreRol = ''
+      let nombreUsuario = ''
       if (id_rol==0) {
         nombreRol = 'Adminitrador Geoportal'
+        nombreUsuario = ''
       } else{
         const rol = await Rol.findOne({
           where:{id_rol},
           attributes: ['c_nombre_rol']
         })
-        nombreRol = rol ? rol.c_nombre_rol : '';
+        nombreRol = rol ? rol.c_nombre_rol : ''
+        const usuario = await TgUsuario.findOne({
+          where:{id_usuario},
+          attributes: ['nombres', 'ape_paterno']
+        })
+        nombreUsuario = usuario.nombres + ' ' + usuario.ape_paterno
       }
-      return nombreRol;
+      const valores = {
+        nombreRol: nombreRol,
+        nombreUsuario: nombreUsuario
+      }
+      return valores;
     } catch (error) {
       throw new Error("Error: " + error);
     }
