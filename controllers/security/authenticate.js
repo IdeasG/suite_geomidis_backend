@@ -186,7 +186,7 @@ export class AuthenticateController {
         id,
         password
       );
-      res.status(200).json({ status: "success" });
+      res.status(200).json({ status: "success", actualiado: id, password: password });
     } catch (error) {
       res.status(500).json({ error: "Error: " + error });
     }
