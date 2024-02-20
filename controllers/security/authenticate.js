@@ -163,13 +163,14 @@ export class AuthenticateController {
 
   async updatePasswordUsuariosInternoByGeoportal(req, res) {
     // console.log('123');
-    const { id } = req.user;
+    const { id,id_rol } = req.user;
     // const { id_usuario } = req.params;
     const { password } = req.body;
     try {
       await authenticateService.updatePasswordUsuariosInternoByGeoportal(
         id,
-        password
+        password,
+        id_rol        
       );
       res.status(200).json({ status: "success" });
     } catch (error) {

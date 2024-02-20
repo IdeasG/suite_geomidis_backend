@@ -428,15 +428,25 @@ export class AuthenticateService {
     }
   }
 
-  async updatePasswordUsuariosInternoByGeoportal(id_usuario, password) {
+  async updatePasswordUsuariosInternoByGeoportal(id_usuario, password,id_rol) {
     try {
-      console.log(password, id_usuario);
-      await TgUsuario.update(
-        {
-          clave: generatePasswordHash(password),
-        },
-        { where: { id_usuario } }
-      );
+      if (id_rol==0) {
+        await Authenticate.update(
+          {
+            c_contrasena: generatePasswordHash(password)
+          },
+          {
+            where: { id_usuario }
+          }
+        )
+      } else{
+        await TgUsuario.update(
+          {
+            clave: generatePasswordHash(password)
+          },
+          { where: { id_usuario } }
+        );
+      }
       return;
     } catch (error) {
       throw new Error("Error: " + error);
