@@ -437,7 +437,7 @@ export class AuthenticateService {
         },
         { where: { id_usuario } }
       );
-      return response;
+      return;
     } catch (error) {
       throw new Error("Error: " + error);
     }

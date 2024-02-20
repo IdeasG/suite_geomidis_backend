@@ -161,22 +161,6 @@ export class AuthenticateController {
     }
   }
 
-  async prueba(req, res) {
-    // console.log('123');
-    const { id } = req.user;
-    // const { id_usuario } = req.params;
-    // const { password } = req.body;
-    try {
-      // await authenticateService.updatePasswordUsuariosInternoByGeoportal(
-      //   id,
-      //   password
-      // );
-      res.status(200).json({ status: "success", data: id });
-    } catch (error) {
-      res.status(500).json({ error: "Error: " + error });
-    }
-  }
-
   async updatePasswordUsuariosInternoByGeoportal(req, res) {
     // console.log('123');
     const { id } = req.user;
