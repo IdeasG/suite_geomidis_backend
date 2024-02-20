@@ -1,3 +1,4 @@
+import { response } from "express";
 import { AuthenticateService } from "../../services/security/authenticate.js";
 
 const authenticateService = new AuthenticateService();
@@ -182,11 +183,11 @@ export class AuthenticateController {
     // const { id_usuario } = req.params;
     const { password } = req.body;
     try {
-      await authenticateService.updatePasswordUsuariosInternoByGeoportal(
+      const response = await authenticateService.updatePasswordUsuariosInternoByGeoportal(
         id,
         password
       );
-      res.status(200).json({ status: "success", actualiado: id, password: password });
+      res.status(200).json({ status: "success",data: response,  actualiado: id, password: password });
     } catch (error) {
       res.status(500).json({ error: "Error: " + error });
     }
