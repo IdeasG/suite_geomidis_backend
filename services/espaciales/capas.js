@@ -256,25 +256,38 @@ export class CapasService {
     }
   }
 
-  async cruceInformacion(body) {
-    // select * from espaciales.spg_fcd_ushakwin
-    // inner join espaciales.spg_fcd_usdemiab on espaciales.spg_fcd_ushakwin."DNJEHO" = espaciales.spg_fcd_usdemiab."NDJEHO"
+  async cruceInformacion(body,tipo,busqueda,offset,pageSize) {
     try {
-      // console.log(body)
+      let resultado = {}
       let consulta = ''
-      for (let index in body) {
-        const element = body[index];
-        console.log(element, index);
-        if (index == '0') {
-          consulta = consulta + 'select * from espaciales.' + element.value + ' '
+      if (tipo == '1') {
+        for (let index in body) {
+          const element = body[index];
+          // console.log(element, index);
+          if (index == '0') {
+            consulta = consulta + 'select * from espaciales.' + element.value + ' '
+          }
+          else {
+            consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'"::character varying = espaciales.' + element.value + '."'+ element.campo+'"::character varying '
+          }
         }
-        else {
-          consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'" = espaciales.' + element.value + '."'+ element.campo+'" '
+        consulta = consulta + ' offset ' + offset + ' limit ' + pageSize
+        const [results, metadata] = await sequelize.query(consulta);
+        const respuetaProcesada = {
+          'consulta_grupal': results
+        }
+        resultado = respuetaProcesada
+      } else {
+        for (let index in body) {
+          const element = body[index];
+          const query = 'select * from espaciales.' + element.value + ' where espaciales.' + element.value + '."' + element.campo + '"::character varying = ' + busqueda + '::character varying'
+          console.log(query);
+          const [results, metadata] = await sequelize.query(query);
+          console.log(results);
+          resultado[element.value] = results
         }
       }
-      console.log('consulta',consulta);
-      const [results, metadata] = await sequelize.query(consulta);
-      return results;
+      return resultado;
     } catch (error) {
       throw new Error("Error al obtener el json:" + error);
     }

@@ -547,10 +547,11 @@ export class CapasController {
   }
 
   async cruceInformacion(req, res) {
-    const body = req.body.capas;
+    const { capas, tipo, busqueda, page = 1, pageSize = 5} = req.body;
     try {
-      const respuesta = await capasService.cruceInformacion(body);
-      res.send(JSON.stringify(jsonData, null, 2));
+      const offset = (page - 1) * pageSize;
+      const respuesta = await capasService.cruceInformacion(capas,tipo,busqueda,offset,pageSize);
+      res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
