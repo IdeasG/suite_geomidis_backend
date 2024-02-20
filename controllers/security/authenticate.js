@@ -183,11 +183,11 @@ export class AuthenticateController {
     // const { id_usuario } = req.params;
     const { password } = req.body;
     try {
-      const response = await authenticateService.updatePasswordUsuariosInternoByGeoportal(
+      await authenticateService.updatePasswordUsuariosInternoByGeoportal(
         id,
         password
       );
-      res.status(200).json({ status: "success",data: response,  actualiado: id, password: password });
+      res.status(200).json({ status: "success" });
     } catch (error) {
       res.status(500).json({ error: "Error: " + error });
     }
