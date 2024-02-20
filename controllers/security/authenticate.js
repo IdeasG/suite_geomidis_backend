@@ -178,6 +178,19 @@ export class AuthenticateController {
     }
   }
 
+  async getNombreRol(req, res) {
+    // console.log('123');
+    const { id_rol } = req.user;
+    try {
+      const response = await authenticateService.getNombreRol(
+        id_rol        
+      );
+      res.status(200).json({ status: "success", nombreRol: response});
+    } catch (error) {
+      res.status(500).json({ error: "Error: " + error });
+    }
+  }
+
   async deleteUsuariosInternoByGeoportal(req, res) {
     const { id_usuario } = req.params;
     try {

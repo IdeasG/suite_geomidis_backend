@@ -453,6 +453,24 @@ export class AuthenticateService {
     }
   }
 
+  async getNombreRol(id_rol) {
+    try {
+      let nombreRol = ''
+      if (id_rol==0) {
+        nombreRol = 'Adminitrador Geoportal'
+      } else{
+        const rol = await Rol.findOne({
+          where:{id_rol},
+          attributes: ['c_nombre_rol']
+        })
+        nombreRol = rol ? rol.c_nombre_rol : '';
+      }
+      return nombreRol;
+    } catch (error) {
+      throw new Error("Error: " + error);
+    }
+  }
+
   async deleteUsuariosInternoByGeoportal(id_usuario) {
     try {
       const usuario = await TgUsuario.destroy({

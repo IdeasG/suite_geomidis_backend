@@ -104,6 +104,12 @@ export const createAuthenticateRouter = () => {
     authenticateController.updatePasswordUsuariosInternoByGeoportal
   );
 
+  AuthenticateRouter.get(
+    "/nombre/rol",
+    validarToken,
+    authenticateController.getNombreRol
+  );
+
   AuthenticateRouter.delete(
     "/geoportal/internos/:id_usuario",
     validarToken,
