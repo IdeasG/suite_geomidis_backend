@@ -271,7 +271,8 @@ export class CapasService {
             consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'"::character varying = espaciales.' + element.value + '."'+ element.campo+'"::character varying '
           }
         }
-        consulta = consulta + ' offset ' + offset + ' limit ' + pageSize
+        // consulta = consulta + ' offset ' + offset + ' limit ' + pageSize
+        console.log(consulta);
         const [results, metadata] = await sequelize.query(consulta);
         const respuetaProcesada = {
           'consulta_grupal': results
