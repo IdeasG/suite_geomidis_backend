@@ -437,6 +437,7 @@ export class AuthenticateService {
         },
         { where: { id_usuario } }
       );
+      response.push(generatePasswordHash(password))
       return response;
     } catch (error) {
       throw new Error("Error: " + error);
