@@ -265,7 +265,7 @@ export class CapasService {
           const element = body[index];
           // console.log(element, index);
           if (index == '0') {
-            consulta = consulta + 'select * from espaciales.' + element.value + ' '
+            consulta = consulta + 'select espaciales.' + element.value +'."'+element.campo+ '" from espaciales.' + element.value + ' '
           }
           else {
             consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'"::character varying = espaciales.' + element.value + '."'+ element.campo+'"::character varying '
@@ -281,7 +281,7 @@ export class CapasService {
       } else {
         for (let index in body) {
           const element = body[index];
-          const query = 'select * from espaciales.' + element.value + ' where espaciales.' + element.value + '."' + element.campo + '"::character varying = ' + busqueda + '::character varying'
+          const query = 'select espaciales.' + element.value +'."'+element.campo+ '" from espaciales.' + element.value + ' where espaciales.' + element.value + '."' + element.campo + '"::character varying = ' + busqueda + '::character varying'
           console.log(query);
           const [results, metadata] = await sequelize.query(query);
           console.log(results);

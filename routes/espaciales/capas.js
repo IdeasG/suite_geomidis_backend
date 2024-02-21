@@ -95,6 +95,7 @@ export const createRouteCapas = () => {
   CapaRouter.put("/actualizar/visible", capasController.putVisibles);
   CapaRouter.post("/excel", capasController.descargarExcel);
   CapaRouter.post("/excel/simple", capasController.descargarExcelSimple);
+  CapaRouter.post("/excel/cruzada", capasController.descargarExcelCruzada);
   CapaRouter.post("/excel/solocapas", capasController.descargarExcelSoloCapas);
   CapaRouter.post("/busquedaavanzada", capasController.busquedaAvanzada);
   CapaRouter.post("/archivoshape", capasController.archivoShape);
