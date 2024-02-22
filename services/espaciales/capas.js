@@ -373,7 +373,7 @@ export class CapasService {
       let nuevasColumnas = [];
       for (let index in results2) {
         const element = results2[index].column_name;
-        if (element !== "IDEASG") {
+        if (element !== "geom") {
           const registrados = {
             c_campo_original: element,
             c_campo_alias: element,
