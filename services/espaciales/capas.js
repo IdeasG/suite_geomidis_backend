@@ -14,7 +14,65 @@ export class CapasService {
       throw new Error("Error al obtener los tipos de vía...." + error);
     }
   }
+  async getAllCapasTable(offset,pageSize,currentPage) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+      select * from administracion.tadm_capas_supergrupo sg
+      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'interno'
+      order by sg.c_nombre_super_grupo asc`
+      // limit `+ pageSize + ` offset ` + offset
+      );
+      const [resultsConteo, metadataConteo] = await sequelize.query(`
+      select count(*) as conteo from administracion.tadm_capas_supergrupo sg
+      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'interno'
+      `);
+      const totalItems = parseInt(resultsConteo[0].conteo)
+      const totalPages = Math.ceil(totalItems / pageSize);
+      const data = {
+        data: results,
+        currentPage:1,
+        totalPages:1,
+        totalItems:totalItems
+      }
+      return data;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
 
+  async getAllCapasTableExterno(offset,pageSize,currentPage) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+      select * from administracion.tadm_capas_supergrupo sg
+      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'externo'
+      order by sg.c_nombre_super_grupo asc`
+      // limit `+ pageSize + ` offset ` + offset
+      );
+      const [resultsConteo, metadataConteo] = await sequelize.query(`
+      select count(*) as conteo from administracion.tadm_capas_supergrupo sg
+      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
+      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
+      where c_tipo = 'externo'
+      `);
+      const totalItems = parseInt(resultsConteo[0].conteo)
+      const totalPages = Math.ceil(totalItems / pageSize);
+      const data = {
+        data: results,
+        currentPage:1,
+        totalPages:1,
+        totalItems:totalItems
+      }
+      return data;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
   async getAllTablasEspaciales() {
     try {
       const [results, metadata] = await sequelize.query(`
@@ -23,7 +81,7 @@ export class CapasService {
         WHERE table_schema='espaciales'
       `);
       return results;
-    } catch {
+    } catch (error) {
       throw new Error("Error al obtener los resultados..." + error);
     }
   }

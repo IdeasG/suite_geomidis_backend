@@ -20,13 +20,10 @@ export class CapasController {
   constructor() {}
 
   async getAllCapasTable(req, res) {
+    const { page = 1, pageSize = 5 } = req.query;
     try {
-      const [response, metadata] = await sequelize.query(`
-      select * from administracion.tadm_capas_supergrupo sg
-      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'interno'
-      `);
+      const offset = (page - 1) * pageSize;
+      const response = await capasService.getAllCapasTable(offset, pageSize,page)
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -34,13 +31,10 @@ export class CapasController {
   }
 
   async getAllCapasTableExterno(req, res) {
+    const { page = 1, pageSize = 5 } = req.query;
     try {
-      const [response, metadata] = await sequelize.query(`
-      select * from administracion.tadm_capas_supergrupo sg
-      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'externo' 
-      `);
+      const offset = (page - 1) * pageSize;
+      const response = await capasService.getAllCapasTableExterno(offset, pageSize,page)
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
