@@ -105,7 +105,10 @@ export class CapasService {
 
   async getAllCapasInternas() {
     try {
-      const response = await Capas.findAll({ where: { c_tipo: "interno" } });
+      const response = await Capas.findAll({
+        where: { c_tipo: "interno" },
+        order: [['c_nombre_tabla_capa', 'ASC']]
+      });
       return response;
     } catch (error) {
       throw new Error("Error al obtener los tipos de vía...." + error);
