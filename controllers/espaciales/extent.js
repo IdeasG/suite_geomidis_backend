@@ -20,10 +20,8 @@ export class ExtentController {
 
   async getExtentTable(req, res) {
     const { tabla } = req.body;
-    console.log(tabla);
     try {
       const dbResponse = await extentService.getExtentTable(tabla);
-      console.log(dbResponse);
       let data = dbResponse[0][0].bextent;
       var extent = data.replace(',',' ').substr(4, (data.length-5)).split(" ");
       var ext = [parseInt(extent[0]), parseInt(extent[1]), parseInt(extent[2]), parseInt(extent[3])]

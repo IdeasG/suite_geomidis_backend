@@ -42,6 +42,10 @@ const capasGrupo = sequelize.define('tadm_capas', {
   c_servicio: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  c_nombre_geoserver:{
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   schema: 'administracion',
