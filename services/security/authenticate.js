@@ -414,11 +414,14 @@ export class AuthenticateService {
     }
   }
 
-  async updateUsuariosInternoByGeoportal(id_usuario, id_rol) {
+  async updateUsuariosInternoByGeoportal(id_usuario, id_rol,nombres, ape_paterno, ape_materno, correo, dni, celular,id_usuario_auditoria,id_rol_auditoria) {
     try {
       const usuario = await TgUsuario.update(
         {
+          nombres, ape_paterno, ape_materno, correo, dni, celular,
           rol_id: id_rol,
+          id_usuario_auditoria,
+          id_rol_auditoria          
         },
         { where: { id_usuario: id_usuario } }
       );
@@ -482,8 +485,13 @@ export class AuthenticateService {
     }
   }
 
-  async deleteUsuariosInternoByGeoportal(id_usuario) {
+  async deleteUsuariosInternoByGeoportal(id_usuario, id_usuario_auditoria, id_rol_auditoria) {
     try {
+      await TgUsuario.update({
+        id_usuario_auditoria, id_rol_auditoria
+      },{
+        where: { id_usuario: id_usuario },
+      })
       const usuario = await TgUsuario.destroy({
         where: { id_usuario: id_usuario },
       });
@@ -502,7 +510,9 @@ export class AuthenticateService {
     celular,
     tipo_usuario,
     rol_id,
-    id_cliente
+    id_cliente,
+    id_usuario_auditoria,
+    id_rol_auditoria
   ) {
     try {
       const usuario = await TgUsuario.create({
@@ -518,6 +528,8 @@ export class AuthenticateService {
         rol_id,
         estado: "0",
         id_cliente,
+        id_usuario_auditoria,
+        id_rol_auditoria
       });
       return usuario;
     } catch (error) {

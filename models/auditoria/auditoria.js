@@ -23,11 +23,14 @@ const Auditoria = sequelize.define(
         type: DataTypes.DATE,
     },
     id_usuario: {
-        type: DataTypes.STRING,
-    },
-    ip_usuario: {
         type: DataTypes.INTEGER,
     },
+    id_rol: {
+      type: DataTypes.INTEGER,
+    },
+    nombre_accion: {
+      type: DataTypes.STRING,
+    }
   },
   {
     schema: "public",

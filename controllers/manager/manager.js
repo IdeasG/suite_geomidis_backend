@@ -111,8 +111,9 @@ export class ManagerController {
 
   async saveCapasByRol(req, res) {
     const { fk_rol, fk_capa } = req.body;
+    const {id,id_rol} = req.user;
     try {
-      const data = await managerService.saveCapasByRol(fk_rol, fk_capa);
+      const data = await managerService.saveCapasByRol(fk_rol, fk_capa,id,id_rol);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -153,8 +154,9 @@ export class ManagerController {
 
   async deleteCapasByRol(req, res) {
     const { id } = req.params;
+    const {id: id_usuario ,id_rol} = req.user;
     try {
-      const data = await managerService.deleteCapasByRol(id);
+      const data = await managerService.deleteCapasByRol(id,id_usuario,id_rol);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });

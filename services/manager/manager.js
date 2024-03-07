@@ -124,11 +124,13 @@ export class ManagerService {
     }
   }
 
-  async saveCapasByRol(fk_rol, fk_capa) {
+  async saveCapasByRol(fk_rol, fk_capa,id_usuario_auditoria,id_rol_auditoria) {
     try {
       const data = await CapaByRol.create({
         fk_rol,
         fk_capa,
+        id_usuario_auditoria,
+        id_rol_auditoria
       });
       return data;
     } catch (error) {
@@ -181,8 +183,16 @@ export class ManagerService {
     }
   }
 
-  async deleteCapasByRol(id) {
+  async deleteCapasByRol(id,id_usuario_auditoria,id_rol_auditoria) {
     try {
+      await CapaByRol.update({
+        id_usuario_auditoria,id_rol_auditoria
+      },{
+          where: {
+          id: id
+        }
+      }
+      )
       const data = await CapaByRol.destroy({
         where: {
           id: id,

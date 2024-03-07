@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ManagerController } from "../../controllers/manager/manager.js";
+import { validarToken } from "../../middlewares/auth.js";
 
 export const createManagerRouter = () => {
   const managerRouter = Router();
@@ -21,7 +22,7 @@ export const createManagerRouter = () => {
   );
   managerRouter.post("/capas/grupo", managerController.saveGrupoCapasSistema);
   managerRouter.post("/capas/capas", managerController.saveCapasSistema);
-  managerRouter.post("/capas/rol", managerController.saveCapasByRol);
+  managerRouter.post("/capas/rol",validarToken,managerController.saveCapasByRol);
   //DELETE
   managerRouter.delete(
     "/sistemas/modulo/:id",
@@ -36,7 +37,7 @@ export const createManagerRouter = () => {
     managerController.deleteMenuSistema
   );
 
-  managerRouter.delete("/capas/rol/:id", managerController.deleteCapasByRol);
+  managerRouter.delete("/capas/rol/:id",validarToken, managerController.deleteCapasByRol);
 
   //GET CLIENTES
   managerRouter.get("/clientes", managerController.getClientes);

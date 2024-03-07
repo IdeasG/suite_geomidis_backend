@@ -168,10 +168,10 @@ export class CapasService {
     c_tipo,
     c_url,
     c_servicio,
-    id_usuario_auditoria
+    id_usuario_auditoria,
+    id_rol_auditoria
   ) {
     try {
-      // console.log(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url);
       const response = await Capas.create({
         id_grupo,
         c_nombre_tabla_capa,
@@ -182,9 +182,9 @@ export class CapasService {
         c_tipo,
         c_url,
         c_servicio,
-        id_usuario_auditoria
+        id_usuario_auditoria,
+        id_rol_auditoria
       });
-      // console.log(response);
       return response;
     } catch (error) {
       throw new Error("Error al obtener las capas visibles con el id_capa:");
@@ -226,7 +226,8 @@ export class CapasService {
     c_tipo,
     c_url,
     c_servicio,
-    id_usuario_auditoria
+    id_usuario_auditoria,
+    id_rol_auditoria
   ) {
     try {
       const response = await Capas.update(
@@ -239,7 +240,8 @@ export class CapasService {
           c_tipo,
           c_url,
           c_servicio,
-          id_usuario_auditoria
+          id_usuario_auditoria,
+          id_rol_auditoria
         },
         { where: { id_capa } }
       );
@@ -278,11 +280,12 @@ export class CapasService {
     }
   }
 
-  async EliminarCapas(id_capa,id_usuario_auditoria) {
+  async EliminarCapas(id_capa,id_usuario_auditoria,id_rol_auditoria) {
     try {
       await Capas.update(
         {
-          id_usuario_auditoria
+          id_usuario_auditoria,
+          id_rol_auditoria
         },
         { where: { id_capa } }
       );

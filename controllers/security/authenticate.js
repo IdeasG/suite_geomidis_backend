@@ -147,13 +147,16 @@ export class AuthenticateController {
   }
 
   async updateUsuariosInternoByGeoportal(req, res) {
-    const { id_cliente } = req.user;
+    const { id,id_rol:id_rol_auditoria,id_cliente } = req.user;
     const { id_usuario } = req.params;
-    const { id_rol } = req.body;
+    const { id_rol, nombres, ape_paterno, ape_materno, correo, dni, celular} = req.body;
     try {
       const data = await authenticateService.updateUsuariosInternoByGeoportal(
         id_usuario,
-        id_rol
+        id_rol,
+        nombres, ape_paterno, ape_materno, correo, dni, celular,
+        id,
+        id_rol_auditoria
       );
       res.status(201).json(data);
     } catch (error) {
@@ -193,9 +196,12 @@ export class AuthenticateController {
 
   async deleteUsuariosInternoByGeoportal(req, res) {
     const { id_usuario } = req.params;
+    const {id, id_rol} = req.user;
     try {
       const data = await authenticateService.deleteUsuariosInternoByGeoportal(
-        id_usuario
+        id_usuario,
+        id,
+        id_rol
       );
       res.status(201).json(data);
     } catch (error) {
@@ -204,7 +210,7 @@ export class AuthenticateController {
   }
 
   async createUsuariosInternoByGeoportal(req, res) {
-    const { id_cliente } = req.user;
+    const { id,id_rol:id_rol_auditoria,id_cliente } = req.user;
     const {
       dni,
       nombres,
@@ -225,7 +231,9 @@ export class AuthenticateController {
         celular,
         tipo_usuario,
         id_rol,
-        id_cliente
+        id_cliente,
+        id,
+        id_rol_auditoria
       );
       res.status(201).json(data);
     } catch (error) {

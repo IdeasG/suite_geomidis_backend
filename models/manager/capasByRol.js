@@ -18,6 +18,14 @@ const CapaByRol = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    id_usuario_auditoria:{
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    id_rol_auditoria:{
+      type: DataTypes.INTEGER,
+      allowNull: true
+    }
   },
   {
     schema: "administracion",
