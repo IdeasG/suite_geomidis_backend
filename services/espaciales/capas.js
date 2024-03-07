@@ -167,7 +167,8 @@ export class CapasService {
     b_capa,
     c_tipo,
     c_url,
-    c_servicio
+    c_servicio,
+    id_usuario_auditoria
   ) {
     try {
       // console.log(id_grupo, c_nombre_tabla_capa, c_nombre_public_capa, c_sql_capa, b_capa, c_tipo, c_url);
@@ -181,6 +182,7 @@ export class CapasService {
         c_tipo,
         c_url,
         c_servicio,
+        id_usuario_auditoria
       });
       // console.log(response);
       return response;
@@ -223,7 +225,8 @@ export class CapasService {
     b_capa,
     c_tipo,
     c_url,
-    c_servicio
+    c_servicio,
+    id_usuario_auditoria
   ) {
     try {
       const response = await Capas.update(
@@ -236,6 +239,7 @@ export class CapasService {
           c_tipo,
           c_url,
           c_servicio,
+          id_usuario_auditoria
         },
         { where: { id_capa } }
       );
@@ -274,8 +278,14 @@ export class CapasService {
     }
   }
 
-  async EliminarCapas(id_capa) {
+  async EliminarCapas(id_capa,id_usuario_auditoria) {
     try {
+      await Capas.update(
+        {
+          id_usuario_auditoria
+        },
+        { where: { id_capa } }
+      );
       const response = await Capas.destroy({ where: { id_capa } });
       // console.log(response);
       return response;

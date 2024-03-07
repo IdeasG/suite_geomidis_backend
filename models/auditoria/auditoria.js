@@ -26,7 +26,7 @@ const Auditoria = sequelize.define(
         type: DataTypes.STRING,
     },
     ip_usuario: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
     },
   },
   {

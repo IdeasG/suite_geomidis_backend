@@ -38,7 +38,7 @@ export const createRouteCapas = () => {
     capasController.getAllTablasEspaciales
   );
   // registrar capas
-  CapaRouter.post("/", cacheMiddleware, capasController.getAllCapasPost);
+  CapaRouter.post("/", cacheMiddleware, validarToken, capasController.getAllCapasPost);
   CapaRouter.post(
     "/grupos",
     cacheMiddleware,
@@ -50,7 +50,7 @@ export const createRouteCapas = () => {
     capasController.getAllCapasSupergruposPost
   );
   // actualizar capas
-  CapaRouter.put("/", cacheMiddleware, capasController.getAllCapasPut);
+  CapaRouter.put("/", cacheMiddleware, validarToken, capasController.getAllCapasPut);
   CapaRouter.put(
     "/grupos",
     cacheMiddleware,
@@ -65,6 +65,7 @@ export const createRouteCapas = () => {
   CapaRouter.delete(
     "/:id_capa",
     cacheMiddleware,
+    validarToken,
     capasController.getAllCapasDelete
   );
   CapaRouter.delete(

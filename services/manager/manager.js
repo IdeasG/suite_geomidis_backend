@@ -115,6 +115,7 @@ export class ManagerService {
         c_nombre_tabla_capa: c_tabla,
         c_nombre_public_capa: c_nombre,
         c_sql_capa: "1",
+        c_tipo: "interno"
       });
       return data;
     } catch (error) {

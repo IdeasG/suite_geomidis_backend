@@ -112,6 +112,7 @@ export class CapasController {
       c_url,
       c_servicio,
     } = req.body;
+    const {id} = req.user;
     try {
       const capas = await capasService.RegistrarCapas(
         id_grupo,
@@ -122,7 +123,8 @@ export class CapasController {
         b_capa,
         c_tipo,
         c_url,
-        c_servicio
+        c_servicio,
+        id
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
@@ -168,6 +170,7 @@ export class CapasController {
       c_url,
       c_servicio,
     } = req.body;
+    const {id} = req.user;
     try {
       const capas = await capasService.ActualizarCapas(
         id_capa,
@@ -177,7 +180,8 @@ export class CapasController {
         b_capa,
         c_tipo,
         c_url,
-        c_servicio
+        c_servicio,
+        id
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
@@ -216,8 +220,9 @@ export class CapasController {
 
   async getAllCapasDelete(req, res) {
     const { id_capa } = req.params;
+    const {id} = req.user;
     try {
-      const capas = await capasService.EliminarCapas(id_capa);
+      const capas = await capasService.EliminarCapas(id_capa,id);
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });

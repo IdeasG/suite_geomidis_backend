@@ -16,7 +16,7 @@ export class RegistrosService {
       });
       return response;
     } catch (error) {
-      throw new Error("Error al obtener los tipos de vía...." + error);
+      throw new Error("Error...." + error);
     }
   }
 }
