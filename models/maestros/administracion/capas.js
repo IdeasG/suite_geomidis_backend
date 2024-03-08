@@ -35,6 +35,10 @@ const capasGrupo = sequelize.define('tadm_capas', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  c_url_seleccionado:{
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   c_tipo: {
     type: DataTypes.STRING,
     allowNull: true

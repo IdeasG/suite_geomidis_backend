@@ -169,7 +169,8 @@ export class CapasService {
     c_url,
     c_servicio,
     id_usuario_auditoria,
-    id_rol_auditoria
+    id_rol_auditoria,
+    c_url_seleccionado
   ) {
     try {
       const response = await Capas.create({
@@ -183,7 +184,8 @@ export class CapasService {
         c_url,
         c_servicio,
         id_usuario_auditoria,
-        id_rol_auditoria
+        id_rol_auditoria,
+        c_url_seleccionado
       });
       return response;
     } catch (error) {
@@ -227,7 +229,8 @@ export class CapasService {
     c_url,
     c_servicio,
     id_usuario_auditoria,
-    id_rol_auditoria
+    id_rol_auditoria,
+    c_url_seleccionado
   ) {
     try {
       const response = await Capas.update(
@@ -241,7 +244,8 @@ export class CapasService {
           c_url,
           c_servicio,
           id_usuario_auditoria,
-          id_rol_auditoria
+          id_rol_auditoria,
+          c_url_seleccionado
         },
         { where: { id_capa } }
       );

@@ -111,6 +111,7 @@ export class CapasController {
       c_tipo,
       c_url,
       c_servicio,
+      c_url_seleccionado
     } = req.body;
     const {id,id_rol} = req.user;
     try {
@@ -125,7 +126,8 @@ export class CapasController {
         c_url,
         c_servicio,
         id,
-        id_rol
+        id_rol,
+        c_url_seleccionado
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
@@ -170,6 +172,7 @@ export class CapasController {
       c_tipo,
       c_url,
       c_servicio,
+      c_url_seleccionado
     } = req.body;
     const {id,id_rol} = req.user;
     try {
@@ -183,7 +186,8 @@ export class CapasController {
         c_url,
         c_servicio,
         id,
-        id_rol
+        id_rol,
+        c_url_seleccionado
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
