@@ -7,8 +7,9 @@ export const createRouteMapfish = () => {
   const MapaRouter = Router();
 
   const mapfishController = new MapfishController();
-  // obtener capas
-  MapaRouter.post("/leyenda", cacheMiddleware, mapfishController.getPrint);
+  MapaRouter.post("/", cacheMiddleware, mapfishController.getPrint);
+  MapaRouter.post("/subir", cacheMiddleware, mapfishController.postImagen);
+  // MapaRouter.post("/imagenes", cacheMiddleware, mapfishController.getPrint);
 
   return MapaRouter;
 };
