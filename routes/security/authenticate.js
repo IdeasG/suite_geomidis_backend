@@ -33,7 +33,7 @@ export const createAuthenticateRouter = () => {
   AuthenticateRouter.post("/rol", validarToken, authenticateController.saveRol);
   AuthenticateRouter.post("/rol/tools", authenticateController.saveRolTools);
 
-  AuthenticateRouter.delete("/erol/:id", authenticateController.deleteRol);
+  AuthenticateRouter.delete("/rol/:id", authenticateController.deleteRol);
   AuthenticateRouter.delete(
     "/rol/tools/:id_rol/:fk_modulo/:fk_grupo/:fk_menu",
     authenticateController.deleteRolTools

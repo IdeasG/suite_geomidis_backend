@@ -769,7 +769,7 @@ export class AuthenticateService {
         return false;
       } else {
         await Rol.destroy({
-          where: { id: id },
+          where: { id_rol: id },
         });
         await ComponentByRol.destroy({
           where: { fk_rol: id },
@@ -779,7 +779,7 @@ export class AuthenticateService {
       }
     } catch (error) {
       console.log(error);
-      throw new Error("Error al obtener el servicio.");
+      throw new Error("Error al obtener el servicio."+error);
     }
   }
 
