@@ -9,6 +9,7 @@ export const createRouteMapfish = () => {
   const mapfishController = new MapfishController();
   MapaRouter.post("/", cacheMiddleware, mapfishController.getPrint);
   MapaRouter.post("/subir", cacheMiddleware, mapfishController.postImagen);
+  MapaRouter.post("/eliminar", cacheMiddleware, mapfishController.deleteImagen);
   // MapaRouter.post("/imagenes", cacheMiddleware, mapfishController.getPrint);
 
   return MapaRouter;
