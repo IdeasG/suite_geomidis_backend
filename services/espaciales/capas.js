@@ -103,13 +103,21 @@ export class CapasService {
     }
   }
 
-  async getAllCapasInternas() {
+  async getAllCapasInternas(id_rol) {
     try {
-      const response = await Capas.findAll({
-        where: { c_tipo: "interno" },
-        order: [['c_nombre_tabla_capa', 'ASC']]
-      });
-      return response;
+      let responseData
+      if (id_rol != "0") {
+        // cambiar consulta a sequellize, se requeire conexion con el rol
+        const [response, metadata] = await sequelize.query(`select * from administracion.tadm_capas tc
+        left join administracion.rol_capas rc on tc.id_capa = rc.fk_capa
+        where fk_rol = ` + id_rol + ` and c_tipo = 'interno'
+        order by c_nombre_public_capa asc`);
+        responseData = response
+      } else {
+        const [response, metadata] = await sequelize.query(`select * from administracion.tadm_capas where c_tipo = 'interno' order by c_nombre_public_capa asc;`);
+        responseData = response
+      }
+      return responseData;
     } catch (error) {
       throw new Error("Error al obtener los tipos de vía...." + error);
     }

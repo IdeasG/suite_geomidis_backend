@@ -18,7 +18,7 @@ export const createRouteCapas = () => {
   CapaRouter.get("/", cacheMiddleware, capasController.getAllCapas);
   CapaRouter.get(
     "/interno",
-    cacheMiddleware,
+    validarToken,
     capasController.getAllCapasInternas
   );
   CapaRouter.get(

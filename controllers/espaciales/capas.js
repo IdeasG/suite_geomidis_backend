@@ -65,8 +65,9 @@ export class CapasController {
   }
 
   async getAllCapasInternas(req, res) {
+    const {id, id_rol, id_cliente } = req.user;
     try {
-      const capas = await capasService.getAllCapasInternas();
+      const capas = await capasService.getAllCapasInternas(id_rol);
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
       res.status(500).json({ error: error.message });

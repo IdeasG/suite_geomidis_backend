@@ -111,8 +111,8 @@ export class MapfishController {
     let json = req.body;
     try {
         // console.log(json);
-        let ss = await axios.post("http://185.214.135.183:8080/print/print/buildreport.pdf",
-        // let ss = await axios.post("http://localhost:8080/print/print/buildreport.pdf",
+        // let ss = await axios.post("http://185.214.135.183:8080/print/print/buildreport.pdf",
+        let ss = await axios.post("http://localhost:8080/print/print/buildreport.pdf",
         json,
         {
             responseType: 'arraybuffer',
