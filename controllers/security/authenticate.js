@@ -7,9 +7,13 @@ export class AuthenticateController {
   constructor() {}
 
   async signIn(req, res) {
-    const { c_usuario, c_contrasena } = req.body;
+    const { c_usuario, c_contrasena, id } = req.body;
     try {
-      const data = await authenticateService.signIn(c_usuario, c_contrasena);
+      const data = await authenticateService.signIn(
+        c_usuario,
+        c_contrasena,
+        id
+      );
       res.status(200).json(data);
     } catch (error) {
       res.status(401).json({ error: error.message });
@@ -119,12 +123,9 @@ export class AuthenticateController {
 
   async getUsuariosInternoByGeoportal(req, res) {
     const { id_cliente } = req.user;
-    const { page = 1, pageSize = 5 } = req.query;
     try {
       const data = await authenticateService.getUsuariosInternoByGeoportal(
-        id_cliente,
-        page,
-        pageSize
+        id_cliente
       );
       res.status(200).json(data);
     } catch (error) {
@@ -147,14 +148,20 @@ export class AuthenticateController {
   }
 
   async updateUsuariosInternoByGeoportal(req, res) {
-    const { id,id_rol:id_rol_auditoria,id_cliente } = req.user;
+    const { id, id_rol: id_rol_auditoria, id_cliente } = req.user;
     const { id_usuario } = req.params;
-    const { id_rol, nombres, ape_paterno, ape_materno, correo, dni, celular} = req.body;
+    const { id_rol, nombres, ape_paterno, ape_materno, correo, dni, celular } =
+      req.body;
     try {
       const data = await authenticateService.updateUsuariosInternoByGeoportal(
         id_usuario,
         id_rol,
-        nombres, ape_paterno, ape_materno, correo, dni, celular,
+        nombres,
+        ape_paterno,
+        ape_materno,
+        correo,
+        dni,
+        celular,
         id,
         id_rol_auditoria
       );
@@ -166,14 +173,14 @@ export class AuthenticateController {
 
   async updatePasswordUsuariosInternoByGeoportal(req, res) {
     // console.log('123');
-    const { id,id_rol } = req.user;
+    const { id, id_rol } = req.user;
     // const { id_usuario } = req.params;
     const { password } = req.body;
     try {
       await authenticateService.updatePasswordUsuariosInternoByGeoportal(
         id,
         password,
-        id_rol        
+        id_rol
       );
       res.status(200).json({ status: "success" });
     } catch (error) {
@@ -185,10 +192,12 @@ export class AuthenticateController {
     // console.log('123');
     const { id_rol, id } = req.user;
     try {
-      const response = await authenticateService.getNombreRol(
-        id_rol, id        
-      );
-      res.status(200).json({ status: "success", nombreRol: response.nombreRol, nombreUsuario: response.nombreUsuario});
+      const response = await authenticateService.getNombreRol(id_rol, id);
+      res.status(200).json({
+        status: "success",
+        nombreRol: response.nombreRol,
+        nombreUsuario: response.nombreUsuario,
+      });
     } catch (error) {
       res.status(500).json({ error: "Error: " + error });
     }
@@ -196,7 +205,7 @@ export class AuthenticateController {
 
   async deleteUsuariosInternoByGeoportal(req, res) {
     const { id_usuario } = req.params;
-    const {id, id_rol} = req.user;
+    const { id, id_rol } = req.user;
     try {
       const data = await authenticateService.deleteUsuariosInternoByGeoportal(
         id_usuario,
@@ -210,7 +219,7 @@ export class AuthenticateController {
   }
 
   async createUsuariosInternoByGeoportal(req, res) {
-    const { id,id_rol:id_rol_auditoria,id_cliente } = req.user;
+    const { id, id_rol: id_rol_auditoria, id_cliente } = req.user;
     const {
       dni,
       nombres,

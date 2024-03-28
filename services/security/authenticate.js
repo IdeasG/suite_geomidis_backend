@@ -17,7 +17,7 @@ import Geoportal from "../../models/manager/geoportal.js";
 import TgUsuario from "../../models/security/tgUsuario.js";
 import ComponentByRol from "../../models/security/componentByRol.js";
 export class AuthenticateService {
-  async signIn(c_usuario, c_contrasena) {
+  async signIn(c_usuario, c_contrasena, id) {
     try {
       let data = await Authenticate.findOne({
         where: { c_usuario },
@@ -32,7 +32,7 @@ export class AuthenticateService {
 
       if (!data) {
         data = await IntAuthenticate.findOne({
-          where: { usuario: c_usuario },
+          where: { usuario: c_usuario, id_cliente: id },
         });
 
         if (!data) {
@@ -51,8 +51,7 @@ export class AuthenticateService {
       const accessToken = generarToken(data, "1d");
       return { isSuiteUser, backendTokens: accessToken };
     } catch (error) {
-      console.error(error);
-      throw new Error("Error: ", error);
+      throw error;
     }
   }
 
@@ -377,21 +376,30 @@ export class AuthenticateService {
       const roles = await Rol.findAll({
         where: { id_cliente: id },
       });
-      const offset = (pageNumber - 1) * pageSize;
-      const data = await TgUsuario.findAndCountAll({
+      // const offset = (pageNumber - 1) * pageSize;
+      // const data = await TgUsuario.findAndCountAll({
+      //   where: {
+      //     id_cliente: id,
+      //   },
+      //   offset,
+      //   limit: pageSize,
+      // });
+      // const totalItems = data.count;
+      // const totalPages = Math.ceil(totalItems / pageSize);
+      // return {
+      //   items: data.rows,
+      //   currentPage: parseInt(pageNumber),
+      //   totalPages,
+      //   totalItems,
+      //   roles,
+      // };
+      const data = await TgUsuario.findAll({
         where: {
           id_cliente: id,
         },
-        offset,
-        limit: pageSize,
       });
-      const totalItems = data.count;
-      const totalPages = Math.ceil(totalItems / pageSize);
       return {
-        items: data.rows,
-        currentPage: parseInt(pageNumber),
-        totalPages,
-        totalItems,
+        items: data,
         roles,
       };
     } catch (error) {
@@ -414,14 +422,30 @@ export class AuthenticateService {
     }
   }
 
-  async updateUsuariosInternoByGeoportal(id_usuario, id_rol,nombres, ape_paterno, ape_materno, correo, dni, celular,id_usuario_auditoria,id_rol_auditoria) {
+  async updateUsuariosInternoByGeoportal(
+    id_usuario,
+    id_rol,
+    nombres,
+    ape_paterno,
+    ape_materno,
+    correo,
+    dni,
+    celular,
+    id_usuario_auditoria,
+    id_rol_auditoria
+  ) {
     try {
       const usuario = await TgUsuario.update(
         {
-          nombres, ape_paterno, ape_materno, correo, dni, celular,
+          nombres,
+          ape_paterno,
+          ape_materno,
+          correo,
+          dni,
+          celular,
           rol_id: id_rol,
           id_usuario_auditoria,
-          id_rol_auditoria          
+          id_rol_auditoria,
         },
         { where: { id_usuario: id_usuario } }
       );
@@ -431,21 +455,21 @@ export class AuthenticateService {
     }
   }
 
-  async updatePasswordUsuariosInternoByGeoportal(id_usuario, password,id_rol) {
+  async updatePasswordUsuariosInternoByGeoportal(id_usuario, password, id_rol) {
     try {
-      if (id_rol==0) {
+      if (id_rol == 0) {
         await Authenticate.update(
           {
-            c_contrasena: generatePasswordHash(password)
+            c_contrasena: generatePasswordHash(password),
           },
           {
-            where: { id_usuario }
+            where: { id_usuario },
           }
-        )
-      } else{
+        );
+      } else {
         await TgUsuario.update(
           {
-            clave: generatePasswordHash(password)
+            clave: generatePasswordHash(password),
           },
           { where: { id_usuario } }
         );
@@ -456,42 +480,50 @@ export class AuthenticateService {
     }
   }
 
-  async getNombreRol(id_rol,id_usuario) {
+  async getNombreRol(id_rol, id_usuario) {
     try {
-      let nombreRol = ''
-      let nombreUsuario = ''
-      if (id_rol==0) {
-        nombreRol = 'Adminitrador Geoportal'
-        nombreUsuario = ''
-      } else{
+      let nombreRol = "";
+      let nombreUsuario = "";
+      if (id_rol == 0) {
+        nombreRol = "Adminitrador Geoportal";
+        nombreUsuario = "";
+      } else {
         const rol = await Rol.findOne({
-          where:{id_rol},
-          attributes: ['c_nombre_rol']
-        })
-        nombreRol = rol ? rol.c_nombre_rol : ''
+          where: { id_rol },
+          attributes: ["c_nombre_rol"],
+        });
+        nombreRol = rol ? rol.c_nombre_rol : "";
         const usuario = await TgUsuario.findOne({
-          where:{id_usuario},
-          attributes: ['nombres', 'ape_paterno']
-        })
-        nombreUsuario = usuario.nombres + ' ' + usuario.ape_paterno
+          where: { id_usuario },
+          attributes: ["nombres", "ape_paterno"],
+        });
+        nombreUsuario = usuario.nombres + " " + usuario.ape_paterno;
       }
       const valores = {
         nombreRol: nombreRol,
-        nombreUsuario: nombreUsuario
-      }
+        nombreUsuario: nombreUsuario,
+      };
       return valores;
     } catch (error) {
       throw new Error("Error: " + error);
     }
   }
 
-  async deleteUsuariosInternoByGeoportal(id_usuario, id_usuario_auditoria, id_rol_auditoria) {
+  async deleteUsuariosInternoByGeoportal(
+    id_usuario,
+    id_usuario_auditoria,
+    id_rol_auditoria
+  ) {
     try {
-      await TgUsuario.update({
-        id_usuario_auditoria, id_rol_auditoria
-      },{
-        where: { id_usuario: id_usuario },
-      })
+      await TgUsuario.update(
+        {
+          id_usuario_auditoria,
+          id_rol_auditoria,
+        },
+        {
+          where: { id_usuario: id_usuario },
+        }
+      );
       const usuario = await TgUsuario.destroy({
         where: { id_usuario: id_usuario },
       });
@@ -529,7 +561,7 @@ export class AuthenticateService {
         estado: "0",
         id_cliente,
         id_usuario_auditoria,
-        id_rol_auditoria
+        id_rol_auditoria,
       });
       return usuario;
     } catch (error) {
@@ -779,7 +811,7 @@ export class AuthenticateService {
       }
     } catch (error) {
       console.log(error);
-      throw new Error("Error al obtener el servicio."+error);
+      throw new Error("Error al obtener el servicio." + error);
     }
   }
 
