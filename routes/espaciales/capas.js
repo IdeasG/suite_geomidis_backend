@@ -74,7 +74,7 @@ export const createRouteCapas = () => {
     capasController.getAllCapasGruposDelete
   );
   CapaRouter.delete(
-    "/supergrupos/:id_supergrupo",
+    "/supergrupos/:id_super_grupo",
     cacheMiddleware,
     capasController.getAllCapasSupergruposDelete
   );

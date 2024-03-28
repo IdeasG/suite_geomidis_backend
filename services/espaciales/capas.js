@@ -267,7 +267,7 @@ export class CapasService {
 
   async ActualizarGrupos(id_grupo, id_super_grupo, c_nombre_grupo, b_grupo) {
     try {
-      const response = await CapasGrupo.create(
+      const response = await CapasGrupo.update(
         { id_super_grupo, c_nombre_grupo, b_grupo },
         { where: { id_grupo } }
       );
@@ -284,7 +284,7 @@ export class CapasService {
   ) {
     // console.log('hola');
     try {
-      const response = await CapasSuperGrupo.create(
+      const response = await CapasSuperGrupo.update(
         { c_nombre_super_grupo, b_super_grupo },
         { where: { id_super_grupo } }
       );
@@ -328,7 +328,7 @@ export class CapasService {
       });
       return response;
     } catch (error) {
-      throw new Error("Error al actualizar super grupos");
+      throw new Error("Error al eliminar super grupos: "+error);
     }
   }
 
