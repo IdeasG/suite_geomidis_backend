@@ -16,6 +16,7 @@ import Component from "../../models/security/component.js";
 import Geoportal from "../../models/manager/geoportal.js";
 import TgUsuario from "../../models/security/tgUsuario.js";
 import ComponentByRol from "../../models/security/componentByRol.js";
+import Solicitud from "../../models/manager/solicitud.js";
 export class AuthenticateService {
   async signIn(c_usuario, c_contrasena, id) {
     try {
@@ -51,7 +52,8 @@ export class AuthenticateService {
       const accessToken = generarToken(data, "1d");
       return { isSuiteUser, backendTokens: accessToken };
     } catch (error) {
-      throw error;
+      console.error(error);
+      throw new Error("Error: ", error);
     }
   }
 
@@ -376,23 +378,10 @@ export class AuthenticateService {
       const roles = await Rol.findAll({
         where: { id_cliente: id },
       });
-      // const offset = (pageNumber - 1) * pageSize;
-      // const data = await TgUsuario.findAndCountAll({
-      //   where: {
-      //     id_cliente: id,
-      //   },
-      //   offset,
-      //   limit: pageSize,
-      // });
-      // const totalItems = data.count;
-      // const totalPages = Math.ceil(totalItems / pageSize);
-      // return {
-      //   items: data.rows,
-      //   currentPage: parseInt(pageNumber),
-      //   totalPages,
-      //   totalItems,
-      //   roles,
-      // };
+
+      const solicitudes = await Solicitud.findAll({
+        where: { fk_geoportal: id },
+      });
       const data = await TgUsuario.findAll({
         where: {
           id_cliente: id,
@@ -401,6 +390,7 @@ export class AuthenticateService {
       return {
         items: data,
         roles,
+        solicitudes,
       };
     } catch (error) {
       console.log(error);

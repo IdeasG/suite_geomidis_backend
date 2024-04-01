@@ -20,6 +20,9 @@ import Capa from "../../models/manager/capas.js";
 import CapaByRol from "../../models/manager/capasByRol.js";
 import Geoportal from "../../models/manager/geoportal.js";
 import GeoportalComponent from "../../models/manager/geoportalComponent.js";
+import OrdenCapa from "../../models/manager/ordenCapas.js";
+import Solicitud from "../../models/manager/solicitud.js";
+import { compileWelcomeTemplate, sendMail } from "../../helpers/sendMail.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -115,7 +118,7 @@ export class ManagerService {
         c_nombre_tabla_capa: c_tabla,
         c_nombre_public_capa: c_nombre,
         c_sql_capa: "1",
-        c_tipo: "interno"
+        c_tipo: "interno",
       });
       return data;
     } catch (error) {
@@ -124,17 +127,50 @@ export class ManagerService {
     }
   }
 
-  async saveCapasByRol(fk_rol, fk_capa,id_usuario_auditoria,id_rol_auditoria) {
+  async saveCapasByRol(
+    fk_rol,
+    fk_capa,
+    id_usuario_auditoria,
+    id_rol_auditoria
+  ) {
     try {
       const data = await CapaByRol.create({
         fk_rol,
         fk_capa,
         id_usuario_auditoria,
-        id_rol_auditoria
+        id_rol_auditoria,
       });
       return data;
     } catch (error) {
       console.log(error);
+      throw new Error("Error al crear " + error);
+    }
+  }
+
+  async saveOrdenByRol(fk_rol, j_orden) {
+    try {
+      const orden = await OrdenCapa.findOne({
+        where: {
+          fk_rol: fk_rol,
+        },
+      });
+
+      if (orden) {
+        await OrdenCapa.update(
+          {
+            j_orden,
+          },
+          { where: { fk_rol } }
+        );
+      } else {
+        await OrdenCapa.create({
+          fk_rol,
+          j_orden,
+        });
+      }
+
+      return orden;
+    } catch (error) {
       throw new Error("Error al crear " + error);
     }
   }
@@ -183,16 +219,19 @@ export class ManagerService {
     }
   }
 
-  async deleteCapasByRol(id,id_usuario_auditoria,id_rol_auditoria) {
+  async deleteCapasByRol(id, id_usuario_auditoria, id_rol_auditoria) {
     try {
-      await CapaByRol.update({
-        id_usuario_auditoria,id_rol_auditoria
-      },{
+      await CapaByRol.update(
+        {
+          id_usuario_auditoria,
+          id_rol_auditoria,
+        },
+        {
           where: {
-          id: id
+            id: id,
+          },
         }
-      }
-      )
+      );
       const data = await CapaByRol.destroy({
         where: {
           id: id,
@@ -437,6 +476,51 @@ export class ManagerService {
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async saveSolicitud(
+    fk_geoportal,
+    nombres,
+    apellidos,
+    nacionalidad,
+    tipo_documento,
+    numero_documento,
+    email,
+    telefono_personal,
+    ocupacion,
+    institucion_trabajo,
+    cargo,
+    motivacion_geovisor
+  ) {
+    try {
+      const data = await Solicitud.create({
+        fk_geoportal,
+        nombres,
+        apellidos,
+        nacionalidad,
+        tipo_documento,
+        numero_documento,
+        email,
+        telefono_personal,
+        ocupacion,
+        institucion_trabajo,
+        cargo,
+        motivacion_geovisor,
+      });
+      if (data) {
+        await sendMail({
+          to: email,
+          name: "GEOMIDIS",
+          subject: "Solicitud generada exitosamente",
+          body: compileWelcomeTemplate(
+            "FELICIDADES, su solicitud ha sido generada con exito, espere el correo de la confirmación de creación y entrega de credenciales."
+          ),
+        });
+      }
+      return data;
+    } catch (error) {
+      throw new Error(error);
     }
   }
 

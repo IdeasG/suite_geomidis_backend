@@ -22,7 +22,16 @@ export const createManagerRouter = () => {
   );
   managerRouter.post("/capas/grupo", managerController.saveGrupoCapasSistema);
   managerRouter.post("/capas/capas", managerController.saveCapasSistema);
-  managerRouter.post("/capas/rol",validarToken,managerController.saveCapasByRol);
+  managerRouter.post(
+    "/capas/rol",
+    validarToken,
+    managerController.saveCapasByRol
+  );
+  managerRouter.post(
+    "/capas/rol/orden",
+    validarToken,
+    managerController.saveOrdenByRol
+  );
   //DELETE
   managerRouter.delete(
     "/sistemas/modulo/:id",
@@ -37,7 +46,11 @@ export const createManagerRouter = () => {
     managerController.deleteMenuSistema
   );
 
-  managerRouter.delete("/capas/rol/:id",validarToken, managerController.deleteCapasByRol);
+  managerRouter.delete(
+    "/capas/rol/:id",
+    validarToken,
+    managerController.deleteCapasByRol
+  );
 
   //GET CLIENTES
   managerRouter.get("/clientes", managerController.getClientes);
@@ -67,6 +80,9 @@ export const createManagerRouter = () => {
   managerRouter.post("/geoportales", managerController.saveGeoportales);
   managerRouter.put("/geoportales/:id", managerController.editGeoportales);
   managerRouter.delete("/geoportales/:id", managerController.deleteGeoportales);
+
+  //SOLICITUDES DE ACCESO
+  managerRouter.post("/register/geoportal", managerController.saveSolicitud);
 
   return managerRouter;
 };
