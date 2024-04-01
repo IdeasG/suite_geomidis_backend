@@ -128,5 +128,11 @@ export const createAuthenticateRouter = () => {
     authenticateController.createComponentByRol
   );
 
+  AuthenticateRouter.post(
+    "/geoportal/solicitud",
+    validarToken,
+    authenticateController.createUsuariosBySolicitud
+  );
+
   return AuthenticateRouter;
 };

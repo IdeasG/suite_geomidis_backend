@@ -111,9 +111,24 @@ export class ManagerController {
 
   async saveCapasByRol(req, res) {
     const { fk_rol, fk_capa } = req.body;
-    const {id,id_rol} = req.user;
+    const { id, id_rol } = req.user;
     try {
-      const data = await managerService.saveCapasByRol(fk_rol, fk_capa,id,id_rol);
+      const data = await managerService.saveCapasByRol(
+        fk_rol,
+        fk_capa,
+        id,
+        id_rol
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async saveOrdenByRol(req, res) {
+    const { fk_rol, j_orden } = req.body;
+    try {
+      const data = await managerService.saveOrdenByRol(fk_rol, j_orden);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -154,9 +169,13 @@ export class ManagerController {
 
   async deleteCapasByRol(req, res) {
     const { id } = req.params;
-    const {id: id_usuario ,id_rol} = req.user;
+    const { id: id_usuario, id_rol } = req.user;
     try {
-      const data = await managerService.deleteCapasByRol(id,id_usuario,id_rol);
+      const data = await managerService.deleteCapasByRol(
+        id,
+        id_usuario,
+        id_rol
+      );
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -246,6 +265,52 @@ export class ManagerController {
         componentsMenu,
         componentsArriba
       );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async saveSolicitud(req, res) {
+    const {
+      fk_geoportal,
+      nombres,
+      apellidos,
+      nacionalidad,
+      tipoDocumento,
+      numeroDocumento,
+      email,
+      telefono,
+      ocupacion,
+      institucion,
+      cargo,
+      motivacion,
+    } = req.body;
+    try {
+      const data = await managerService.saveSolicitud(
+        fk_geoportal,
+        nombres,
+        apellidos,
+        nacionalidad,
+        tipoDocumento,
+        numeroDocumento,
+        email,
+        telefono,
+        ocupacion,
+        institucion,
+        cargo,
+        motivacion
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async sendMessage(req, res) {
+    const { fk_geoportal, email } = req.body;
+    try {
+      const data = await managerService.sendMessage(fk_geoportal, email);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
