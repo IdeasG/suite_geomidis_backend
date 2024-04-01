@@ -1,4 +1,4 @@
-export const welcomeTemplate = `
+export const reseteoTemplate = `
 <!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 
@@ -107,17 +107,18 @@ export const welcomeTemplate = `
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:25px;padding-right:25px;padding-top:10px;">
 																<div style="color:#1f0b0b;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:30px;line-height:120%;text-align:left;mso-line-height-alt:36px;">
-																	<p style="margin: 0; word-break: break-word;"><span><strong><span>Estamos contentos</span></strong></span></p>
-																	<p style="margin: 0; word-break: break-word;"><span><strong><span>que estes aqui</span></strong></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span><strong><span>Has solicitado un</span></strong></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span><strong><span>reseteo de contraseña</span></strong></span></p>
 																</div>
 															</td>
 														</tr>
 													</table>
-													<table class="paragraph_block block-3" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
+													<table class="paragraph_block block-5" width="100%" border="0" cellpadding="10" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
 														<tr>
-															<td class="pad" style="padding-bottom:25px;padding-left:25px;padding-right:25px;padding-top:10px;">
-																<div style="color:#393d47;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:14px;line-height:180%;text-align:left;mso-line-height-alt:25.2px;">
-																	<p style="margin: 0; word-break: break-word;">{{mensaje}}</p>
+															<td class="pad">
+																<div style="color:#007cff;direction:ltr;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:19.2px;">
+																	<p style="margin: 0; margin-bottom: 5px;">&nbsp; &nbsp; Tu nueva contraseña:<strong>&nbsp; &nbsp; &nbsp;{{password}}</strong></p>
+																	<p style="margin: 0;">&nbsp;</p>
 																</div>
 															</td>
 														</tr>
@@ -141,34 +142,7 @@ export const welcomeTemplate = `
 								</td>
 							</tr>
 						</tbody>
-					</table>
-					<table class="row row-2" align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #e4faf4;">
-						<tbody>
-							<tr>
-								<td>
-									<table class="row-content stack" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #000; width: 720px; margin: 0 auto;" width="720">
-										<tbody>
-											<tr>
-												<td class="column column-1" width="50%" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
-													<div class="spacer_block block-1" style="height:20px;line-height:20px;font-size:1px;">&#8202;</div>
-													<table class="paragraph_block block-2" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;">
-														<tr>
-															<td class="pad" style="padding-bottom:10px;padding-left:35px;padding-right:35px;padding-top:5px;">
-																<div style="color:#34495e;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:20px;line-height:150%;text-align:center;mso-line-height-alt:30px;">
-																	<p style="margin: 0; word-break: break-word;"><span><strong><span>Agradecemos el interes por el Geoportal</span></strong></span></p>
-																</div>
-															</td>
-														</tr>
-													</table>
-													<div class="spacer_block block-3 mobile_hide" style="height:20px;line-height:20px;font-size:1px;">&#8202;</div>
-												</td>
-											</tr>
-										</tbody>
-									</table>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+					</table>					
 				</td>
 			</tr>
 		</tbody>

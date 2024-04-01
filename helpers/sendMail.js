@@ -2,6 +2,9 @@ import nodemailer from "nodemailer";
 import handlebars from "handlebars";
 import { welcomeTemplate } from "../libs/templates/welcome.js";
 import "dotenv/config";
+import { aceptarTemplate } from "../libs/templates/aceptar.js";
+import { rechazaTemplate } from "../libs/templates/rechazar.js";
+import { reseteoTemplate } from "../libs/templates/reseteo.js";
 
 export async function sendMail({ to, name, subject, body }) {
   const { SMTP_EMAIL, SMTP_PASSWORD } = process.env;
@@ -39,6 +42,33 @@ export function compileWelcomeTemplate(name) {
   const template = handlebars.compile(welcomeTemplate);
   const htmlBody = template({
     mensaje: name,
+  });
+  return htmlBody;
+}
+
+export function compileReseteoTemplate(password) {
+  const template = handlebars.compile(reseteoTemplate);
+  const htmlBody = template({
+    password: password,
+  });
+  return htmlBody;
+}
+
+export function compileRechazaSolicitud(name) {
+  const template = handlebars.compile(rechazaTemplate);
+  const htmlBody = template({
+    mensaje: name,
+  });
+  return htmlBody;
+}
+
+export function compileAceptaSolicitud(mensaje, rol, usuario, password) {
+  const template = handlebars.compile(aceptarTemplate);
+  const htmlBody = template({
+    mensaje: mensaje,
+    rol: rol,
+    usuario: usuario,
+    password: password,
   });
   return htmlBody;
 }

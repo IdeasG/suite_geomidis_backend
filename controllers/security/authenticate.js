@@ -250,6 +250,40 @@ export class AuthenticateController {
     }
   }
 
+  async createUsuariosBySolicitud(req, res) {
+    const {
+      fk_geoportal,
+      id_rol,
+      isAceptado,
+      mensaje,
+      password,
+      user,
+      dni,
+      nombres,
+      ape_paterno,
+      email,
+      celular,
+    } = req.body;
+    try {
+      const data = await authenticateService.createUsuariosBySolicitud(
+        fk_geoportal,
+        id_rol,
+        isAceptado,
+        mensaje,
+        password,
+        user,
+        dni,
+        nombres,
+        ape_paterno,
+        email,
+        celular
+      );
+      res.status(201).json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Error: " + error });
+    }
+  }
+
   async createComponentByRol(req, res) {
     const {
       componentsIzquierda,

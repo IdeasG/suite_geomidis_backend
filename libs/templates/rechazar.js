@@ -1,4 +1,4 @@
-export const welcomeTemplate = `
+export const rechazaTemplate = `
 <!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 
@@ -107,8 +107,8 @@ export const welcomeTemplate = `
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:25px;padding-right:25px;padding-top:10px;">
 																<div style="color:#1f0b0b;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:30px;line-height:120%;text-align:left;mso-line-height-alt:36px;">
-																	<p style="margin: 0; word-break: break-word;"><span><strong><span>Estamos contentos</span></strong></span></p>
-																	<p style="margin: 0; word-break: break-word;"><span><strong><span>que estes aqui</span></strong></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span><strong><span>Tenemos malas noticias</span></strong></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span><strong><span>en esta oportunidad tu solicitud ha sido rechazada</span></strong></span></p>
 																</div>
 															</td>
 														</tr>

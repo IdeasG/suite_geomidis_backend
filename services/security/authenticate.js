@@ -8,7 +8,7 @@ import IntAuthenticate from "../../models/security/intAuthenticate.js";
 import ToolsDetail from "../../models/security/tools.js";
 import Rol from "../../models/security/rol.js";
 import ToolsAdmin from "../../models/security/toolsAdmin.js";
-import { Op, Sequelize } from "sequelize";
+import { Op, Sequelize, literal } from "sequelize";
 import HerramientaRoles from "../../models/security/herramientaSistema.js";
 import TiSisClienteD from "../../models/manager/tiSisClienteDetail.js";
 import { sequelize } from "../../config/postgres/sequelize.js";
@@ -17,6 +17,12 @@ import Geoportal from "../../models/manager/geoportal.js";
 import TgUsuario from "../../models/security/tgUsuario.js";
 import ComponentByRol from "../../models/security/componentByRol.js";
 import Solicitud from "../../models/manager/solicitud.js";
+import {
+  compileAceptaSolicitud,
+  compileRechazaSolicitud,
+  compileWelcomeTemplate,
+  sendMail,
+} from "../../helpers/sendMail.js";
 export class AuthenticateService {
   async signIn(c_usuario, c_contrasena, id) {
     try {
@@ -554,6 +560,84 @@ export class AuthenticateService {
         id_rol_auditoria,
       });
       return usuario;
+    } catch (error) {
+      throw new Error("Error: " + error);
+    }
+  }
+
+  async createUsuariosBySolicitud(
+    fk_geoportal,
+    id_rol,
+    isAceptado,
+    mensaje,
+    password,
+    user,
+    dni,
+    nombres,
+    ape_paterno,
+    email,
+    celular
+  ) {
+    try {
+      if (isAceptado) {
+        const rol = await Rol.findOne({
+          where: {
+            id_cliente: fk_geoportal,
+          },
+        });
+
+        const usuario = await TgUsuario.create({
+          usuario: user,
+          clave: generatePasswordHash(password),
+          dni,
+          nombres,
+          ape_paterno,
+          ape_materno: "",
+          email,
+          celular,
+          tipo_usuario: "",
+          rol_id: id_rol,
+          estado: "0",
+          id_cliente: fk_geoportal,
+        });
+        if (usuario) {
+          await Solicitud.update(
+            {
+              b_solicitud: true,
+              estado: isAceptado,
+              d_estado: Sequelize.literal("NOW()"),
+            },
+            { where: { fk_geoportal: fk_geoportal, numero_documento: dni } }
+          );
+          await sendMail({
+            to: email,
+            name: "GEOMIDIS",
+            subject: "Solicitud aceptada",
+            body: compileAceptaSolicitud(
+              mensaje,
+              rol.c_nombre_rol,
+              user,
+              password
+            ),
+          });
+        }
+      } else {
+        await Solicitud.update(
+          {
+            b_solicitud: true,
+            estado: isAceptado,
+            d_estado: Sequelize.literal("NOW()"),
+          },
+          { where: { fk_geoportal: fk_geoportal, numero_documento: dni } }
+        );
+        await sendMail({
+          to: email,
+          name: "GEOMIDIS",
+          subject: "Solicitud rechazada",
+          body: compileRechazaSolicitud(mensaje),
+        });
+      }
+      return true;
     } catch (error) {
       throw new Error("Error: " + error);
     }

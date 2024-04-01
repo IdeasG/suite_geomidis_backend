@@ -307,6 +307,16 @@ export class ManagerController {
     }
   }
 
+  async sendMessage(req, res) {
+    const { fk_geoportal, email } = req.body;
+    try {
+      const data = await managerService.sendMessage(fk_geoportal, email);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async editGeoportales(req, res) {
     const {
       nombre,

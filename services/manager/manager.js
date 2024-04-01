@@ -22,7 +22,12 @@ import Geoportal from "../../models/manager/geoportal.js";
 import GeoportalComponent from "../../models/manager/geoportalComponent.js";
 import OrdenCapa from "../../models/manager/ordenCapas.js";
 import Solicitud from "../../models/manager/solicitud.js";
-import { compileWelcomeTemplate, sendMail } from "../../helpers/sendMail.js";
+import {
+  compileReseteoTemplate,
+  compileWelcomeTemplate,
+  sendMail,
+} from "../../helpers/sendMail.js";
+import TgUsuario from "../../models/security/tgUsuario.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -516,6 +521,29 @@ export class ManagerService {
           body: compileWelcomeTemplate(
             "FELICIDADES, su solicitud ha sido generada con exito, espere el correo de la confirmación de creación y entrega de credenciales."
           ),
+        });
+      }
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async sendMessage(fk_geoportal, email) {
+    try {
+      const password = "123456@";
+      const data = await TgUsuario.update(
+        {
+          clave: generatePasswordHash(password),
+        },
+        { where: { email: email, id_cliente: fk_geoportal } }
+      );
+      if (data) {
+        await sendMail({
+          to: email,
+          name: "GEOMIDIS",
+          subject: "Reseteo de Contraseña",
+          body: compileReseteoTemplate(password),
         });
       }
       return data;

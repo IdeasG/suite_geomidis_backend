@@ -57,6 +57,13 @@ const Solicitud = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    estado: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    d_estado: {
+      type: DataTypes.DATE,
+    },
   },
   {
     timestamps: false,
