@@ -496,7 +496,8 @@ export class ManagerService {
     ocupacion,
     institucion_trabajo,
     cargo,
-    motivacion_geovisor
+    motivacion_geovisor,
+    password
   ) {
     try {
       const data = await Solicitud.create({
@@ -512,6 +513,7 @@ export class ManagerService {
         institucion_trabajo,
         cargo,
         motivacion_geovisor,
+        password,
       });
       if (data) {
         await sendMail({

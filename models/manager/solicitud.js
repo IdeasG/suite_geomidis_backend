@@ -49,6 +49,9 @@ const Solicitud = sequelize.define(
     motivacion_geovisor: {
       type: DataTypes.TEXT,
     },
+    password: {
+      type: DataTypes.TEXT,
+    },
     b_solicitud: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
