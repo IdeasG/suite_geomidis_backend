@@ -158,6 +158,7 @@ export class CapasService {
   async getCapasVisibles(id_capa,id_rol) {
     try {
       const response = await CapasMostrar.findAll({ where: { id_capa, id_rol } });
+      console.log(response);
       return response;
     } catch (error) {
       throw new Error(
@@ -463,7 +464,7 @@ export class CapasService {
       let nuevasColumnas = [];
       for (let index in results2) {
         const element = results2[index].column_name;
-        if (element !== "geom") {
+        if (element !== "geom" && element !== "CODOBJ" && element !== "gid") {
           const registrados = {
             c_campo_original: element,
             c_campo_alias: element,
@@ -472,7 +473,7 @@ export class CapasService {
           nuevasColumnas.push(registrados);
         }
       }
-      nuevasColumnas = JSON.stringify(nuevasColumnas)
+      // nuevasColumnas = JSON.stringify(nuevasColumnas)
       const registrado = await CapasMostrar.create({
         id_capa,
         c_array_campos:nuevasColumnas,

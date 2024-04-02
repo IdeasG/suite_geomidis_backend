@@ -417,17 +417,27 @@ export class CapasController {
   }
 
   async getVisibles(req, res) {
-    const { id_capa, id_rol = null } = req.params;
+    const { id_capa, id_rol } = req.params;
+    const {id_rol:id_rol_usuario} = req.user;
+    console.log(id_capa,id_rol,id_rol_usuario);
     try {
-      let dbResponse = await capasService.getCapasVisibles(id_capa, id_rol);
+      let id_rol_enviar
+      if (id_rol != "undefined") {
+        id_rol_enviar = id_rol
+      } else {
+        id_rol_enviar = id_rol_usuario.toString()
+      }
+      console.log('ID_CAPA Y ROL FINAL:' + id_capa, id_rol_enviar);
+      let dbResponse = await capasService.getCapasVisibles(id_capa, id_rol_enviar);
       if (dbResponse.length == 0) {
         const responseCreate = await capasService.postCapasVisibles(
           id_capa,
-          id_rol
+          id_rol_enviar
         );
         // console.log(responseCreate);
         dbResponse = responseCreate;
       }
+      console.log(dbResponse);
       res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       res.status(500).json({ error: error.message });

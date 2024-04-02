@@ -92,7 +92,7 @@ export const createRouteCapas = () => {
     "/estructura/:id_geoportal",
     capasController.getStructureInvitado
   );
-  CapaRouter.get("/visible/:id_capa", capasController.getVisibles);
+  CapaRouter.get("/visible/:id_capa/:id_rol", validarToken, capasController.getVisibles);
   CapaRouter.put("/actualizar/visible", capasController.putVisibles);
   CapaRouter.post("/excel", capasController.descargarExcel);
   CapaRouter.post("/excel/simple", capasController.descargarExcelSimple);

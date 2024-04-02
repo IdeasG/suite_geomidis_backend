@@ -14,7 +14,7 @@ const CamposMostrar = sequelize.define(
         allowNull: false
         },
         c_array_campos: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: false
         },
         id_rol: {
