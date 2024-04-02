@@ -285,6 +285,7 @@ export class ManagerController {
       institucion,
       cargo,
       motivacion,
+      password,
     } = req.body;
     try {
       const data = await managerService.saveSolicitud(
@@ -299,7 +300,8 @@ export class ManagerController {
         ocupacion,
         institucion,
         cargo,
-        motivacion
+        motivacion,
+        password
       );
       res.status(200).json(data);
     } catch (error) {

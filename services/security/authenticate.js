@@ -582,7 +582,7 @@ export class AuthenticateService {
       if (isAceptado) {
         const rol = await Rol.findOne({
           where: {
-            id_cliente: fk_geoportal,
+            id_rol: id_rol,
           },
         });
 
