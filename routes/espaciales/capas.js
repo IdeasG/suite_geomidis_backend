@@ -93,6 +93,7 @@ export const createRouteCapas = () => {
     capasController.getStructureInvitado
   );
   CapaRouter.get("/visible/:id_capa/:id_rol", validarToken, capasController.getVisibles);
+  CapaRouter.get("/visible/invitado/:id_capa/:id_cliente", capasController.getVisiblesInvitado);
   CapaRouter.put("/actualizar/visible", capasController.putVisibles);
   CapaRouter.post("/excel", capasController.descargarExcel);
   CapaRouter.post("/excel/simple", capasController.descargarExcelSimple);

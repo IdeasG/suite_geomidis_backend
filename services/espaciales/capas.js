@@ -167,6 +167,22 @@ export class CapasService {
     }
   }
 
+  async getCapasVisiblesInvitado(id_capa,id_cliente) {
+    try {
+      const [response, metadata] = await sequelize.query(`
+        select cm.* from administracion.tadm_capas_campos_mostrar cm
+        left join seguridad.tseg_roles tr on cm.id_rol = tr.id_rol
+        where tr.id_cliente = `+ id_cliente +` and tr.c_nombre_rol ilike '%invitado%' and id_capa = `+ id_capa +`;
+      `);
+      // console.log(response);
+      return response;
+    } catch (error) {
+      throw new Error(
+        "Error al obtener las capas visibles con el id_capa:" + id_capa + error
+      );
+    }
+  }
+
   async RegistrarCapas(
     id_grupo,
     c_nombre_tabla_capa,
@@ -474,6 +490,46 @@ export class CapasService {
         }
       }
       // nuevasColumnas = JSON.stringify(nuevasColumnas)
+      const registrado = await CapasMostrar.create({
+        id_capa,
+        c_array_campos:nuevasColumnas,
+        id_rol
+      })
+      return [registrado];
+    } catch (error) {
+      throw new Error(
+        "Error al obtener las capas visibles con el id_capa:" + id_capa + error
+      );
+    }
+  }
+
+  async postCapasVisiblesInvitado(id_capa,id_cliente) {
+    try {
+      const [results, metadata] = await sequelize.query(
+        `select * from administracion.tadm_capas where id_capa = ${id_capa}`
+      );
+      const c_nombre_tabla_capa = results[0].c_nombre_tabla_capa;
+      const [results2, metadata2] = await sequelize.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_schema = 'espaciales' AND table_name = '${c_nombre_tabla_capa}'`);
+      let nuevasColumnas = [];
+      for (let index in results2) {
+        const element = results2[index].column_name;
+        if (element !== "geom" && element !== "CODOBJ" && element !== "gid") {
+          const registrados = {
+            c_campo_original: element,
+            c_campo_alias: element,
+            b_campo: false,
+          }
+          nuevasColumnas.push(registrados);
+        }
+      }
+      // nuevasColumnas = JSON.stringify(nuevasColumnas)
+      const [response, metadata3] = await sequelize.query(`
+        select * from seguridad.tseg_roles
+        where id_cliente = `+ id_cliente +` and c_nombre_rol ilike '%invitado%';
+      `);
+      const id_rol = response[0].id_rol
       const registrado = await CapasMostrar.create({
         id_capa,
         c_array_campos:nuevasColumnas,
