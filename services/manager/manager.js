@@ -29,10 +29,23 @@ import {
 } from "../../helpers/sendMail.js";
 import TgUsuario from "../../models/security/tgUsuario.js";
 import Actividades from "../../models/manager/actividades.js";
+import ActividadesFotos from "../../models/manager/actividadesFotos.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export class ManagerService {
+  async saveActividadesFoto(id_actividad, c_ruta_foto) {
+    try {
+      const data = await ActividadesFotos.create({
+        id_actividad, c_ruta_foto
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
   async saveActividades(c_titulo,c_subtitulo,c_descripcion) {
     try {
       const data = await Actividades.create({
@@ -64,6 +77,26 @@ export class ManagerService {
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getActividadesFotosIdFoto(id_foto) {
+    try {
+      const data = await ActividadesFotos.findOne({where:{id_foto}});
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio." + error);
+    }
+  }
+
+  async deleteActividadesFotos(id_foto) {
+    try {
+      const data = await ActividadesFotos.destroy({where:{id_foto}});
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio." + error);
     }
   }
 
@@ -303,6 +336,16 @@ export class ManagerService {
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getActividadesFotos(id_actividad) {
+    try {
+      const data = await ActividadesFotos.findAll({where:{id_actividad}});
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio." + error);
     }
   }
 

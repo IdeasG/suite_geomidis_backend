@@ -1,4 +1,7 @@
 import { ManagerService } from "../../services/manager/manager.js";
+import path from "path";
+import fs from "fs";
+import { log } from "console";
 
 const managerService = new ManagerService();
 
@@ -20,6 +23,48 @@ export class ManagerController {
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getActividadesFotos(req, res) {
+    const {id_actividad} = req.query;
+    // const {id_actividad} = req.params;
+    try {
+      const data = await managerService.getActividadesFotos(id_actividad);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async postActividadesFotos(req,res) {
+    const {id_actividad, imagen} = req.body;
+    try {
+      // Obtener el dato base64 de la imagen desde el cuerpo de la solicitud
+      // Separar el prefijo "data:image/jpeg;base64," del dato base64
+      const base64Image = imagen.split(";base64,").pop();
+      
+      // Decodificar el dato base64 en un buffer
+      const imageBuffer = Buffer.from(base64Image, "base64");
+
+      // Generar un nombre de archivo único
+      const fileName = Date.now() + "gr.jpg";
+
+      // Ruta de la carpeta donde se guardará la imagen
+      const folderPath = path.join(process.cwd(), "actividades");
+
+      // Crear la carpeta si no existe
+      if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+      }
+
+      // Guardar la imagen en la carpeta
+      fs.writeFileSync(path.join(folderPath, fileName), imageBuffer);
+      const data = await managerService.saveActividadesFoto(id_actividad,'/actividades/'+fileName);
+      res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al procesar la imagen" });
     }
   }
 
@@ -69,6 +114,31 @@ export class ManagerController {
     try {
       const data = await managerService.deleteActividades(
         id_actividad
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteActividadesFotos(req, res) {
+    const { id_foto } = req.params;
+    try {
+      // console.log(id_foto);
+      const data2 = await managerService.getActividadesFotosIdFoto(
+        id_foto
+      );
+      if (data2) {
+        const imagen = data2.c_ruta_foto.split("/actividades/").pop();
+        const folderPath = path.join(process.cwd(), "actividades");
+        // Eliminar cada imagen
+        if (imagen) {
+          const imagePathGrande = path.join(folderPath, imagen);
+          fs.unlinkSync(imagePathGrande);
+        }
+      }
+      const data = await managerService.deleteActividadesFotos(
+        id_foto
       );
       res.status(200).json(data);
     } catch (error) {
