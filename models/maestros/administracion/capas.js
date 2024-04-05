@@ -31,6 +31,10 @@ const capasGrupo = sequelize.define('tadm_capas', {
     type: DataTypes.BOOLEAN,
     allowNull: true
   },
+  b_geoportal: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true
+  },
   c_url: {
     type: DataTypes.STRING,
     allowNull: true

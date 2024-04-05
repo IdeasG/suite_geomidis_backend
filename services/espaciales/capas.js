@@ -14,6 +14,25 @@ export class CapasService {
       throw new Error("Error al obtener los tipos de vía...." + error);
     }
   }
+
+  async getPublicadosGeoportalIn() {
+    try {
+      const response = await Capas.findAll({where:{c_tipo:'interno', b_geoportal:true}});
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener los tipos de vía...." + error);
+    }
+  }
+
+  async getPublicadosGeoportalEx() {
+    try {
+      const response = await Capas.findAll({where:{c_tipo:'externo', b_geoportal:true}});
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener los tipos de vía...." + error);
+    }
+  }
+
   async getAllCapasTable(offset,pageSize,currentPage) {
     try {
       const [results, metadata] = await sequelize.query(`
@@ -250,6 +269,7 @@ export class CapasService {
     c_nombre_tabla_capa,
     c_nombre_public_capa,
     c_nombre_geoserver,
+    b_geoportal,
     b_capa,
     c_tipo,
     c_url,
@@ -266,6 +286,7 @@ export class CapasService {
           c_nombre_public_capa,
           c_nombre_geoserver,
           c_sql_capa: "1",
+          b_geoportal,
           b_capa,
           c_tipo,
           c_url,

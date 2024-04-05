@@ -9,6 +9,7 @@ export const createRouteCapas = () => {
 
   const capasController = new CapasController();
   // obtener capas
+  CapaRouter.get("/publicados/geoportal", capasController.getPublicadosGeoportal);
   CapaRouter.get("/table", cacheMiddleware, capasController.getAllCapasTable);
   CapaRouter.get(
     "/table/externo",

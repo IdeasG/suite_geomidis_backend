@@ -30,6 +30,10 @@ const Capa = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    b_geoportal: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   },
   {
     schema: "administracion",

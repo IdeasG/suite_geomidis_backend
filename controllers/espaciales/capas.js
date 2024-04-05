@@ -19,6 +19,17 @@ const capasService = new CapasService();
 export class CapasController {
   constructor() {}
 
+  async getPublicadosGeoportal(req, res) {
+    try {
+      const response = {}
+      response.internos = await capasService.getPublicadosGeoportalIn()
+      response.externos = await capasService.getPublicadosGeoportalEx()
+      res.status(200).json({ status: "success", data: response });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getAllCapasTable(req, res) {
     const { page = 1, pageSize = 5 } = req.query;
     try {
@@ -170,6 +181,7 @@ export class CapasController {
       c_nombre_tabla_capa,
       c_nombre_public_capa,
       c_nombre_geoserver,
+      b_geoportal,
       b_capa,
       c_tipo,
       c_url,
@@ -184,6 +196,7 @@ export class CapasController {
         c_nombre_tabla_capa,
         c_nombre_public_capa,
         c_nombre_geoserver,
+        b_geoportal,
         b_capa,
         c_tipo,
         c_url,
