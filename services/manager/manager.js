@@ -28,10 +28,45 @@ import {
   sendMail,
 } from "../../helpers/sendMail.js";
 import TgUsuario from "../../models/security/tgUsuario.js";
+import Actividades from "../../models/manager/actividades.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export class ManagerService {
+  async saveActividades(c_titulo,c_subtitulo,c_descripcion) {
+    try {
+      const data = await Actividades.create({
+        c_titulo,c_subtitulo,c_descripcion
+      });
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+  
+  async updateActividades(c_titulo,c_subtitulo,c_descripcion,id_actividad) {
+    try {
+      const data = await Actividades.update({
+        c_titulo,c_subtitulo,c_descripcion
+      }, {where:{id_actividad}});
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async deleteActividades(id_actividad) {
+    try {
+      const data = await Actividades.destroy({where:{id_actividad}});
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
   async saveModuloSistema(pk_sistema, c_modulo, c_descripcion, url, icono) {
     try {
       const data = await Modulo.create({
@@ -47,6 +82,7 @@ export class ManagerService {
       throw new Error("Error al obtener el servicio.");
     }
   }
+
 
   async saveGrupoSistema(pk_modulo, c_nombre, url) {
     try {
@@ -253,6 +289,16 @@ export class ManagerService {
   async getSistemas() {
     try {
       const data = await Geoportal.findAll();
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getActividades() {
+    try {
+      const data = await Actividades.findAll();
       return data;
     } catch (error) {
       console.log(error);

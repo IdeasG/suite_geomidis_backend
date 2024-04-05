@@ -14,6 +14,15 @@ export class ManagerController {
     }
   }
 
+  async getActividades(req, res) {
+    try {
+      const data = await managerService.getActividades();
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async saveModuloSistema(req, res) {
     const { pk_sistema, c_modulo, c_descripcion, url, icono } = req.body;
     try {
@@ -23,6 +32,43 @@ export class ManagerController {
         c_descripcion,
         url,
         icono
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async saveActividades(req, res) {
+    const { c_titulo,c_subtitulo,c_descripcion } = req.body;
+    try {
+      const data = await managerService.saveActividades(
+        c_titulo,c_subtitulo,c_descripcion
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async updateActividades(req, res) {
+    const { id_actividad } = req.params;
+    const { c_titulo,c_subtitulo,c_descripcion } = req.body;
+    try {
+      const data = await managerService.updateActividades(
+        c_titulo,c_subtitulo,c_descripcion,id_actividad
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteActividades(req, res) {
+    const { id_actividad } = req.params;
+    try {
+      const data = await managerService.deleteActividades(
+        id_actividad
       );
       res.status(200).json(data);
     } catch (error) {
@@ -202,6 +248,7 @@ export class ManagerController {
       res.status(500).json({ error: error.message });
     }
   }
+
 
   //CLIENTES
   async getClientes(req, res) {

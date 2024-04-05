@@ -11,10 +11,16 @@ export const createManagerRouter = () => {
   managerRouter.get("/sistemas", managerController.getSistemas);
   managerRouter.get("/sistemas/:id", managerController.getSistemabyId);
   managerRouter.get("/capas/:id", managerController.getCapasById);
+  managerRouter.get("/actividades", managerController.getActividades);
   //POST
   managerRouter.post("/sistemas/modulo", managerController.saveModuloSistema);
   managerRouter.post("/sistemas/grupo", managerController.saveGrupoSistema);
   managerRouter.post("/sistemas/menu", managerController.saveMenuSistema);
+  managerRouter.post("/actividades", managerController.saveActividades);
+  //PUT
+  managerRouter.put("/actividades/:id_actividad", managerController.updateActividades);
+  //DELETE
+  managerRouter.delete("/actividades/:id_actividad", managerController.deleteActividades);
 
   managerRouter.post(
     "/capas/supergrupo",
