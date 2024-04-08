@@ -21,9 +21,7 @@ export class CapasController {
 
   async getPublicadosGeoportal(req, res) {
     try {
-      const response = {}
-      response.internos = await capasService.getPublicadosGeoportalIn()
-      response.externos = await capasService.getPublicadosGeoportalEx()
+      const response = await capasService.getPublicadosGeoportalIn()
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });

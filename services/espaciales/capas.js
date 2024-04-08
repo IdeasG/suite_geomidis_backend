@@ -17,16 +17,32 @@ export class CapasService {
 
   async getPublicadosGeoportalIn() {
     try {
-      const response = await Capas.findAll({where:{c_tipo:'interno', b_geoportal:true}});
-      return response;
-    } catch (error) {
-      throw new Error("Error al obtener los tipos de vía...." + error);
-    }
-  }
+      const [data, metadata] = await sequelize.query(`
+        select tcg.id_grupo, c_nombre_grupo, c_nombre_public_capa, c_nombre_geoserver, c_url, c_tipo
+        from administracion.tadm_capas_grupo tcg
+        left join administracion.tadm_capas tc on tcg.id_grupo = tc.id_grupo
+        where b_geoportal = true
+      `)
 
-  async getPublicadosGeoportalEx() {
-    try {
-      const response = await Capas.findAll({where:{c_tipo:'externo', b_geoportal:true}});
+      const groupedData = data.reduce((acc, currentValue) => {
+        if (currentValue.c_tipo === 'interno') {
+            if (!acc.interno[currentValue.c_nombre_grupo]) {
+                acc.interno[currentValue.c_nombre_grupo] = [];
+            }
+            acc.interno[currentValue.c_nombre_grupo].push(currentValue);
+        } else if (currentValue.c_tipo === 'externo') {
+            if (!acc.externo[currentValue.c_nombre_grupo]) {
+                acc.externo[currentValue.c_nombre_grupo] = [];
+            }
+            acc.externo[currentValue.c_nombre_grupo].push(currentValue);
+        }
+        return acc;
+      }, { interno: {}, externo: {} });
+
+      const interno = groupedData.interno;
+      const externo = groupedData.externo;
+      const response = { interno, externo }
+      // console.log(response);
       return response;
     } catch (error) {
       throw new Error("Error al obtener los tipos de vía...." + error);
