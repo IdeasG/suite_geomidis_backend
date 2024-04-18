@@ -13,6 +13,7 @@ import axios from "axios";
 import TgUsuario from "../../models/security/tgUsuario.js";
 import { Sequelize } from "sequelize";
 import Rol from "../../models/security/rol.js";
+import fs from "fs";
 
 const capasService = new CapasService();
 
@@ -594,6 +595,51 @@ export class CapasController {
 
       // Convertir el objeto JSON a una cadena JSON y enviarlo en el cuerpo de la respuesta
       res.send(JSON.stringify(jsonData, null, 2));
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async archivoGeoJSON(req, res) {
+    const { jsonData } = req.body; // Obtener el JSON de la solicitud
+  
+    try {
+      // Crear una FeatureCollection para almacenar las características GeoJSON
+      const featureCollection = {
+        type: "FeatureCollection",
+        crs: {
+          type: "name",
+          properties: {
+            name: "urn:ogc:def:crs:EPSG::4326"
+          }
+        },
+        features: jsonData.map(obj => {
+          // Comprobar si COUBIX y COUBIY existen en el objeto
+          if (obj.COUBIX !== undefined && obj.COUBIY !== undefined) {
+            // Crear un objeto Feature GeoJSON para cada objeto
+            return {
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: [obj.COUBIX, obj.COUBIY] // [longitud, latitud]
+              },
+              properties: obj
+            };
+          } else {
+            return null; // Retornar null si las coordenadas no están presentes en el objeto
+          }
+        }).filter(feature => feature !== null) // Filtrar para eliminar objetos nulos
+      };
+  
+      // Convertir el objeto FeatureCollection a cadena GeoJSON
+      const geoJSONString = JSON.stringify(featureCollection, null, 2);
+  
+      // Configurar cabeceras para indicar que se envía un archivo JSON
+      res.setHeader("Content-Disposition", "attachment; filename=datos.geojson");
+      res.setHeader("Content-Type", "application/json");
+  
+      // Enviar el GeoJSON en el cuerpo de la respuesta
+      res.send(geoJSONString);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
