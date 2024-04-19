@@ -517,7 +517,7 @@ export class CapasService {
       let nuevasColumnas = [];
       for (let index in results2) {
         const element = results2[index].column_name;
-        if (element !== "geom" && element !== "CODOBJ" && element !== "gid") {
+        if (element !== "geom" && element !== "CODOBJ" && element !== "gid" && element !== "ideasg") {
           const registrados = {
             c_campo_original: element,
             c_campo_alias: element,
@@ -552,7 +552,7 @@ export class CapasService {
       let nuevasColumnas = [];
       for (let index in results2) {
         const element = results2[index].column_name;
-        if (element !== "geom" && element !== "CODOBJ" && element !== "gid") {
+        if (element !== "geom" && element !== "CODOBJ" && element !== "gid" && element !== "ideasg") {
           const registrados = {
             c_campo_original: element,
             c_campo_alias: element,
