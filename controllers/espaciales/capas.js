@@ -122,7 +122,8 @@ export class CapasController {
       c_tipo,
       c_url,
       c_servicio,
-      c_url_seleccionado
+      c_url_seleccionado,
+      b_geoportal
     } = req.body;
     const {id,id_rol} = req.user;
     try {
@@ -138,7 +139,8 @@ export class CapasController {
         c_servicio,
         id,
         id_rol,
-        c_url_seleccionado
+        c_url_seleccionado,
+        b_geoportal
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {

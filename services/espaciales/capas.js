@@ -230,7 +230,8 @@ export class CapasService {
     c_servicio,
     id_usuario_auditoria,
     id_rol_auditoria,
-    c_url_seleccionado
+    c_url_seleccionado,
+    b_geoportal
   ) {
     try {
       const response = await Capas.create({
@@ -245,7 +246,8 @@ export class CapasService {
         c_servicio,
         id_usuario_auditoria,
         id_rol_auditoria,
-        c_url_seleccionado
+        c_url_seleccionado,
+        b_geoportal
       });
       return response;
     } catch (error) {
