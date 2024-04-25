@@ -5,6 +5,7 @@ import Grupo from "../../models/manager/grupo.js";
 import Menu from "../../models/manager/menu.js";
 import Cliente from "../../models/manager/clientes.js";
 import TiSisCliente from "../../models/manager/tiSisCliente.js";
+import { sequelize } from "../../config/postgres/sequelize.js";
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -30,6 +31,7 @@ import {
 import TgUsuario from "../../models/security/tgUsuario.js";
 import Actividades from "../../models/manager/actividades.js";
 import ActividadesFotos from "../../models/manager/actividadesFotos.js";
+import { log } from "console";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -217,6 +219,76 @@ export class ManagerService {
       return data;
     } catch (error) {
       console.log(error);
+      throw new Error("Error al crear " + error);
+    }
+  }
+
+async getRolByIdCliente(id_cliente) {
+  try {
+    const [response, metadata] = await sequelize.query(`
+      select * from seguridad.tseg_roles
+      where id_cliente = `+ id_cliente +` and c_nombre_rol ilike '%invitado%';
+    `);
+    // console.log(response);
+    return response[0].id_rol;
+  } catch (error) {
+    throw new Error("Error al crear " + error);
+  }
+}
+  async getCapasOrdenByIdRol(fk_rol) {
+    try {
+      let orden = await OrdenCapa.findOne({
+        where: {
+          fk_rol: fk_rol,
+        },
+      });
+      if (orden) {
+        orden = orden.dataValues.j_orden
+      }
+      return orden;
+    } catch (error) {
+      throw new Error("Error al crear " + error);
+    }
+  }
+
+  async postCapasOrdenByIdRol(fk_rol) {
+    try {
+          const [superGrupos, metadata] = await sequelize.query(
+            `select distinct sp.* from administracion.tadm_capas_supergrupo sp
+          inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+          inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+          inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+          where fk_rol=${fk_rol}`
+          );
+          const dbResponse = superGrupos;
+          for (let index = 0; index < superGrupos.length; index++) {
+            const element = superGrupos[index];
+            const [grupos, metadata] = await sequelize.query(
+              `select distinct cp.* from administracion.tadm_capas_supergrupo sp
+          inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+          inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+          inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+          where fk_rol=${fk_rol} and cp.id_super_grupo = ${element.id_super_grupo}`
+            );
+            for (let index = 0; index < grupos.length; index++) {
+              const element = grupos[index];
+              const [capas, metadata] = await sequelize.query(
+                `select distinct tc.* from administracion.tadm_capas_supergrupo sp
+                inner join administracion.tadm_capas_grupo cp on sp.id_super_grupo=cp.id_super_grupo
+                inner join administracion.tadm_capas tc on cp.id_grupo=tc.id_grupo
+                inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
+                where fk_rol=${fk_rol} and tc.id_grupo = ${element.id_grupo}`
+              );
+              element.capas = capas;
+            }
+            element.grupos = grupos;
+          }
+        await OrdenCapa.create({
+          fk_rol,
+          j_orden: dbResponse,
+        })
+      return dbResponse;
+    } catch (error) {
       throw new Error("Error al crear " + error);
     }
   }

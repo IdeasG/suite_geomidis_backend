@@ -41,6 +41,15 @@ export const createManagerRouter = () => {
     validarToken,
     managerController.saveOrdenByRol
   );
+  managerRouter.get(
+    "/capas/rol/orden",
+    validarToken,
+    managerController.getOrdenByRol
+  );
+  managerRouter.get(
+    "/capas/rol/orden/invitado/:id_cliente",
+    managerController.getOrdenByRolInvitado
+  );
   //DELETE
   managerRouter.delete(
     "/sistemas/modulo/:id",

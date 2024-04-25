@@ -250,7 +250,40 @@ export class ManagerController {
       res.status(500).json({ error: error.message });
     }
   }
-  //
+
+  async getOrdenByRol(req, res) {
+    const {id_rol} = req.user;
+    try {
+      // console.log('ID_CAPA Y ROL FINAL:' + id_capa, id_rol_enviar);
+      let dbResponse = await managerService.getCapasOrdenByIdRol(id_rol);
+      if (!dbResponse) {
+        const responseCreate = await managerService.postCapasOrdenByIdRol(
+          id_rol
+        );
+        dbResponse = responseCreate;
+      }
+      res.status(200).json({ status: "success", data: dbResponse });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getOrdenByRolInvitado(req, res) {
+    const { id_cliente } = req.params;
+    try {
+      const id_rol = await  managerService.getRolByIdCliente(id_cliente);
+      let dbResponse = await managerService.getCapasOrdenByIdRol(id_rol);
+      if (!dbResponse) {
+        const responseCreate = await managerService.postCapasOrdenByIdRol(
+          id_rol
+        );
+        dbResponse = responseCreate;
+      }
+      res.status(200).json({ status: "success", data: dbResponse });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 
   //DELETE
   async deleteModuloSistema(req, res) {

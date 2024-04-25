@@ -315,6 +315,7 @@ export class CapasController {
 
   async getStructureInvitado(req, res) {
     const { id_geoportal } = req.params;
+    console.log(id_geoportal);
     try {
       const rol = await Rol.findOne({
         where: {
