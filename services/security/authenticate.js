@@ -585,7 +585,6 @@ export class AuthenticateService {
             id_rol: id_rol,
           },
         });
-
         const usuario = await TgUsuario.create({
           usuario: user,
           clave: generatePasswordHash(password),
