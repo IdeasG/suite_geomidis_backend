@@ -22,6 +22,12 @@ const GrupoCapa = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    id_usuario_auditoria: {
+      type: DataTypes.INTEGER,
+    },
+    id_rol_auditoria: {
+      type: DataTypes.INTEGER,
+    },
   },
   {
     schema: "administracion",

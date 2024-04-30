@@ -18,6 +18,15 @@ const SuperGrupo = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    b_super_grupo: {
+      type: DataTypes.INTEGER,
+    },
+    id_usuario_auditoria: {
+      type: DataTypes.INTEGER,
+    },
+    id_rol_auditoria: {
+      type: DataTypes.INTEGER,
+    },
   },
   {
     schema: "administracion",
