@@ -410,7 +410,11 @@ async getRolByIdCliente(id_cliente) {
 
   async getActividades() {
     try {
-      const data = await Actividades.findAll();
+      const data = await Actividades.findAll({
+        order: [
+          ['id_actividad', 'DESC']
+        ]
+      });
       return data;
     } catch (error) {
       console.log(error);
