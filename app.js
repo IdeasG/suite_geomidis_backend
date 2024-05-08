@@ -15,6 +15,8 @@ import { createEvaluacionPredioRouter } from "./routes/fichas/individual/evaluac
 import { createUnicatRouter } from "./routes/fichas/unicat.js";
 import { createAuthenticateRouter } from "./routes/security/authenticate.js";
 import { createManagerRouter } from "./routes/suite/manager.js";
+import cron from 'node-cron';
+import { callServicesDaily, callServicesAnual } from './controllers/automatizacion/automatizacion.js';
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -31,6 +33,20 @@ app.use(corsMiddleware());
 app.use(express.static(path.join(__dirname, "")));
 
 app.disable("x-powered-by");
+
+// Configurar el cronjob para que se ejecute diariamente a las 00:00 horas
+cron.schedule('1 0 * * *', () => {
+  console.log('Ejecutando llamadas diarias a los servicios...');
+  callServicesDaily(); // Llama a la función para realizar las llamadas diarias a los servicios
+});
+
+// Programa la tarea cron para que se ejecute todos los 1 de enero de cada año
+cron.schedule('0 0 1 1 * *', () => {
+  console.log('Ejecutando tarea cron el 1 de enero.');
+  callServicesAnual();
+  // Aquí puedes llamar a la función o realizar cualquier tarea que necesites ejecutar
+});
+
 setupPruebasRoutes(app);
 setupMaestroRoutes(app);
 setupEspacialesRoutes(app);

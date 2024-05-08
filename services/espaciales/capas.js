@@ -418,7 +418,7 @@ export class CapasService {
           }
         }
         // consulta = consulta + ' offset ' + offset + ' limit ' + pageSize
-        console.log(consulta);
+        // console.log(consulta);
         const [results, metadata] = await sequelize.query(consulta);
         const respuetaProcesada = {
           'consulta_grupal': results
