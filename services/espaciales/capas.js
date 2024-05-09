@@ -294,7 +294,8 @@ export class CapasService {
     c_servicio,
     id_usuario_auditoria,
     id_rol_auditoria,
-    c_url_seleccionado
+    c_url_seleccionado,
+    c_sql_capa
   ) {
     try {
       const response = await Capas.update(
@@ -303,7 +304,6 @@ export class CapasService {
           c_nombre_tabla_capa,
           c_nombre_public_capa,
           c_nombre_geoserver,
-          c_sql_capa: "1",
           b_geoportal,
           b_capa,
           c_tipo,
@@ -311,7 +311,8 @@ export class CapasService {
           c_servicio,
           id_usuario_auditoria,
           id_rol_auditoria,
-          c_url_seleccionado
+          c_url_seleccionado,
+          c_sql_capa
         },
         { where: { id_capa } }
       );
