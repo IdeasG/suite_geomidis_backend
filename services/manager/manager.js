@@ -888,7 +888,7 @@ async getRolByIdCliente(id_cliente) {
     componentsArriba
   ) {
     try {
-      if (logo_bs && logo_bs.length > 0) {
+      if (logo_bs) {
         const ahora = Date.now();
         const currentDir = __dirname;
         const desiredDir = path.join(currentDir, "..", "..");
