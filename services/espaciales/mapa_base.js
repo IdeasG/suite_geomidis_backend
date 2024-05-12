@@ -11,7 +11,7 @@ export class MapaBaseService {
         data: dbResponse,
       };
     } catch (error) {
-      throw new Error("Error al obtener lista de mapa base externa.");
+      throw new Error("Error al obtener lista de mapa base externa."+error);
     }
   }
 
