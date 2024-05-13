@@ -59,7 +59,7 @@ export class AuthenticateService {
       return { isSuiteUser, backendTokens: accessToken };
     } catch (error) {
       console.error(error);
-      throw new Error("Error: ", error);
+      throw new Error("Error: " + error);
     }
   }
 
@@ -87,7 +87,7 @@ export class AuthenticateService {
       return { isSuiteUser, backendTokens: accessToken };
     } catch (error) {
       console.error(error);
-      throw new Error("Error: ", error);
+      throw new Error("Error: " + error);
     }
   }
 
