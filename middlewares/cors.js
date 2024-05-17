@@ -3,6 +3,7 @@ import cors from "cors";
 const ACCEPTED_ORIGINS = [
   "http://localhost:3000",
   "https://backend.geoportalmidis.pe",
+  "https://geoportalmidis.pe",
   // "https://suite.juegodepalabras.com.pe",
   // "https://suite-nextjs.vercel.app",
   "https://geomidis2024.ideasg.org",
