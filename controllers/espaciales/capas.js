@@ -544,6 +544,36 @@ export class CapasController {
     }
   }
 
+  async filtroServicios(req, res) {
+    console.log('hola filtros');
+    const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
+    // console.log(simbolo, column, layer, inputBt);
+    try {
+      console.log(req.body);
+      let tabla
+      let where
+      switch (tipoServicio) {
+        case "S":
+          tabla = "ccpp_eess_total_atributos"
+          let formattedString = categoria.map(item => `'${item}'`).join(', ');
+          where = "id_ccpp = '"+idccpp+"' and distancia_km < "+distancia+" and categoria_eess in ("+formattedString+")"
+          break;
+        case "E":
+          tabla = "ccpp_iiee_total_atributos"
+          where = "id_ccpp = '"+idccpp+"' and distancia_km < "+distancia+" and nivmodali_iiee = '" + nivel + "'"
+        break;
+        default:
+          break;
+      }
+      const respuesta = await capasService.filtroServicios(
+        tabla, where
+      );
+      res.status(200).json({ status: "success", data: respuesta });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async archivoShape(req, res) {
     // console.log(simbolo, column, layer, inputBt);
     const { geoserver, workspace, layer, simbolo, column, inputBt } = req.body;

@@ -492,6 +492,19 @@ export class CapasService {
     }
   }
 
+  async filtroServicios(tabla, where) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+        SELECT * FROM public.${tabla}
+        WHERE ${where}
+        order by distancia_km asc
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
   async busquedaAvanzada(simbolo, column, layer, inputBt) {
     try {
       // console.log(`

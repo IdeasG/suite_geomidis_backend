@@ -4,13 +4,13 @@ import https from 'https';
 const servicios = [
     { url: 'https://localhost:44383/qali_warma/almaprov', program: 'Qali Warma', capa: 'Almacén del Proveedor' },
     { url: 'https://localhost:44383/qali_warma/entrprod', program: 'Qali Warma', capa: 'Entrega de Productos' },
+    
     { url: 'https://localhost:44383/pension/agebanac', program: 'PENSION 65', capa: 'Agencias del Banco de la Nación' },
     { url: 'https://localhost:44383/pension/emtraval', program: 'PENSION 65', capa: 'Empresa Transportadora de Valores' },
     { url: 'https://localhost:44383/pension/usupen65', program: 'PENSION 65', capa: 'Usuario de PENSIÓN 65' },
     { url: 'https://localhost:44383/cuna_mas/sa', program: 'CUNA MAS', capa: 'Local de Servicios Alimentarios' },
     { url: 'https://localhost:44383/cuna_mas/ciai', program: 'CUNA MAS', capa: 'Local del Centro Infantil de Atención Integral' }
 ];
-
 
 const serviciosAnuales = [
     { url: 'https://localhost:44383/cuna_mas/seuniter', program: 'CUNA MAS', capa: 'Sedes de Unidades Territoriales' },
