@@ -269,7 +269,6 @@ export class CapasService {
   }
 
   async RegistrarSupergrupos(c_nombre_super_grupo, b_super_grupo) {
-    // console.log('hola');
     try {
       const response = await CapasSuperGrupo.create({
         c_nombre_super_grupo,
@@ -408,15 +407,35 @@ export class CapasService {
       let resultado = {}
       let consulta = ''
       if (tipo == '1') {
-        for (let index in body) {
-          const element = body[index];
-          // console.log(element, index);
-          if (index == '0') {
-            consulta = consulta + 'select espaciales.' + element.value +'."'+element.campo+ '" from espaciales.' + element.value + ' '
+        if (body['0'].campo == "IDCCPP") {
+          for (let index in body) {
+            const element = body[index];
+            // console.log(element, index);
+            if (index == '0') {
+              consulta = consulta + 'select  espaciales.sp_centros_poblados.nombccpp, espaciales.' + element.value +'."'+element.campo+ '", count(*) as cantidad from espaciales.' + element.value + ' '
+              // console.log(consulta);
+            }
+            else {
+              consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'"::character varying = espaciales.' + element.value + '."'+ element.campo+'"::character varying '
+              // console.log(consulta);
+            }
           }
-          else {
-            consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'"::character varying = espaciales.' + element.value + '."'+ element.campo+'"::character varying '
+          // console.log(body['0'].value);
+          consulta = consulta + 'left join  espaciales.sp_centros_poblados on espaciales.sp_centros_poblados.idccpp_21 = '+ 'espaciales.' + body['0'].value+'."'+body['0'].campo+'" group by espaciales.' + body['0'].value+'."'+body['0'].campo+'", espaciales.sp_centros_poblados.nombccpp' 
+        } else {
+          for (let index in body) {
+            const element = body[index];
+            // console.log(element, index);
+            if (index == '0') {
+              consulta = consulta + 'select  espaciales.' + element.value +'."'+element.campo+ '", count(*) as cantidad from espaciales.' + element.value + ' '
+              // console.log(consulta);
+            }
+            else {
+              consulta = consulta + 'inner join espaciales.' + element.value + ' on espaciales.' + body[parseInt(index)-1].value + '."'+body[parseInt(index)-1].campo+'"::character varying = espaciales.' + element.value + '."'+ element.campo+'"::character varying '
+              // console.log(consulta);
+            }
           }
+          consulta = consulta + 'group by espaciales.' + body['0'].value+'."'+body['0'].campo+'"' 
         }
         // consulta = consulta + ' offset ' + offset + ' limit ' + pageSize
         // console.log(consulta);

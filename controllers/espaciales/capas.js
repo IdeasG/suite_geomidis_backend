@@ -545,11 +545,8 @@ export class CapasController {
   }
 
   async filtroServicios(req, res) {
-    console.log('hola filtros');
     const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
-    // console.log(simbolo, column, layer, inputBt);
     try {
-      console.log(req.body);
       let tabla
       let where
       switch (tipoServicio) {
@@ -1147,19 +1144,28 @@ export class CapasController {
       const exportarTempo = [];
       const columns = [];
       const consulta_grupal = data.consulta_grupal
-      if (consulta_grupal.length>0) {
-        const newData = {}
+
+      if (campoBuscado == "Centro Poblado") {
+        columns.push({ header: "Nombre Centro Poblado", key: '1', width: 30 })
+        columns.push({ header: campoBuscado, key: '2', width: 30 })
+        columns.push({ header: "Cantidad", key: '3', width: 30 })
+      } else {
+        columns.push({ header: campoBuscado, key: '1', width: 30 })
+        columns.push({ header: "Cantidad", key: '2', width: 30 })
+      }
+      if (consulta_grupal.length>0 && campoBuscado == "Centro Poblado") {
         for (let index in consulta_grupal) {
           const element = consulta_grupal[index];
-          for (let index2 in element) {
-            contador = contador + 1
-            if (contador == 1) {
-              columns.push({ header: campoBuscado, key: '1', width: 30 })
-            }
-            const value = {}
-            value['1'] = element[index2]
-            exportarTempo.push(value)
-          }
+          // console.log(element);
+            exportarTempo.push({ '1':element.nombccpp, '2':element['IDCCPP'], '3':element.cantidad})
+        }
+      } else if(consulta_grupal.length>0) {
+        for (let index in consulta_grupal) {
+          const element = consulta_grupal[index];
+          let firstElement = element;
+          let firstKey = Object.keys(firstElement)[0];
+            // console.log(element);
+            exportarTempo.push({ '1':element[firstKey], '2':element.cantidad})
         }
       }
       // console.log(columns);
