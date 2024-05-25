@@ -520,7 +520,7 @@ export class CapasService {
       // `);
       const [results, metadata] = await sequelize.query(`
         SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17 FROM espaciales.${tabla}
-        left join espaciales.sp_centros_poblados cp on espaciales.ccpp_eess_total_atributos.id_ccpp = cp.idccpp_21
+        left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
         WHERE ${where}
         order by distancia_km asc
       `);
@@ -540,7 +540,7 @@ export class CapasService {
     // `);
       const [results, metadata] = await sequelize.query(`
         SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17  FROM espaciales.${tabla}
-        left join espaciales.sp_centros_poblados cp on espaciales.ccpp_eess_total_atributos.id_ccpp = cp.idccpp_21
+        left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
         WHERE ${where}
         order by id_ccpp,distancia_km asc
       `);
