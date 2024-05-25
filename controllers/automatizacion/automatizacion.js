@@ -1,20 +1,21 @@
 import axios from 'axios';
 import https from 'https';
+const netBackend = process.env.NET_BACKEND
 
 const servicios = [
-    { url: 'https://localhost:44383/qali_warma/almaprov', program: 'Qali Warma', capa: 'Almacén del Proveedor' },
-    { url: 'https://localhost:44383/qali_warma/entrprod', program: 'Qali Warma', capa: 'Entrega de Productos' },
-    
-    { url: 'https://localhost:44383/pension/agebanac', program: 'PENSION 65', capa: 'Agencias del Banco de la Nación' },
-    { url: 'https://localhost:44383/pension/emtraval', program: 'PENSION 65', capa: 'Empresa Transportadora de Valores' },
-    { url: 'https://localhost:44383/pension/usupen65', program: 'PENSION 65', capa: 'Usuario de PENSIÓN 65' },
-    { url: 'https://localhost:44383/cuna_mas/sa', program: 'CUNA MAS', capa: 'Local de Servicios Alimentarios' },
-    { url: 'https://localhost:44383/cuna_mas/ciai', program: 'CUNA MAS', capa: 'Local del Centro Infantil de Atención Integral' }
+    { url: netBackend + '/qali_warma/almaprov', program: 'Qali Warma', capa: 'Almacén del Proveedor' },
+    { url: netBackend + '/qali_warma/entrprod', program: 'Qali Warma', capa: 'Entrega de Productos' },
+    { url: netBackend + '/qali_warma/supeiiee', program: 'Qali Warma', capa: 'Supervisión IIEE' },
+    { url: netBackend + '/pension/agebanac', program: 'PENSION 65', capa: 'Agencias del Banco de la Nación' },
+    { url: netBackend + '/pension/emtraval', program: 'PENSION 65', capa: 'Empresa Transportadora de Valores' },
+    { url: netBackend + '/pension/usupen65', program: 'PENSION 65', capa: 'Usuario de PENSIÓN 65' },
+    { url: netBackend + '/cuna_mas/sa', program: 'CUNA MAS', capa: 'Local de Servicios Alimentarios' },
+    { url: netBackend + '/cuna_mas/ciai', program: 'CUNA MAS', capa: 'Local del Centro Infantil de Atención Integral' }
 ];
 
 const serviciosAnuales = [
-    { url: 'https://localhost:44383/cuna_mas/seuniter', program: 'CUNA MAS', capa: 'Sedes de Unidades Territoriales' },
-    { url: 'https://localhost:44383/cuna_mas/untecuma', program: 'CUNA MAS', capa: 'Sedes de Unidades Territoriales' },
+    { url: netBackend + '/cuna_mas/seuniter', program: 'CUNA MAS', capa: 'Sedes de Unidades Territoriales' },
+    { url: netBackend + '/cuna_mas/untecuma', program: 'CUNA MAS', capa: 'Sedes de Unidades Territoriales' },
 ];
 
 // Función para realizar la llamada a los servicios diariamente

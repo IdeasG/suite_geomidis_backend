@@ -513,10 +513,62 @@ export class CapasService {
 
   async filtroServicios(tabla, where) {
     try {
+      // console.log(`
+      //   SELECT * FROM espaciales.${tabla}
+      //   WHERE ${where}
+      //   order by distancia_km asc
+      // `);
       const [results, metadata] = await sequelize.query(`
-        SELECT * FROM public.${tabla}
+        SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17 FROM espaciales.${tabla}
+        left join espaciales.sp_centros_poblados cp on espaciales.ccpp_eess_total_atributos.id_ccpp = cp.idccpp_21
         WHERE ${where}
         order by distancia_km asc
+      `);
+      // console.log(results);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
+  async filtroServiciosArea(tabla, where) {
+    try {
+    //   console.log(`
+    //   SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, * FROM espaciales.${tabla}
+    //   WHERE ${where}
+    //   order by id_ccpp,distancia_km asc
+    // `);
+      const [results, metadata] = await sequelize.query(`
+        SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17  FROM espaciales.${tabla}
+        left join espaciales.sp_centros_poblados cp on espaciales.ccpp_eess_total_atributos.id_ccpp = cp.idccpp_21
+        WHERE ${where}
+        order by id_ccpp,distancia_km asc
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
+  async filtroAfiliados(idccpp) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+        SELECT 'Beneficiarios Cunamás SA' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_cums_loserali 
+        WHERE "IDCCPP" = '${idccpp}'
+        UNION ALL
+        SELECT 'Beneficiarios Pensión65' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_psn65_usupen65 
+        WHERE "IDCCPP" = '${idccpp}'
+        UNION ALL
+        SELECT 'Hogares afilados Juntos' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_jts_hogajunt 
+        WHERE "IDCCPP" = '${idccpp}'
+        UNION ALL
+        SELECT 'Beneficiarios Contigo' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_ctg_usprocon 
+        WHERE "IDCCPP" = '${idccpp}'
+        ;
       `);
       return results;
     } catch (error) {
@@ -526,10 +578,6 @@ export class CapasService {
 
   async busquedaAvanzada(simbolo, column, layer, inputBt) {
     try {
-      // console.log(`
-      //   SELECT * FROM espaciales.${layer}
-      //   WHERE ${column} ${simbolo} ${inputBt}
-      // `);
       const [results, metadata] = await sequelize.query(`
         SELECT * FROM espaciales.${layer}
         WHERE ${column} ${simbolo} ${inputBt}

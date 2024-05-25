@@ -544,6 +544,103 @@ export class CapasController {
     }
   }
 
+  async filtroAfiliados(req, res) {
+    const { idccpp } = req.params;
+    try {
+      const respuesta = await capasService.filtroAfiliados(
+        idccpp
+      );
+      res.status(200).json({ status: "success", data: respuesta });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async filtroServiciosGenerales(req, res) {
+    const { idccpp, tipoServicio} = req.body;
+    try {
+      let tabla
+      let where
+      switch (tipoServicio) {
+        case "S":
+          tabla = "ccpp_eess_total_atributos"
+          where = "id_ccpp = '"+idccpp+"'"
+          break;
+        case "E":
+          tabla = "ccpp_iiee_total_atributos"
+          where = "id_ccpp = '"+idccpp+"'"
+        break;
+        default:
+          break;
+      }
+      const respuesta = await capasService.filtroServicios(
+        tabla, where
+      );
+      res.status(200).json({ status: "success", data: respuesta });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  
+  async filtroServiciosAreaGenerales(req,res) {
+    const { idccpp, tipoServicio} = req.body;
+    // console.log(req.body);
+    const ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+    try {
+      let tabla
+      let where
+      switch (tipoServicio) {
+        case "S":
+          tabla = "ccpp_eess_total_atributos"
+          where = "id_ccpp in ("+ccppFormato+")"
+          break;
+        case "E":
+          tabla = "ccpp_iiee_total_atributos"
+          where = "id_ccpp in ("+ccppFormato+")"
+        break;
+        default:
+          break;
+      }
+      const respuesta = await capasService.filtroServicios(
+        tabla, where
+      );
+      res.status(200).json({ status: "success", data: respuesta });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async filtroServiciosArea(req, res) {
+    const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
+    try {
+      let tabla
+      let where
+      let ccppFormato
+      switch (tipoServicio) {
+        case "S":
+          tabla = "ccpp_eess_total_atributos"
+          let categoriaFormato = categoria.map(item => `'${item}'`).join(', ');
+          ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+          where = "id_ccpp in ("+ccppFormato+") and distancia_km < "+distancia+" and categoria_eess in ("+categoriaFormato+")"
+          break;
+        case "E":
+          tabla = "ccpp_iiee_total_atributos"
+          ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+          where = "id_ccpp in ("+ccppFormato+") and distancia_km < "+distancia+" and nivmodali_iiee = '" + nivel + "'"
+        break;
+        default:
+          break;
+      }
+      const respuesta = await capasService.filtroServiciosArea(
+        tabla, where
+      );
+      // console.log(respuesta);
+      res.status(200).json({ status: "success", data: respuesta });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async filtroServicios(req, res) {
     const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
     try {

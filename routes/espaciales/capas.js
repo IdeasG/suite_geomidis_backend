@@ -103,7 +103,10 @@ export const createRouteCapas = () => {
   CapaRouter.post("/busquedaavanzada", capasController.busquedaAvanzada);
   CapaRouter.post("/archivoshape", capasController.archivoShape);
   CapaRouter.post("/filtro/servicios", capasController.filtroServicios);
-
+  CapaRouter.post("/filtro/servicios/area", capasController.filtroServiciosArea);
+  CapaRouter.post("/filtro/servicios/generales", capasController.filtroServiciosGenerales);
+  CapaRouter.post("/filtro/servicios/area/generales", capasController.filtroServiciosAreaGenerales);
+  CapaRouter.get("/filtro/afiliados/:idccpp", capasController.filtroAfiliados);
   CapaRouter.get("/validaciondata", capasController.validacionData);
   CapaRouter.get("/json/fallido/:id", capasController.jsonFallido);
   CapaRouter.post("/archivojson", capasController.archivoJson);
