@@ -541,7 +541,9 @@ export class CapasService {
       //   select * from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
       //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
       //   left join ${leftjoin}
-      //   WHERE ${where})
+      //   WHERE ${where}
+      //   order by id_ccpp, distancia_km asc
+      //   )
       //   as newTable
       //   order by distancia_km asc
       // `
@@ -550,7 +552,9 @@ export class CapasService {
         select * from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
         left join ${leftjoin}
-        WHERE ${where})
+        WHERE ${where}
+        order by id_ccpp, distancia_km asc
+        )
         as newTable
         order by distancia_km asc
       `);
