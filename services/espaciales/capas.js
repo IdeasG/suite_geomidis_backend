@@ -511,16 +511,19 @@ export class CapasService {
     }
   }
 
-  async filtroServicios(tabla, where) {
+  async filtroServicios(tabla, where, leftjoin, nombEst) {
     try {
       // console.log(`
-      //   SELECT * FROM espaciales.${tabla}
+      //   SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
+      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+      //   left join ${leftjoin}
       //   WHERE ${where}
       //   order by distancia_km asc
       // `);
       const [results, metadata] = await sequelize.query(`
-        SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17 FROM espaciales.${tabla}
+        SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+        left join ${leftjoin}
         WHERE ${where}
         order by distancia_km asc
       `);
@@ -531,18 +534,25 @@ export class CapasService {
     }
   }
 
-  async filtroServiciosArea(tabla, where) {
+  async filtroServiciosArea(tabla, where, leftjoin, nombEst) {
     try {
-    //   console.log(`
-    //   SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, * FROM espaciales.${tabla}
-    //   WHERE ${where}
-    //   order by id_ccpp,distancia_km asc
-    // `);
+      // console.log(
+      //   `
+      //   select * from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
+      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+      //   left join ${leftjoin}
+      //   WHERE ${where})
+      //   as newTable
+      //   order by distancia_km asc
+      // `
+      // );
       const [results, metadata] = await sequelize.query(`
-        SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17  FROM espaciales.${tabla}
+        select * from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
-        WHERE ${where}
-        order by id_ccpp,distancia_km asc
+        left join ${leftjoin}
+        WHERE ${where})
+        as newTable
+        order by distancia_km asc
       `);
       return results;
     } catch (error) {
@@ -568,6 +578,32 @@ export class CapasService {
         SELECT 'Beneficiarios Contigo' AS afiliado, COUNT(*) AS conteo 
         FROM espaciales.spg_ctg_usprocon 
         WHERE "IDCCPP" = '${idccpp}'
+        ;
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
+  async filtroAfiliadosArea(idccpp) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+        SELECT 'Beneficiarios Cunamás SA' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_cums_loserali 
+        WHERE "IDCCPP" in (${idccpp})
+        UNION ALL
+        SELECT 'Beneficiarios Pensión65' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_psn65_usupen65 
+        WHERE "IDCCPP" in (${idccpp})
+        UNION ALL
+        SELECT 'Hogares afilados Juntos' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_jts_hogajunt 
+        WHERE "IDCCPP" in (${idccpp})
+        UNION ALL
+        SELECT 'Beneficiarios Contigo' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_ctg_usprocon 
+        WHERE "IDCCPP" in (${idccpp})
         ;
       `);
       return results;
