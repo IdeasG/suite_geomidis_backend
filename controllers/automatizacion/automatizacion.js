@@ -6,11 +6,11 @@ const servicios = [
     { url: netBackend + '/qali_warma/almaprov', program: 'Qali Warma', capa: 'Almacén del Proveedor' },
     { url: netBackend + '/qali_warma/entrprod', program: 'Qali Warma', capa: 'Entrega de Productos' },
     { url: netBackend + '/qali_warma/supeiiee', program: 'Qali Warma', capa: 'Supervisión IIEE' },
-    // { url: netBackend + '/pension/agebanac', program: 'PENSION 65', capa: 'Agencias del Banco de la Nación' },
-    // { url: netBackend + '/pension/emtraval', program: 'PENSION 65', capa: 'Empresa Transportadora de Valores' },
-    // { url: netBackend + '/pension/usupen65', program: 'PENSION 65', capa: 'Usuario de PENSIÓN 65' },
+    { url: netBackend + '/pension/agebanac', program: 'PENSION 65', capa: 'Agencias del Banco de la Nación' },
+    { url: netBackend + '/pension/emtraval', program: 'PENSION 65', capa: 'Empresa Transportadora de Valores' },
+    { url: netBackend + '/pension/usupen65', program: 'PENSION 65', capa: 'Usuario de PENSIÓN 65' },
     { url: netBackend + '/cuna_mas/sa', program: 'CUNA MAS', capa: 'Local de Servicios Alimentarios' },
-    // { url: netBackend + '/cuna_mas/ciai', program: 'CUNA MAS', capa: 'Local del Centro Infantil de Atención Integral' }
+    { url: netBackend + '/cuna_mas/ciai', program: 'CUNA MAS', capa: 'Local del Centro Infantil de Atención Integral' }
 ];
 
 const serviciosAnuales = [
@@ -80,6 +80,7 @@ export const callServicesAnual = async () => {
             console.log(fullUrl);
             // Busca un registro existente o crea uno nuevo
         }
+        console.log('Se termino de llamar a los servicios');
     } catch (error) {
         console.error('Error al llamar a los servicios:', error);
     }
