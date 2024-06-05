@@ -474,10 +474,15 @@ export class CapasService {
         raw: true,
       });
       // Formatear el campo 'd_registro' en cada registro
-      const registrosFormateados = response.map((registro) => ({
-        ...registro,
-        d_registro: registro.d_registro.toISOString().split("T")[0],
-      }));
+      const registrosFormateados = response.map((registro) => {
+        const fecha = new Date(registro.d_registro);
+        const fechaFormateada = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')} ${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}:${String(fecha.getSeconds()).padStart(2, '0')}`;
+        
+        return {
+          ...registro,
+          d_registro: fechaFormateada,
+        };
+      });
       return registrosFormateados;
     } catch (error) {
       throw new Error(
@@ -501,10 +506,15 @@ export class CapasService {
         where: { id: id },
       });
       // Formatear el campo 'd_registro' en cada registro
-      const registrosFormateados = response.map((registro) => ({
-        ...registro,
-        d_registro: registro.d_registro.toISOString().split("T")[0],
-      }));
+      const registrosFormateados = response.map((registro) => {
+        const fecha = new Date(registro.d_registro);
+        const fechaFormateada = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')} ${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}:${String(fecha.getSeconds()).padStart(2, '0')}`;
+        
+        return {
+          ...registro,
+          d_registro: fechaFormateada,
+        };
+      });
       return registrosFormateados;
     } catch (error) {
       throw new Error("Error al obtener el json:" + error);
