@@ -1177,6 +1177,197 @@ export class CapasController {
     }
   }
 
+  async descargarExcelFiltros(req, res) {
+    const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
+    const titulo = 'titulo prueba'
+    // console.log(columnas);
+    try {
+
+      let tabla
+      let where
+      let ccppFormato
+      let leftjoin
+      let nombEst
+      switch (tipoServicio) {
+        case "S":
+          tabla = "ccpp_eess_total_atributos"
+          let categoriaFormato = categoria.map(item => `'${item}'`).join(', ');
+          ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+          where = "id_ccpp in ("+ccppFormato+") and categoria_eess in ("+categoriaFormato+")" // and distancia_km < "+distancia+""
+          leftjoin = 'espaciales.eess as nomb on nomb."código_ú" = espaciales.ccpp_eess_total_atributos.codigo_eess'
+          nombEst = "nombre_del"
+          break;
+        case "E":
+          tabla = "ccpp_iiee_total_atributos"
+          ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+          where = "id_ccpp in ("+ccppFormato+") and nivmodali_iiee = '" + nivel + "'" // and distancia_km < "+distancia+""
+          leftjoin = 'espaciales.iiee as nomb on nomb."vcodlocal" = espaciales.ccpp_iiee_total_atributos.codlocal_iiee'
+          nombEst = "vinseducat"
+        break;
+        default:
+          break;
+      }
+      const responseExcel = await capasService.filtroServiciosAreaExcel(
+        tabla, where,leftjoin,nombEst,distancia
+      );
+      const datosExcel = []
+      if (responseExcel.length>0) {
+        responseExcel.map((e,index)=>{
+          let codigoServicio
+          let categoriaNivel
+          if (tipoServicio == "S") {
+            codigoServicio = e.codigo_eess
+            categoriaNivel = e.categoria_eess;
+          } else {
+            codigoServicio = e.codlocal_iiee;
+            categoriaNivel = e.nivmodali_iiee;
+          }
+          datosExcel.push({id_ccpp: e.id_ccpp, nombccpp: e.nombccpp, area_17: e.area_17, ubigeo: e.ubigeo,
+            coddpto:e.coddpto, codprov: e.codprov, coddist: e.coddist, codccpp: e.codccpp, capital:e.capital,
+            nombdep:e.nombdep, nombprov: e.nombprov, nombdist:e.nombdist,
+            pob_total:e.pob_total_cpv2017,pob_menor_3:e.pob_menor_3_anios_pnominal,pob_menor_1:e.pob_menor_1_anio_pnominal,
+            pob_3_5a: e.pob_3_5_anios_cpv2017, pob_6_11a:e.pob_6_11_anios_cpv2017, pob_12_16a:e.pob_12_16_anios_cpv2017,
+            cod_serv: codigoServicio, nomb_serv:e.nombre_lugar, categoriaNivel: categoriaNivel, distancia:e.distancia_km,
+            cobertura: e.cobertura, disponib_serrv: e.contador
+          })
+        })
+      }
+
+      let workbook = new excel.Workbook();
+      let worksheet = workbook.addWorksheet(titulo);
+
+      const columnas = [];
+      // for (let i = 1; i <= 24; i++) {
+      //   titulo2.push({ header: '', key: i.toString(), width: 30 });
+      // }
+
+      columnas.push({ header: '', key: 'id_ccpp', width: 30});
+      columnas.push({ header: '', key: 'nombccpp', width: 30});
+      columnas.push({ header: '', key: 'area_17', width: 30});
+      columnas.push({ header: '', key: 'ubigeo', width: 30});
+      columnas.push({ header: '', key: 'coddpto', width: 30});
+      columnas.push({ header: '', key: 'codprov', width: 30});
+      columnas.push({ header: '', key: 'coddist', width: 30});
+      columnas.push({ header: '', key: 'codccpp', width: 30});
+      columnas.push({ header: '', key: 'nombdep', width: 30});
+      columnas.push({ header: '', key: 'nombprov', width: 30});
+      columnas.push({ header: '', key: 'nombdist', width: 30});
+      columnas.push({ header: '', key: 'capital', width: 30});
+      columnas.push({ header: '', key: 'pob_total', width: 30});
+      columnas.push({ header: '', key: 'pob_menor_3', width: 30});
+      columnas.push({ header: '', key: 'pob_menor_1', width: 30});
+      columnas.push({ header: '', key: 'pob_3_5a', width: 30});
+      columnas.push({ header: '', key: 'pob_6_11a', width: 30});
+      columnas.push({ header: '', key: 'pob_12_16a', width: 30});
+      columnas.push({ header: '', key: 'cod_serv', width: 30});
+      columnas.push({ header: '', key: 'nomb_serv', width: 30});
+      columnas.push({ header: '', key: 'categoriaNivel', width: 30});
+      columnas.push({ header: '', key: 'distancia', width: 30});
+      columnas.push({ header: '', key: 'cobertura', width: 30});
+      columnas.push({ header: '', key: 'disponib_serrv', width: 30});
+
+      worksheet.columns = columnas;
+
+      // Añadir los títulos en la parte superior
+      worksheet.mergeCells('A1:L1');  // Primer título ocupa 12 espacios
+      worksheet.getCell('A1').value = 'Referente a los centros poblados';
+      
+      worksheet.getCell('M1').value = 'Población Total (Censada)';
+      worksheet.getCell('N1').value = 'Población <3° (P. Nominal)';
+      worksheet.getCell('O1').value = 'Población <1° (P. Nominal)';
+
+      worksheet.getCell('P1').value = 'Población de 3-5a';
+      worksheet.getCell('Q1').value = 'Población de 6-11a (Censada)';
+      worksheet.getCell('R1').value = 'Población de 12-16a (Censada)';
+
+      worksheet.mergeCells('S1:U1');  // Cuarto título ocupa 3 espacios
+      worksheet.getCell('S1').value = 'Referente al servicio Salud o Educación';
+      
+      worksheet.mergeCells('V1:X1');  // Quinto título ocupa 3 espacios
+      worksheet.getCell('V1').value = 'Disponibilidad del servicio más cercano';
+
+      // Estilo para los títulos
+      const tituloStyles = {
+        'A1': { bgColor: '000000', fontColor: 'FFFFFF' },  // Fondo negro, letras blancas
+        'M1': { bgColor: '800080', fontColor: 'FFFFFF' },  // Fondo morado, letras blancas
+        'N1': { bgColor: '800080', fontColor: 'FFFFFF' },  // Fondo morado, letras blancas
+        'O1': { bgColor: '800080', fontColor: 'FFFFFF' },  // Fondo morado, letras blancas
+        'P1': { bgColor: '000000', fontColor: 'FFFFFF' },  // Fondo negro, letras blancas
+        'Q1': { bgColor: '000000', fontColor: 'FFFFFF' },  // Fondo negro, letras blancas
+        'R1': { bgColor: '000000', fontColor: 'FFFFFF' },  // Fondo negro, letras blancas
+        'S1': { bgColor: '008000', fontColor: 'FFFFFF' },  // Fondo verde, letras blancas
+        'V1': { bgColor: '0000FF', fontColor: 'FFFFFF' },  // Fondo azul, letras blancas
+      };
+
+      for (const cell in tituloStyles) {
+        worksheet.getCell(cell).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: tituloStyles[cell].bgColor }
+        };
+        worksheet.getCell(cell).font = {
+          color: { argb: tituloStyles[cell].fontColor },
+          bold: true,
+          size: 12
+        };
+        worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center' };
+      }
+
+
+      // Textos en la segunda fila
+      const secondRowTexts = [
+        'IDCCPP_21', 'NOMBCCPP', 'AREA_21', 'UBIGEO', 'CODDPTO', 'CODPROV', 'CODDIST', 'CODCCPP',
+        'NOMBDEP', 'NOMPROV', 'NOMBDIST', 'CAPITAL', 'POB_TOT', 'POB_<3a', 'POB_<1a', 'P_3_5a',
+        'P_6_11a', 'P_12_16a', 'COD_SERV', 'NONB_SERV', 'CATEG/NIVEL', 'DISTANCIA', 'COBERTURA',
+        'DISPONIB_SERRV'
+      ];
+
+      const secondRowStyles = [
+        'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 
+        'M1', 'M1', 'M1', 'P1', 'P1', 'P1',
+        'S1', 'S1', 'S1', 
+        'V1', 'V1', 'V1'
+      ];
+
+      for (let i = 0; i < secondRowTexts.length; i++) {
+        const cell = worksheet.getCell(2, i + 1);
+        cell.value = secondRowTexts[i];
+        const style = tituloStyles[secondRowStyles[i]];
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: style.bgColor }
+        };
+        cell.font = {
+          color: { argb: style.fontColor },
+          // bold: true,
+          size: 9
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      }
+
+      worksheet.addRows(datosExcel);
+
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=" + titulo + ".xlsx"
+      );
+
+      return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+      });
+    } catch (error) {
+      res.json({
+        status: "error",
+        message: "Error en el servidor " + error,
+      });
+    }
+  }
+
   async descargarExcelSimple(req, res) {
     const { data, columnas, titulo } = req.body;
     // console.log(columnas);

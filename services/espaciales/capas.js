@@ -524,14 +524,14 @@ export class CapasService {
   async filtroServicios(tabla, where, leftjoin, nombEst) {
     try {
       // console.log(`
-      //   SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
+      //   SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
       //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
       //   left join ${leftjoin}
       //   WHERE ${where}
       //   order by distancia_km asc
       // `);
       const [results, metadata] = await sequelize.query(`
-        SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
+        SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
         left join ${leftjoin}
         WHERE ${where}
@@ -544,22 +544,31 @@ export class CapasService {
     }
   }
 
+  async filtroServiciosAreaExcel(tabla, where, leftjoin, nombEst,distancia) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+         SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar,
+        CASE
+          WHEN espaciales.${tabla}.distancia_km < ${distancia} THEN 'SI'
+          ELSE 'NO'
+        END AS cobertura,
+        ROW_NUMBER() OVER(PARTITION BY espaciales.${tabla}.id_ccpp ORDER BY espaciales.${tabla}.distancia_km) AS contador
+        FROM espaciales.${tabla}
+        left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+        left join ${leftjoin}
+        WHERE ${where}
+        order by id_ccpp, distancia_km asc
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
   async filtroServiciosArea(tabla, where, leftjoin, nombEst) {
     try {
-      // console.log(
-      //   `
-      //   select * from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
-      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
-      //   left join ${leftjoin}
-      //   WHERE ${where}
-      //   order by id_ccpp, distancia_km asc
-      //   )
-      //   as newTable
-      //   order by distancia_km asc
-      // `
-      // );
       const [results, metadata] = await sequelize.query(`
-        select * from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
+        select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
         left join ${leftjoin}
         WHERE ${where}
