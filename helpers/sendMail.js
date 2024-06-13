@@ -5,6 +5,7 @@ import "dotenv/config";
 import { aceptarTemplate } from "../libs/templates/aceptar.js";
 import { rechazaTemplate } from "../libs/templates/rechazar.js";
 import { reseteoTemplate } from "../libs/templates/reseteo.js";
+import { nuevoUsuarioTemplate } from "../libs/templates/usuario.js";
 
 export async function sendMail({ to, name, subject, body }) {
   const { SMTP_EMAIL, SMTP_PASSWORD } = process.env;
@@ -40,6 +41,14 @@ export async function sendMail({ to, name, subject, body }) {
 
 export function compileWelcomeTemplate(name) {
   const template = handlebars.compile(welcomeTemplate);
+  const htmlBody = template({
+    mensaje: name,
+  });
+  return htmlBody;
+}
+
+export function compileNuevoUsuarioTemplate(name) {
+  const template = handlebars.compile(nuevoUsuarioTemplate);
   const htmlBody = template({
     mensaje: name,
   });

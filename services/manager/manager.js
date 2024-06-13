@@ -26,6 +26,7 @@ import Solicitud from "../../models/manager/solicitud.js";
 import {
   compileReseteoTemplate,
   compileWelcomeTemplate,
+  compileNuevoUsuarioTemplate,
   sendMail,
 } from "../../helpers/sendMail.js";
 import TgUsuario from "../../models/security/tgUsuario.js";
@@ -655,6 +656,29 @@ async getRolByIdCliente(id_cliente) {
       throw new Error("Error al obtener el servicio.");
     }
   }
+
+  async adminNewUser(
+    usuario,
+    password
+  ) {
+    try {
+        await sendMail({
+          to: "jcolunche@ideasg.org",          
+          name: "GEOMIDIS",
+          subject: "🚨 Solicitud - Registro de nuevo usuario 🚨",
+          body: compileNuevoUsuarioTemplate(
+            "Estimado administrador,<br>" +
+            "Se solicita el registro de un nuevo usuario con las siguientes credenciales:<br>" +
+            "USUARIO: " + usuario + "<br>" +
+            "CONTRASEÑA: " + password
+          ),
+        });
+      return;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
 
   async saveSolicitud(
     fk_geoportal,

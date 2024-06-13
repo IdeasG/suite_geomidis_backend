@@ -421,6 +421,23 @@ export class ManagerController {
     }
   }
 
+  
+  async adminNewUser(req, res) {
+    const {
+      usuario,
+      password,
+    } = req.body;
+    try {
+      const data = await managerService.adminNewUser(
+        usuario,
+        password
+      );
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async saveSolicitud(req, res) {
     const {
       fk_geoportal,
