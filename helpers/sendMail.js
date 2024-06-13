@@ -6,6 +6,7 @@ import { aceptarTemplate } from "../libs/templates/aceptar.js";
 import { rechazaTemplate } from "../libs/templates/rechazar.js";
 import { reseteoTemplate } from "../libs/templates/reseteo.js";
 import { nuevoUsuarioTemplate } from "../libs/templates/usuario.js";
+import { gmailDiarioTemplate } from "../libs/templates/gmailDiario.js";
 
 export async function sendMail({ to, name, subject, body }) {
   const { SMTP_EMAIL, SMTP_PASSWORD } = process.env;
@@ -47,10 +48,28 @@ export function compileWelcomeTemplate(name) {
   return htmlBody;
 }
 
-export function compileNuevoUsuarioTemplate(name) {
+export function compileNuevoUsuarioTemplate(mensaje,nombres,cargo,email,tipoDocumento,numeroDocumento,telefono,mensajeDos) {
   const template = handlebars.compile(nuevoUsuarioTemplate);
   const htmlBody = template({
-    mensaje: name,
+    mensaje: mensaje,
+    nombres: nombres,
+    cargo: cargo,
+    email: email,
+    tipoDocumento: tipoDocumento,
+    numeroDocumento: numeroDocumento,
+    telefono: telefono,
+    mensajeDos: mensajeDos
+  });
+  return htmlBody;
+}
+
+export function compileGmailDiarioRegistro(titulo,mensaje,nombres,mensajeDos) {
+  const template = handlebars.compile(gmailDiarioTemplate);
+  const htmlBody = template({
+    titulo: titulo,
+    mensaje: mensaje,
+    servicios: nombres,
+    mensajeDos: mensajeDos
   });
   return htmlBody;
 }

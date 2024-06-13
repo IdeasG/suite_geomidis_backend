@@ -1,4 +1,4 @@
-export const nuevoUsuarioTemplate = `
+export const gmailDiarioTemplate = `
 <!DOCTYPE html>
 <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 
@@ -107,7 +107,7 @@ export const nuevoUsuarioTemplate = `
 														<tr>
 															<td class="pad" style="padding-bottom:10px;padding-left:25px;padding-right:25px;padding-top:10px;">
 																<div style="color:#1f0b0b;font-family:Montserrat, Trebuchet MS, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Tahoma, sans-serif;font-size:30px;line-height:120%;text-align:left;mso-line-height-alt:36px;">
-																	<p style="margin: 0; word-break: break-word;"><span><strong><span>Creación de nuevo usuario</span></strong></span></p>
+																	<p style="margin: 0; word-break: break-word;"><span><strong><span>{{titulo}}</span></strong></span></p>
 																</div>
 															</td>
 														</tr>
@@ -119,14 +119,11 @@ export const nuevoUsuarioTemplate = `
 																	<p style="margin: 0; word-break: break-word;">
 																	{{mensaje}}
 																	</p>
-																	<ul>
-																		<li>Nombres: {{nombres}}</li>
-																		<li>Cargo: {{cargo}}</li>
-																		<li>Email: {{email}}</li>
-																		<li>Tipo Documento: {{tipoDocumento}}</li>
-																		<li>N° Documento: {{numeroDocumento}}</li>
-																		<li>Telefono: {{telefono}}</li>
-																	</ul>
+                                                                    <ul>
+                                                                        {{#each servicios}}
+                                                                        <li>Programa {{program}}, capa {{capa}}</li>
+                                                                        {{/each}}
+                                                                    </ul>
 																	<p style="margin: 0; word-break: break-word;">
 																	{{mensajeDos}}
 																	</p>

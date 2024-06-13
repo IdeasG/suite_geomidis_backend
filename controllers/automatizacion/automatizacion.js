@@ -1,6 +1,8 @@
 import axios from 'axios';
 import https from 'https';
+import { AutomatizacionService } from '../../services/automatizacion/automatizacion.js';
 const netBackend = process.env.NET_BACKEND
+const automatizacionService = new AutomatizacionService;
 
 const servicios = [
     { url: netBackend + '/qali_warma/almaprov', program: 'Qali Warma', capa: 'Almacén del Proveedor' },
@@ -47,6 +49,8 @@ export const callServicesDaily = async () => {
             console.log(fullUrl);
             // Busca un registro existente o crea uno nuevo
         }
+        automatizacionService.gmailRegistroDiario(feFin,servicios)
+        
     } catch (error) {
         console.error('Error al llamar a los servicios:', error);
     }
@@ -81,6 +85,7 @@ export const callServicesAnual = async () => {
             // Busca un registro existente o crea uno nuevo
         }
         console.log('Se termino de llamar a los servicios');
+        automatizacionService.gmailRegistroAnual(feFin,serviciosAnuales)
     } catch (error) {
         console.error('Error al llamar a los servicios:', error);
     }

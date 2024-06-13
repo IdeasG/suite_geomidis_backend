@@ -891,21 +891,40 @@ export class CapasController {
     const { table, datosCapas } = req.body;
     try {
       let exportarTemp = [];
-      table.forEach((item) => {
+      for (const item of table) {
+        let cantidadPoblacion = 0;
+        let cantidadPoblacionNoCob = 0;
+  
+        if (item.arrayCCPP && item.arrayCCPPNoCob) {
+          const dataCob = item.arrayCCPP;
+          if (dataCob.length > 0) {
+            cantidadPoblacion = await capasService.sumaCCPPPob(dataCob);
+          }
+  
+          const dataNoCob = item.arrayCCPPNoCob;
+          if (dataNoCob.length > 0) {
+            cantidadPoblacionNoCob = await capasService.sumaCCPPPob(dataNoCob);
+          }
+        }
         exportarTemp.push({
           1: item.grupo,
           2: item.titulo,
-          3: item.cantidad,
+          3: item.cantidadCCPP,
+          4: cantidadPoblacion,
+          5: item.cantidadCCPPNoCob,
+          6: cantidadPoblacionNoCob
         });
-      });
-
+      }
       let workbook = new excel.Workbook();
       let worksheet = workbook.addWorksheet("Reporte general");
 
       worksheet.columns = [
         { header: "Nombre Grupo", key: "1", width: 30 },
         { header: "Nombre Titulo", key: "2", width: 50 },
-        { header: "Cantidad", key: "3", width: 50 },
+        { header: "Cantidad CCPP", key: "3", width: 50 },
+        { header: "Cantidad Población", key: "4", width: 50 },
+        { header: "Cantidad CCPP Fuera Cobertura", key: "5", width: 50 },
+        { header: "Cantidad Población Fuera Cobertura", key: "6", width: 50 },
       ];
 
       worksheet.getCell("A1").fill = {
@@ -923,6 +942,23 @@ export class CapasController {
         pattern: "solid",
         fgColor: { argb: "A3E4D7" },
       };
+      worksheet.getCell("D1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "A3E4D7" },
+      };
+
+      worksheet.getCell("E1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "A3E4D7" },
+      };
+      worksheet.getCell("F1").fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "A3E4D7" },
+      };
+
 
       // Add Array Rows
       worksheet.addRows(exportarTemp);

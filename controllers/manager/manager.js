@@ -424,13 +424,21 @@ export class ManagerController {
   
   async adminNewUser(req, res) {
     const {
-      usuario,
-      password,
+      nombres,
+      cargo,
+      email,
+      tipoDocumento,
+      numeroDocumento,
+      telefono
     } = req.body;
     try {
       const data = await managerService.adminNewUser(
-        usuario,
-        password
+        nombres,
+        cargo,
+        email,
+        tipoDocumento,
+        numeroDocumento,
+        telefono
       );
       res.status(200).json(data);
     } catch (error) {

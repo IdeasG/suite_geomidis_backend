@@ -35,7 +35,7 @@ app.use(express.static(path.join(__dirname, "")));
 app.disable("x-powered-by");
 
 // Configurar el cronjob para que se ejecute diariamente a las 00:00 horas
-cron.schedule('1 0 * * *', () => {
+cron.schedule('39 11 * * *', () => {
   console.log('Ejecutando llamadas diarias a los servicios...');
   callServicesDaily(); // Llama a la función para realizar las llamadas diarias a los servicios
 });

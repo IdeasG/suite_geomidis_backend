@@ -658,19 +658,33 @@ async getRolByIdCliente(id_cliente) {
   }
 
   async adminNewUser(
-    usuario,
-    password
+    nombres,
+    cargo,
+    email,
+    tipoDocumento,
+    numeroDocumento,
+    telefono,
   ) {
     try {
         await sendMail({
-          to: "jcolunche@ideasg.org",          
+          to: "csanchez@midis.gob.pe",          
           name: "GEOMIDIS",
           subject: "🚨 Solicitud - Registro de nuevo usuario 🚨",
           body: compileNuevoUsuarioTemplate(
-            "Estimado administrador,<br>" +
-            "Se solicita el registro de un nuevo usuario con las siguientes credenciales:<br>" +
-            "USUARIO: " + usuario + "<br>" +
-            "CONTRASEÑA: " + password
+            `
+              Estimado administrador,
+              
+              Se solicita el registro de un nuevo usuario con los siguientes datos:
+            `,
+            nombres,
+            cargo,
+            email,
+            tipoDocumento,
+            numeroDocumento,
+            telefono,
+            `
+              Ingrese al módulo de gestión de usuarios para aceptar o rechazar la petición.
+            `
           ),
         });
       return;

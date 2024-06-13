@@ -523,13 +523,6 @@ export class CapasService {
 
   async filtroServicios(tabla, where, leftjoin, nombEst) {
     try {
-      // console.log(`
-      //   SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
-      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
-      //   left join ${leftjoin}
-      //   WHERE ${where}
-      //   order by distancia_km asc
-      // `);
       const [results, metadata] = await sequelize.query(`
         SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
@@ -539,6 +532,19 @@ export class CapasService {
       `);
       // console.log(results);
       return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
+  async sumaCCPPPob(array) {
+    try {
+      const result = array.map(item => `'${item}'`).join(', ');
+      const [results, metadata] = await sequelize.query(`
+        select CAST(SUM(pobtot17) AS INTEGER) as suma from espaciales.sp_centros_poblados
+        where idccpp_21 in (${result});
+      `);
+      return results[0].suma;
     } catch (error) {
       throw new Error("Error al obtener los resultados..." + error);
     }
