@@ -521,10 +521,10 @@ export class CapasService {
     }
   }
 
-  async filtroServicios(tabla, where, leftjoin, nombEst) {
+  async filtroServicios(tabla, where, leftjoin, nombEst,clasicacionCS) {
     try {
       const [results, metadata] = await sequelize.query(`
-        SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar FROM espaciales.${tabla}
+        SELECT espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar ${clasicacionCS} FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
         left join ${leftjoin}
         WHERE ${where}
@@ -573,6 +573,16 @@ export class CapasService {
 
   async filtroServiciosArea(tabla, where, leftjoin, nombEst) {
     try {
+      // console.log(`
+      //   select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
+      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+      //   left join ${leftjoin}
+      //   WHERE ${where}
+      //   order by id_ccpp, distancia_km asc
+      //   )
+      //   as newTable
+      //   order by distancia_km asc
+      // `);
       const [results, metadata] = await sequelize.query(`
         select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21

@@ -576,12 +576,14 @@ export class CapasController {
       let where
       let leftjoin
       let nombEst
+      let clasicacionCS = ''
       switch (tipoServicio) {
         case "S":
           tabla = "ccpp_eess_total_atributos"
           where = "id_ccpp = '"+idccpp+"'"
           leftjoin = 'espaciales.eess as nomb on nomb."código_ú" = espaciales.ccpp_eess_total_atributos.codigo_eess'
           nombEst = "nombre_del"
+          clasicacionCS = ',nomb.clasificac'
           break;
         case "E":
           tabla = "ccpp_iiee_total_atributos"
@@ -593,7 +595,7 @@ export class CapasController {
           break;
       }
       const respuesta = await capasService.filtroServicios(
-        tabla, where,leftjoin,nombEst
+        tabla, where,leftjoin,nombEst,clasicacionCS
       );
       res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
@@ -610,12 +612,14 @@ export class CapasController {
       let where
       let leftjoin
       let nombEst
+      let clasicacionCS = ''
       switch (tipoServicio) {
         case "S":
           tabla = "ccpp_eess_total_atributos"
           where = "id_ccpp in ("+ccppFormato+")"
           leftjoin = 'espaciales.eess as nomb on nomb."código_ú" = espaciales.ccpp_eess_total_atributos.codigo_eess'
           nombEst = "nombre_del"
+          clasicacionCS = ',nomb.clasificac'
           break;
         case "E":
           tabla = "ccpp_iiee_total_atributos"
@@ -627,7 +631,7 @@ export class CapasController {
           break;
       }
       const respuesta = await capasService.filtroServicios(
-        tabla, where,leftjoin,nombEst
+        tabla, where,leftjoin,nombEst,clasicacionCS
       );
       res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
@@ -716,6 +720,7 @@ export class CapasController {
       let where
       let leftjoin
       let nombEst
+      let clasicacionCS = ''
       switch (tipoServicio) {
         case "S":
           tabla = "ccpp_eess_total_atributos"
@@ -723,6 +728,7 @@ export class CapasController {
           where = "id_ccpp = '"+idccpp+"' and distancia_km < "+distancia+" and categoria_eess in ("+formattedString+")"
           leftjoin = 'espaciales.eess as nomb on nomb."código_ú" = espaciales.ccpp_eess_total_atributos.codigo_eess'
           nombEst = "nombre_del"
+          clasicacionCS = ',nomb.clasificac'
           break;
         case "E":
           tabla = "ccpp_iiee_total_atributos"
@@ -734,7 +740,7 @@ export class CapasController {
           break;
       }
       const respuesta = await capasService.filtroServicios(
-        tabla, where,leftjoin,nombEst
+        tabla, where,leftjoin,nombEst,clasicacionCS
       );
       res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
