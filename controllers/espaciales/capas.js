@@ -117,6 +117,7 @@ export class CapasController {
       c_nombre_tabla_capa,
       c_nombre_public_capa,
       c_nombre_geoserver,
+      c_workspace,
       c_sql_capa,
       b_capa,
       c_tipo,
@@ -132,6 +133,7 @@ export class CapasController {
         c_nombre_tabla_capa,
         c_nombre_public_capa,
         c_nombre_geoserver,
+        c_workspace,
         c_sql_capa,
         b_capa,
         c_tipo,
@@ -182,6 +184,7 @@ export class CapasController {
       c_nombre_tabla_capa,
       c_nombre_public_capa,
       c_nombre_geoserver,
+      c_workspace,
       b_geoportal,
       b_capa,
       c_tipo,
@@ -198,6 +201,7 @@ export class CapasController {
         c_nombre_tabla_capa,
         c_nombre_public_capa,
         c_nombre_geoserver,
+        c_workspace,
         b_geoportal,
         b_capa,
         c_tipo,
@@ -652,21 +656,21 @@ export class CapasController {
           tabla = "ccpp_eess_total_atributos"
           let categoriaFormato = categoria.map(item => `'${item}'`).join(', ');
           ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
-          where = "id_ccpp in ("+ccppFormato+") and distancia_km > "+distancia+" and categoria_eess in ("+categoriaFormato+")"
+          where = "cp.idccpp_21 in ("+ccppFormato+")"
           leftjoin = 'espaciales.eess as nomb on nomb."código_ú" = espaciales.ccpp_eess_total_atributos.codigo_eess'
           nombEst = "nombre_del"
           break;
         case "E":
           tabla = "ccpp_iiee_total_atributos"
           ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
-          where = "id_ccpp in ("+ccppFormato+") and distancia_km > "+distancia+" and nivmodali_iiee = '" + nivel + "'"
+          where = "cp.idccpp_21 in ("+ccppFormato+")"
           leftjoin = 'espaciales.iiee as nomb on nomb."vcodlocal" = espaciales.ccpp_iiee_total_atributos.codlocal_iiee'
           nombEst = "vinseducat"
         break;
         default:
           break;
       }
-      const respuesta = await capasService.filtroServiciosArea(
+      const respuesta = await capasService.filtroServiciosAreaNoCob(
         tabla, where,leftjoin,nombEst
       );
       // console.log(respuesta);

@@ -18,7 +18,7 @@ export class CapasService {
   async getPublicadosGeoportalIn() {
     try {
       const [data, metadata] = await sequelize.query(`
-        select tcg.id_grupo, c_nombre_grupo, c_nombre_public_capa, c_nombre_geoserver, c_url, c_tipo
+        select tcg.id_grupo, c_nombre_grupo, c_nombre_public_capa,c_workspace, c_nombre_geoserver, c_url, c_tipo
         from administracion.tadm_capas_grupo tcg
         left join administracion.tadm_capas tc on tcg.id_grupo = tc.id_grupo
         where b_geoportal = true
@@ -223,6 +223,7 @@ export class CapasService {
     c_nombre_tabla_capa,
     c_nombre_public_capa,
     c_nombre_geoserver,
+    c_workspace,
     c_sql_capa,
     b_capa,
     c_tipo,
@@ -239,6 +240,7 @@ export class CapasService {
         c_nombre_tabla_capa,
         c_nombre_public_capa,
         c_nombre_geoserver,
+        c_workspace,
         c_sql_capa,
         b_capa,
         c_tipo,
@@ -286,6 +288,7 @@ export class CapasService {
     c_nombre_tabla_capa,
     c_nombre_public_capa,
     c_nombre_geoserver,
+    c_workspace,
     b_geoportal,
     b_capa,
     c_tipo,
@@ -303,6 +306,7 @@ export class CapasService {
           c_nombre_tabla_capa,
           c_nombre_public_capa,
           c_nombre_geoserver,
+          c_workspace,
           b_geoportal,
           b_capa,
           c_tipo,
@@ -573,8 +577,26 @@ export class CapasService {
 
   async filtroServiciosArea(tabla, where, leftjoin, nombEst) {
     try {
+      const [results, metadata] = await sequelize.query(`
+        select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
+        left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+        left join ${leftjoin}
+        WHERE ${where}
+        order by id_ccpp, distancia_km asc
+        )
+        as newTable
+        order by distancia_km asc
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
+  async filtroServiciosAreaNoCob(tabla, where, leftjoin, nombEst) {
+    try {
       // console.log(`
-      //   select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
+      //   select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital,cp.geom, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
       //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
       //   left join ${leftjoin}
       //   WHERE ${where}
@@ -584,7 +606,7 @@ export class CapasService {
       //   order by distancia_km asc
       // `);
       const [results, metadata] = await sequelize.query(`
-        select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
+        select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,cp.area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital,cp.geom, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
         left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
         left join ${leftjoin}
         WHERE ${where}

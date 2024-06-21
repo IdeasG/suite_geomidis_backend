@@ -18,6 +18,10 @@ const capasGrupo = sequelize.define('tadm_capas', {
     type: DataTypes.STRING, 
     allowNull: true,
   },
+  c_workspace: {
+    type: DataTypes.STRING, 
+    allowNull: true,
+  },
   //ss
   c_nombre_public_capa: {
     type: DataTypes.STRING,
