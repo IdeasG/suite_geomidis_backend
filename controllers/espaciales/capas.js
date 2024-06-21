@@ -646,6 +646,9 @@ export class CapasController {
   async filtroServiciosAreaNoCob(req, res) {
     const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
     try {
+      if (idccpp.length==0) {
+        res.status(200).json({ status: "success", data: [] });
+      }
       let tabla
       let where
       let ccppFormato
@@ -1225,10 +1228,25 @@ export class CapasController {
 
   async descargarExcelFiltros(req, res) {
     const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
-    const titulo = 'titulo prueba'
+    const titulo = 'Filtro demanda.'
     // console.log(columnas);
     try {
-
+      let workbook = new excel.Workbook();
+      let worksheetRG = workbook.addWorksheet('Resumen general.');
+      const columnasRG = []
+      columnasRG.push({ header: '', key: 'id_ccpp', width: 30});
+      columnasRG.push({ header: '', key: 'nombccpp', width: 30});
+      columnasRG.push({ header: '', key: 'area_17', width: 30});
+      columnasRG.push({ header: '', key: 'ubigeo', width: 30});
+      columnasRG.push({ header: '', key: 'coddpto', width: 30});
+      worksheetRG.columns = columnasRG;
+      // Añadir los títulos en la parte superior
+      worksheetRG.mergeCells('A1:E1');  // Primer título ocupa 12 espacios
+      worksheetRG.getCell('A1').value = 'Cobertura de Servicios de Salud públicos categorías I-1,I-2 dentro de 5 km / 60 minutos (1 hora)';
+      worksheetRG.getCell(2,1).value = 'REGIÓN:';
+      worksheetRG.getCell(3,1).value = 'PROVINCIA:';
+      worksheetRG.getCell(4,1).value = 'DISTRITO:';
+      console.log('1');
       let tabla
       let where
       let ccppFormato
@@ -1278,14 +1296,8 @@ export class CapasController {
           })
         })
       }
-
-      let workbook = new excel.Workbook();
-      let worksheet = workbook.addWorksheet(titulo);
-
+      let worksheet = workbook.addWorksheet('Tabla de atributos.');
       const columnas = [];
-      // for (let i = 1; i <= 24; i++) {
-      //   titulo2.push({ header: '', key: i.toString(), width: 30 });
-      // }
 
       columnas.push({ header: '', key: 'id_ccpp', width: 30});
       columnas.push({ header: '', key: 'nombccpp', width: 30});
