@@ -563,6 +563,10 @@ export class CapasController {
   async filtroAfiliadosArea(req, res) {
     const { idccpp } = req.body;
     try {
+      if (idccpp.length==0) {
+        res.status(200).json({ status: "success", data: [] });
+        return;
+      }
       const ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
       const respuesta = await capasService.filtroAfiliadosArea(
         ccppFormato
@@ -648,6 +652,7 @@ export class CapasController {
     try {
       if (idccpp.length==0) {
         res.status(200).json({ status: "success", data: [] });
+        return;
       }
       let tabla
       let where

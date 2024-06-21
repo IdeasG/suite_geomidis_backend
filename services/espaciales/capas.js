@@ -649,6 +649,24 @@ export class CapasService {
 
   async filtroAfiliadosArea(idccpp) {
     try {
+      console.log(`
+        SELECT 'Beneficiarios Cunamás SA' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_cums_loserali 
+        WHERE "IDCCPP" in (${idccpp})
+        UNION ALL
+        SELECT 'Beneficiarios Pensión65' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_psn65_usupen65 
+        WHERE "IDCCPP" in (${idccpp})
+        UNION ALL
+        SELECT 'Hogares afilados Juntos' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_jts_hogajunt 
+        WHERE "IDCCPP" in (${idccpp})
+        UNION ALL
+        SELECT 'Beneficiarios Contigo' AS afiliado, COUNT(*) AS conteo 
+        FROM espaciales.spg_ctg_usprocon 
+        WHERE "IDCCPP" in (${idccpp})
+        ;
+      `);
       const [results, metadata] = await sequelize.query(`
         SELECT 'Beneficiarios Cunamás SA' AS afiliado, COUNT(*) AS conteo 
         FROM espaciales.spg_cums_loserali 
