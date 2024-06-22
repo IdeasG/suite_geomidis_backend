@@ -14,6 +14,7 @@ import TgUsuario from "../../models/security/tgUsuario.js";
 import { Sequelize } from "sequelize";
 import Rol from "../../models/security/rol.js";
 import fs from "fs";
+import { log } from "console";
 
 const capasService = new CapasService();
 
@@ -1232,26 +1233,120 @@ export class CapasController {
   }
 
   async descargarExcelFiltros(req, res) {
-    const { tipoServicio,categoria,distancia,nivel,idccpp } = req.body;
+    const { tipoServicio,categoria,distancia,nivel,idccpp,datosResumen} = req.body;
     const titulo = 'Filtro demanda.'
     // console.log(columnas);
     try {
+      // body.datosResumen = {
+      //   tipoDibujoActual,
+      //   newDataTable,
+      //   newDataTableCercanos,
+      //   nombreDepartamento,
+      //   nombreProvincia,
+      //   nombreDistrito,
+      //   conteoTotalCCPP,
+      //   conteoPoblacionTotal,
+      //   conteoPersoCober,
+      //   conteoEstablecimientos,
+      //   porcePoblacion,
+      //   porcePersoCober,
+      //   selectedCategorias,
+      //   nivelSeleccionado,
+      //   labelDistanciaSeleccionado
+      // }
       let workbook = new excel.Workbook();
       let worksheetRG = workbook.addWorksheet('Resumen general.');
       const columnasRG = []
-      columnasRG.push({ header: '', key: 'id_ccpp', width: 30});
-      columnasRG.push({ header: '', key: 'nombccpp', width: 30});
-      columnasRG.push({ header: '', key: 'area_17', width: 30});
-      columnasRG.push({ header: '', key: 'ubigeo', width: 30});
-      columnasRG.push({ header: '', key: 'coddpto', width: 30});
+      columnasRG.push({ header: '', key: '1', width: 30});
+      columnasRG.push({ header: '', key: '2', width: 30});
+      columnasRG.push({ header: '', key: '3', width: 30});
+      columnasRG.push({ header: '', key: '4', width: 30});
+      columnasRG.push({ header: '', key: '5', width: 30});
       worksheetRG.columns = columnasRG;
       // Añadir los títulos en la parte superior
-      worksheetRG.mergeCells('A1:E1');  // Primer título ocupa 12 espacios
-      worksheetRG.getCell('A1').value = 'Cobertura de Servicios de Salud públicos categorías I-1,I-2 dentro de 5 km / 60 minutos (1 hora)';
-      worksheetRG.getCell(2,1).value = 'REGIÓN:';
-      worksheetRG.getCell(3,1).value = 'PROVINCIA:';
-      worksheetRG.getCell(4,1).value = 'DISTRITO:';
-      console.log('1');
+      worksheetRG.mergeCells('A1:E1');  // Primer título ocupa 12 espacios+
+      worksheetRG.getCell('A1').value = 'Cobertura de Servicios de '+ (tipoServicio == "S" ? 'Salud públicos categorías '+ datosResumen.selectedCategorias:'Educación públicos nivel '+datosResumen.nivelSeleccionado) +' dentro de ' + datosResumen.labelDistanciaSeleccionado.toUpperCase();
+      worksheetRG.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheetRG.getCell('A1').font = { bold: true };
+      console.log(datosResumen.tipoDibujoActual,'tipo poligono?');
+      if (datosResumen.tipoDibujoActual != 'dibujo') {
+        worksheetRG.getCell(2,1).value = 'REGIÓN:'; worksheetRG.getCell(2,2).value = datosResumen.nombreDepartamento;
+        worksheetRG.getCell(3,1).value = 'PROVINCIA:'; worksheetRG.getCell(3,2).value = datosResumen.nombreProvincia;
+        worksheetRG.getCell(4,1).value = 'DISTRITO:'; worksheetRG.getCell(4,2).value = datosResumen.nombreDistrito;
+      }
+      else {
+        worksheetRG.getCell(2,1).value = 'Se dibujó un polígono';
+      }
+      worksheetRG.getCell(5,1).value = 'N° DE CENTROS POBLADOS:'; worksheetRG.getCell(5,2).value = datosResumen.conteoTotalCCPP;
+      worksheetRG.getCell(6,1).value = 'POBLACIÓN TOTAL (CENSADA):'; worksheetRG.getCell(6,2).value = datosResumen.conteoPoblacionTotal;
+      worksheetRG.getCell(7,1).value = tipoServicio == "S" ?'N° DE ESTABLECIMIENTOS DE SALUD:':'N° DE INSTITUCIONES EDUCATIVAS:'; worksheetRG.getCell(7,2).value = datosResumen.conteoEstablecimientos;
+      worksheetRG.mergeCells('A8:E8');
+      worksheetRG.getCell("A8").value = datosResumen.conteoTotalCCPP + ' CENTROS POBLADOS ' + datosResumen.porcePoblacion +'% Y ' + datosResumen.conteoPersoCober +' PERSONAS ' + datosResumen.porcePersoCober +'% TIENEN COBERTURA DE SERVICIO'
+      worksheetRG.getCell('A8').alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheetRG.getCell('A8').font = { bold: true };
+
+      const tablaResumen = datosResumen.newDataTable.map(item => ({
+        "1": item.nombre,
+        "2": item.cantidad
+      }));
+
+      const borderStyles = {
+        top: { style: 'thin', color: { argb: '61c5c0' } },
+        left: { style: 'thin', color: { argb: '61c5c0' } },
+        bottom: { style: 'thin', color: { argb: '61c5c0' } },
+        right: { style: 'thin', color: { argb: '61c5c0' } }
+      };
+    
+      // Agregar los datos de resumen y aplicar bordes verdes a cada celda
+      tablaResumen.forEach((row, index) => {
+        const rowIndex = index + 9; // Empieza después de la fila 8
+        const rowAdded = worksheetRG.addRow(row);
+        for (let i = 1; i <= 2; i++) {
+            const cell = worksheetRG.getCell(`${String.fromCharCode(64 + i)}${rowIndex}`);
+            cell.border = borderStyles;
+        }
+      });
+      const tablaDatosCercanos = datosResumen.newDataTableCercanos.map(item => ({
+        "1": item.ubigeo,
+        "2": item.nombre,
+        "3": item.codigo,
+        "4": item.tipo,
+        "5": item.kil,
+      })); 
+      const borderStylesCercanos = {
+        top: { style: 'thin', color: { argb: '0070f0' } },
+        left: { style: 'thin', color: { argb: '0070f0' } },
+        bottom: { style: 'thin', color: { argb: '0070f0' } },
+        right: { style: 'thin', color: { argb: '0070f0' } }
+      };
+      worksheetRG.mergeCells('A19:E19');
+      worksheetRG.getCell('A19').value = tipoServicio == "S" ? 'LOS ESTABLECIMIENTOS DE SALUD MÁS CERCANOS SON:' : 'LAS INSTITUCIONES EDUCATIVAS MÁS CERCANOS A LAS SON:'
+      worksheetRG.getCell('A19').font = { bold: true };
+      worksheetRG.getCell(20,1).value = 'IDCCPP'
+      worksheetRG.getCell(20,2).value = 'Nombre'
+      worksheetRG.getCell(20,3).value = 'Código'
+      worksheetRG.getCell(20,4).value = tipoServicio == "S" ? 'Categoría':'Nivel'
+      worksheetRG.getCell(20,5).value = 'KILÓMETRO(S)/MINUTO(S)'
+      worksheetRG.getCell(20,1).border = borderStylesCercanos
+      worksheetRG.getCell(20,2).border = borderStylesCercanos
+      worksheetRG.getCell(20,3).border = borderStylesCercanos
+      worksheetRG.getCell(20,4).border = borderStylesCercanos
+      worksheetRG.getCell(20,5).border = borderStylesCercanos
+      worksheetRG.getCell(20,1).font = { bold: true };
+      worksheetRG.getCell(20,2).font = { bold: true };
+      worksheetRG.getCell(20,3).font = { bold: true };
+      worksheetRG.getCell(20,4).font = { bold: true };
+      worksheetRG.getCell(20,5).font = { bold: true };
+      // Agregar los datos de resumen y aplicar bordes verdes a cada celda
+      tablaDatosCercanos.forEach((row, index) => {
+        const rowIndex = index + 21; // Empieza después de la fila 8
+        const rowAdded = worksheetRG.addRow(row);
+        for (let i = 1; i <= 5; i++) {
+            const cell = worksheetRG.getCell(`${String.fromCharCode(64 + i)}${rowIndex}`);
+            cell.border = borderStylesCercanos;
+        }
+      });
+
       let tabla
       let where
       let ccppFormato
@@ -1424,6 +1519,10 @@ export class CapasController {
         res.status(200).end();
       });
     } catch (error) {
+      console.log({
+        status: "error",
+        message: "Error en el servidor " + error,
+      });
       res.json({
         status: "error",
         message: "Error en el servidor " + error,
