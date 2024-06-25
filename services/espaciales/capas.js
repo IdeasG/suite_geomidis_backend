@@ -624,21 +624,8 @@ export class CapasService {
   async filtroAfiliados(idccpp) {
     try {
       const [results, metadata] = await sequelize.query(`
-        SELECT 'Beneficiarios Cunamás SA' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_cums_loserali 
-        WHERE "IDCCPP" = '${idccpp}'
-        UNION ALL
-        SELECT 'Beneficiarios Pensión65' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_psn65_usupen65 
-        WHERE "IDCCPP" = '${idccpp}'
-        UNION ALL
-        SELECT 'Hogares afilados Juntos' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_jts_hogajunt 
-        WHERE "IDCCPP" = '${idccpp}'
-        UNION ALL
-        SELECT 'Beneficiarios Contigo' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_ctg_usprocon 
-        WHERE "IDCCPP" = '${idccpp}'
+        select * from espaciales.sp_ccpp_pt
+        where codccpp ='${idccpp}'
         ;
       `);
       return results;
@@ -650,39 +637,12 @@ export class CapasService {
   async filtroAfiliadosArea(idccpp) {
     try {
       // console.log(`
-      //   SELECT 'Beneficiarios Cunamás SA' AS afiliado, COUNT(*) AS conteo 
-      //   FROM espaciales.spg_cums_loserali 
-      //   WHERE "IDCCPP" in (${idccpp})
-      //   UNION ALL
-      //   SELECT 'Beneficiarios Pensión65' AS afiliado, COUNT(*) AS conteo 
-      //   FROM espaciales.spg_psn65_usupen65 
-      //   WHERE "IDCCPP" in (${idccpp})
-      //   UNION ALL
-      //   SELECT 'Hogares afilados Juntos' AS afiliado, COUNT(*) AS conteo 
-      //   FROM espaciales.spg_jts_hogajunt 
-      //   WHERE "IDCCPP" in (${idccpp})
-      //   UNION ALL
-      //   SELECT 'Beneficiarios Contigo' AS afiliado, COUNT(*) AS conteo 
-      //   FROM espaciales.spg_ctg_usprocon 
-      //   WHERE "IDCCPP" in (${idccpp})
-      //   ;
+      //   select sum(usuar_p65) as usuar_p65,sum(usuacontig) as usuacontig,sum(saf_cuna) as saf_cuna,sum(afilijunto) as afilijunto from espaciales.sp_ccpp_pt
+      //   where codccpp in (${idccpp})
       // `);
       const [results, metadata] = await sequelize.query(`
-        SELECT 'Beneficiarios Cunamás SA' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_cums_loserali 
-        WHERE "IDCCPP" in (${idccpp})
-        UNION ALL
-        SELECT 'Beneficiarios Pensión65' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_psn65_usupen65 
-        WHERE "IDCCPP" in (${idccpp})
-        UNION ALL
-        SELECT 'Hogares afilados Juntos' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_jts_hogajunt 
-        WHERE "IDCCPP" in (${idccpp})
-        UNION ALL
-        SELECT 'Beneficiarios Contigo' AS afiliado, COUNT(*) AS conteo 
-        FROM espaciales.spg_ctg_usprocon 
-        WHERE "IDCCPP" in (${idccpp})
+        select sum(usuar_p65) as usuar_p65,sum(usuacontig) as usuacontig,sum(saf_cuna) as saf_cuna,sum(afilijunto) as afilijunto from espaciales.sp_ccpp_pt
+        where codccpp in (${idccpp})
         ;
       `);
       return results;
