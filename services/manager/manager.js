@@ -9,6 +9,7 @@ import { sequelize } from "../../config/postgres/sequelize.js";
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
+const fs = require('fs');
 const fsp = require("fs").promises;
 const path = require("path");
 import { fileURLToPath } from "url";
@@ -929,9 +930,18 @@ async getRolByIdCliente(id_cliente) {
       if (logo_bs) {
         const ahora = Date.now();
         const currentDir = __dirname;
-        const desiredDir = path.join(currentDir, "..", "..");
+        const logosDir = path.join(currentDir, "..", "..", "public", "logos");
         let ruta_archivo1 = `/public/logos/${ahora}.png`;
-
+        // Verificar y crear el directorio si no existe
+        try {
+          if (!fs.existsSync(logosDir)) {
+            fs.mkdirSync(logosDir, { recursive: true });
+          }
+        } catch (err) {
+          console.error("Error creando el directorio:", err);
+          throw new Error("No se pudo crear el directorio");
+        }
+  
         const data = await Geoportal.update(
           {
             name: nombre,
@@ -945,6 +955,7 @@ async getRolByIdCliente(id_cliente) {
             },
           }
         );
+  
         if (data) {
           await GeoportalComponent.destroy({ where: { fk_geoportal: id } });
           if (componentsIzquierda.length > 0) {
@@ -992,7 +1003,7 @@ async getRolByIdCliente(id_cliente) {
             }
           }
           const binaryData1 = this.base64ToBinary(logo_bs);
-          await fsp.writeFile(desiredDir + ruta_archivo1, binaryData1);
+          await fsp.writeFile(path.join(logosDir, `${ahora}.png`), binaryData1);
           return data;
         } else {
           throw new Error("No se pudo registrar");
@@ -1010,6 +1021,7 @@ async getRolByIdCliente(id_cliente) {
             },
           }
         );
+  
         if (data) {
           await GeoportalComponent.destroy({ where: { fk_geoportal: id } });
           if (componentsIzquierda.length > 0) {
