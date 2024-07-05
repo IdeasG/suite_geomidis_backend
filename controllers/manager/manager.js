@@ -487,6 +487,9 @@ export class ManagerController {
   async sendMessage(req, res) {
     const { fk_geoportal, email } = req.body;
     try {
+      if (!email) {
+        res.status(400).json([])
+      }
       const data = await managerService.sendMessage(fk_geoportal, email);
       res.status(200).json(data);
     } catch (error) {

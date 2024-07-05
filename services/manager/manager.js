@@ -754,9 +754,20 @@ async getRolByIdCliente(id_cliente) {
     }
   }
 
+
+
   async sendMessage(fk_geoportal, email) {
     try {
-      const password = "123456@";
+      function generarCadenaAleatoria() {
+        const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let cadena = '';
+        for (let i = 0; i < 7; i++) {
+            const indiceAleatorio = Math.floor(Math.random() * caracteres.length);
+            cadena += caracteres.charAt(indiceAleatorio);
+        }
+        return cadena;
+      }
+      const password = generarCadenaAleatoria();
       const data = await TgUsuario.update(
         {
           clave: generatePasswordHash(password),
