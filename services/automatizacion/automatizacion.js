@@ -8,7 +8,7 @@ export class AutomatizacionService {
 async gmailRegistroDiario(fecha,nombres) {
     try {
         await sendMail({       
-          to: "csanchez@midis.gob.pe",
+          to: "info.redinforma@midis.gob.pe",
           name: "GEOMIDIS",
           subject: `Registro diario terminado de capas de programas ${fecha}`,
           body: compileGmailDiarioRegistro(
@@ -33,8 +33,8 @@ async gmailRegistroDiario(fecha,nombres) {
   async gmailRegistroAnual(fecha,nombres) {
     try {
         await sendMail({
-        //   to: "csanchez@midis.gob.pe",          
-          to: "csanchez@midis.gob.pe",
+        //   to: "info.redinforma@midis.gob.pe",          
+          to: "info.redinforma@midis.gob.pe",
           name: "GEOMIDIS",
           subject: `Registro anual terminado de capas de programas ${fecha}`,
           body: compileGmailDiarioRegistro(

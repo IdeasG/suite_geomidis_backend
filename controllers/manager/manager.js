@@ -489,6 +489,7 @@ export class ManagerController {
     try {
       if (!email) {
         res.status(400).json([])
+        return;
       }
       const data = await managerService.sendMessage(fk_geoportal, email);
       res.status(200).json(data);

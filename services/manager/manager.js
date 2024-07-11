@@ -668,7 +668,7 @@ async getRolByIdCliente(id_cliente) {
   ) {
     try {
         await sendMail({
-          to: "csanchez@midis.gob.pe",          
+          to: "info.redinforma@midis.gob.pe",          
           name: "GEOMIDIS",
           subject: "🚨 Solicitud - Registro de nuevo usuario 🚨",
           body: compileNuevoUsuarioTemplate(
@@ -736,7 +736,7 @@ async getRolByIdCliente(id_cliente) {
           ),
         });
         await sendMail({
-          to: "csanchez@midis.gob.pe",
+          to: "info.redinforma@midis.gob.pe",
           name: "GEOMIDIS",
           subject: "🚨🚨🚨 Solicitud nueva en cola 🚨🚨🚨",
           body: compileWelcomeTemplate(
