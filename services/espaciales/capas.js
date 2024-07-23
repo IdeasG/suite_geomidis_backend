@@ -114,6 +114,7 @@ export class CapasService {
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema='espaciales'
+        order by table_name asc
       `);
       return results;
     } catch (error) {

@@ -465,16 +465,103 @@ async getRolByIdCliente(id_cliente) {
 
   async getCapasById(id) {
     try {
-      const modulos = await SuperGrupo.findAll();
-      const grupos = await GrupoCapa.findAll();
-      const menu = await Capa.findAll();
+      console.log(id);
+      let orden = await OrdenCapa.findOne({
+        where: {
+          fk_rol: id,
+        },
+      });
+      const data = orden.toJSON();
+      console.log(orden.toJSON());
+      const modulos2 = data.j_orden.map(e => ({
+        "id_super_grupo": e.id_super_grupo,
+        "c_nombre_super_grupo": e.c_nombre_super_grupo,
+        "b_super_grupo": e.b_super_grupo,
+        "id_usuario_auditoria": e.id_usuario_auditoria,
+        "id_rol_auditoria": e.id_rol_auditoria
+      }));
+
+      let grupos2
+      grupos2 = data.j_orden.flatMap(e => e.grupos.map(g => ({
+        "id_grupo": g.id_grupo,
+        "id_super_grupo": g.id_super_grupo,
+        "c_nombre_grupo": g.c_nombre_grupo,
+        "b_grupo": g.b_grupo,
+        "id_usuario_auditoria": g.id_usuario_auditoria,
+        "id_rol_auditoria": g.id_rol_auditoria,
+      })));
+
+      let menu2 = data.j_orden.flatMap(e => e.grupos.flatMap(g => g.capas.map(c => ({
+        "id_capa": c.id_capa,
+        "id_grupo": c.id_grupo,
+        "c_nombre_tabla_capa": c.c_nombre_tabla_capa,
+        "c_nombre_public_capa": c.c_nombre_public_capa,
+        "c_sql_capa": c.c_sql_capa,
+        "b_capa": c.b_capa,
+        "c_url": c.c_url,
+        "c_tipo": c.c_tipo,
+        "c_servicio": c.c_servicio,
+        "c_nombre_geoserver": c.c_nombre_geoserver,
+        "id_usuario_auditoria": c.id_usuario_auditoria,
+        "id_rol_auditoria": c.id_rol_auditoria,
+        "c_url_seleccionado": c.c_url_seleccionado,
+        "b_geoportal": c.b_geoportal,
+      }))));
+    
+
+      let modulos = await SuperGrupo.findAll();
+      let grupos = await GrupoCapa.findAll();
+      let menu = await Capa.findAll();
       const rol_capas = await CapaByRol.findAll({
         where: {
           fk_rol: id,
         },
       });
 
-      return { modulos, grupos, menu, rol_capas };
+
+      // Crear un mapa de índices para modulos2
+      const modulos2IndexMap = new Map();
+      modulos2.forEach((modulo, index) => {
+          modulos2IndexMap.set(modulo.id_super_grupo, index);
+      });
+
+      // Ordenar modulos de acuerdo a modulos2
+      modulos = [...modulos].sort((a, b) => {
+          const indexA = modulos2IndexMap.has(a.id_super_grupo) ? modulos2IndexMap.get(a.id_super_grupo) : Number.MAX_SAFE_INTEGER;
+          const indexB = modulos2IndexMap.has(b.id_super_grupo) ? modulos2IndexMap.get(b.id_super_grupo) : Number.MAX_SAFE_INTEGER;
+          return indexA - indexB;
+      });
+
+
+      // Crear un mapa de índices para grupos2
+      const grupos2IndexMap = new Map();
+      grupos2.forEach((grupo, index) => {
+          grupos2IndexMap.set(grupo.id_grupo, index);
+      });
+
+      // Ordenar grupos de acuerdo a grupos2
+      grupos = [...grupos].sort((a, b) => {
+          const indexA = grupos2IndexMap.has(a.id_grupo) ? grupos2IndexMap.get(a.id_grupo) : Number.MAX_SAFE_INTEGER;
+          const indexB = grupos2IndexMap.has(b.id_grupo) ? grupos2IndexMap.get(b.id_grupo) : Number.MAX_SAFE_INTEGER;
+          return indexA - indexB;
+      });
+
+
+      // Crear un mapa de índices para menu2
+      const menu2IndexMap = new Map();
+      menu2.forEach((capa, index) => {
+          menu2IndexMap.set(capa.id_capa, index);
+      });
+
+      // Ordenar capas de acuerdo a menu2
+      menu = [...menu].sort((a, b) => {
+          const indexA = menu2IndexMap.has(a.id_capa) ? menu2IndexMap.get(a.id_capa) : Number.MAX_SAFE_INTEGER;
+          const indexB = menu2IndexMap.has(b.id_capa) ? menu2IndexMap.get(b.id_capa) : Number.MAX_SAFE_INTEGER;
+          return indexA - indexB;
+      });
+
+
+      return { modulos2, modulos, grupos2, grupos, menu2, menu, rol_capas };
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
