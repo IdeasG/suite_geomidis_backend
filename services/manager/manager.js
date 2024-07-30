@@ -465,14 +465,12 @@ async getRolByIdCliente(id_cliente) {
 
   async getCapasById(id) {
     try {
-      console.log(id);
       let orden = await OrdenCapa.findOne({
         where: {
           fk_rol: id,
         },
       });
       const data = orden.toJSON();
-      console.log(orden.toJSON());
       const modulos2 = data.j_orden.map(e => ({
         "id_super_grupo": e.id_super_grupo,
         "c_nombre_super_grupo": e.c_nombre_super_grupo,
