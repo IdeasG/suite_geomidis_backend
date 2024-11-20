@@ -1,6 +1,5 @@
-import 'dotenv/config'
-
-import { Sequelize } from 'sequelize';
+import 'dotenv/config';
+import { Sequelize, DataTypes } from 'sequelize'; // Importar DataTypes aquí
 
 var opts = {
     define: {
@@ -19,4 +18,4 @@ try {
     console.error('Unable to connect to the database:', error);
 }
 
-export { sequelize };
+export { sequelize, DataTypes }; // Exportar DataTypes también

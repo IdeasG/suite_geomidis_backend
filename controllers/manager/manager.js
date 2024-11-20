@@ -403,6 +403,7 @@ export class ManagerController {
       componentsDerecha,
       componentsMenu,
       componentsArriba,
+      terminos_condiciones
     } = req.body;
     try {
       const data = await managerService.saveGeoportales(
@@ -413,7 +414,8 @@ export class ManagerController {
         componentsIzquierda,
         componentsDerecha,
         componentsMenu,
-        componentsArriba
+        componentsArriba,
+        terminos_condiciones
       );
       res.status(200).json(data);
     } catch (error) {
@@ -508,6 +510,7 @@ export class ManagerController {
       componentsDerecha,
       componentsMenu,
       componentsArriba,
+      terminos_condiciones
     } = req.body;
     const { id } = req.params;
     try {
@@ -520,7 +523,8 @@ export class ManagerController {
         componentsIzquierda,
         componentsDerecha,
         componentsMenu,
-        componentsArriba
+        componentsArriba,
+        terminos_condiciones
       );
       res.status(200).json(data);
     } catch (error) {

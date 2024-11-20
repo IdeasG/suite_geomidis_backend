@@ -881,7 +881,8 @@ async getRolByIdCliente(id_cliente) {
     componentsIzquierda,
     componentsDerecha,
     componentsMenu,
-    componentsArriba
+    componentsArriba,
+    terminos_condiciones
   ) {
     try {
       if (logo_bs && logo_bs.length > 0) {
@@ -895,6 +896,7 @@ async getRolByIdCliente(id_cliente) {
           title: descripcion,
           background: color_primary,
           logo: ruta_archivo1,
+          terminos_condiciones
         });
 
         if (data) {
@@ -954,6 +956,7 @@ async getRolByIdCliente(id_cliente) {
           title: descripcion,
           background: color_primary,
           logo: "",
+          terminos_condiciones
         });
         if (data) {
           if (componentsIzquierda.length > 0) {
@@ -1020,7 +1023,8 @@ async getRolByIdCliente(id_cliente) {
     componentsIzquierda,
     componentsDerecha,
     componentsMenu,
-    componentsArriba
+    componentsArriba,
+    terminos_condiciones
   ) {
     try {
       if (logo_bs) {
@@ -1037,13 +1041,14 @@ async getRolByIdCliente(id_cliente) {
           console.error("Error creando el directorio:", err);
           throw new Error("No se pudo crear el directorio");
         }
-  
+
         const data = await Geoportal.update(
           {
             name: nombre,
             title: descripcion,
             background: color_primary,
             logo: ruta_archivo1,
+            terminos_condiciones
           },
           {
             where: {
@@ -1110,6 +1115,7 @@ async getRolByIdCliente(id_cliente) {
             name: nombre,
             title: descripcion,
             background: color_primary,
+            terminos_condiciones
           },
           {
             where: {

@@ -3,6 +3,7 @@ import { createRouteSML } from "../routes/espaciales/sml.js";
 import { createRouteExtent } from "../routes/espaciales/extent.js";
 import { createRouteViasCuadras } from "../routes/espaciales/vias_cuadras.js";
 import { createRouteMapaBase } from "../routes/espaciales/mapa_base.js";
+import { createRouteServicios } from "../routes/espaciales/servicios.js";
 
 export function setupEspacialesRoutes(app) {
   const maestrosRutas = {
@@ -11,6 +12,7 @@ export function setupEspacialesRoutes(app) {
     extent: createRouteExtent(),
     vias_cuadras: createRouteViasCuadras(),
     mapa_base: createRouteMapaBase(),
+    servicios: createRouteServicios()
   };
 
   for (const [ruta, router] of Object.entries(maestrosRutas)) {

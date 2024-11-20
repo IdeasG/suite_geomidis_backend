@@ -26,6 +26,10 @@ const Geoportal = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    terminos_condiciones: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     timestamps: false,

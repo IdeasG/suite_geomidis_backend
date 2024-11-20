@@ -22,13 +22,15 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import path from "path";
 import { setupGlgisRoutes } from "./setup/routeGlgisSetup.js";
+import { setupEtlRoutes } from "./setup/routeEtlSetup.js";
+import { setupRasterRoutes } from "./setup/routeRasterSetup.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-app.use(express.json({ limit: "100mb" }));
-app.use(express.urlencoded({ extended: true, limit: "100mb" }));
+app.use(express.json({ limit: "500mb" }));
+app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use(corsMiddleware());
 app.use(express.static(path.join(__dirname, "")));
 
@@ -53,6 +55,8 @@ setupEspacialesRoutes(app);
 setupGlgisRoutes(app);
 setupMapfishRoutes(app);
 setupAuditoriaRoutes(app);
+setupEtlRoutes(app);
+setupRasterRoutes(app);
 
 app.use("/fcuin/ubicacion_predio", createUbicacionPredioRouter());
 app.use("/tibc/servicio_predio", createServicioPredioRouter());
