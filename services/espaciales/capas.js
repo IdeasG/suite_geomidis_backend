@@ -652,6 +652,19 @@ export class CapasService {
     }
   }
 
+  async filtroCCPPDatosGeneralArea(idccpp) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+        select sum(usuar_p65) as usuar_p65,sum(usuacontig) as usuacontig,sum(saf_cuna) as saf_cuna,sum(afilijunto) as afilijunto from espaciales.sp_ccpp_pt
+        where codccpp in (${idccpp})
+        ;
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
   async busquedaAvanzada(simbolo, column, layer, inputBt) {
     try {
       const [results, metadata] = await sequelize.query(`

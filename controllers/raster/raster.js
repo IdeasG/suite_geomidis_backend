@@ -14,7 +14,7 @@ export class RasterController {
       const sshCommand = `ssh root@84.247.176.139 "bash -c '${comando}'"`;
 
       console.log(sshCommand);
-      
+
       // Ejecutar el comando
       exec(sshCommand, (error, stdout, stderr) => {
         // Imprimir errores críticos solamente

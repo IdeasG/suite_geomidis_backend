@@ -4,6 +4,7 @@ const ACCEPTED_ORIGINS = [
   "http://localhost:3000",
   "https://backend.geoportalmidis.pe",
   "https://geoportalmidis.pe",
+  "https://geomidis23.ideasg.org",
   // "https://suite.juegodepalabras.com.pe",
   // "https://suite-nextjs.vercel.app",
   "https://geomidis2024.ideasg.org",

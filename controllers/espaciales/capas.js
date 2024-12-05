@@ -578,6 +578,23 @@ export class CapasController {
     }
   }
 
+  async filtroCCPPDatosGeneralArea(req, res) {
+    const { idccpp } = req.body;
+    try {
+      if (idccpp.length==0) {
+        res.status(200).json({ status: "success", data: [] });
+        return;
+      }
+      const ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+      const respuesta = await capasService.filtroCCPPDatosGeneralArea(
+        ccppFormato
+      );
+      res.status(200).json({ status: "success", data: respuesta });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async filtroServiciosGenerales(req, res) {
     const { idccpp, tipoServicio} = req.body;
     try {
