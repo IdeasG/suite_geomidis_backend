@@ -109,27 +109,37 @@ export class MapfishController {
   }
   async getPrint(req, res, next) {
     let json = req.body;
+    const outputFormat = json.outputFormat || 'pdf'; // Establece 'pdf' como valor predeterminado si no se especifica
     try {
-        // console.log(json);
-        // let ss = await axios.post("http://185.214.135.183:8080/print/print/buildreport.pdf",
-        let ss = await axios.post("http://localhost:8080/print/print/buildreport.pdf",
-        json,
-        {
-            responseType: 'arraybuffer',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        const data = ss.data
-        // console.log(json)
-        // let data = await n2yo_service.getPrint(json);
-        res.setHeader('Content-Type', 'application/pdf')
-        res.setHeader('Content-Disposition', 'attachment; filename=name.Pdf')
-        res.setHeader('Content-Length', data.length)
-        return res.end(data)
+      // Configura la URL de MapFish dependiendo del formato solicitado
+      const url = outputFormat === 'png'
+        ? "http://localhost:8080/print/print/buildreport.png" 
+        : "http://localhost:8080/print/print/buildreport.pdf"; // Usa .pdf como valor predeterminado
+  
+      // Enviar solicitud a MapFish para generar el reporte
+      let ss = await axios.post(url, json, {
+        responseType: 'arraybuffer',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      const data = ss.data;
+  
+      // Configurar las cabeceras de la respuesta según el formato solicitado
+      if (outputFormat === 'png') {
+        res.setHeader('Content-Type', 'image/png'); // Para PNG
+        res.setHeader('Content-Disposition', 'attachment; filename=name.png');
+      } else {
+        res.setHeader('Content-Type', 'application/pdf'); // Para PDF
+        res.setHeader('Content-Disposition', 'attachment; filename=name.pdf');
+      }
+  
+      res.setHeader('Content-Length', data.length);
+      return res.end(data);
+  
+    } catch (err) {
+      return next(err);
     }
-    catch (err) {
-        return next(err);
-    }
-  }
+  }  
 }
