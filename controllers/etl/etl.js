@@ -9,8 +9,6 @@ export class EtlController {
   create = async (req, res) => {
     const { nombreEsquema, nombreTabla, indices, fileData } = req.body;
     try {
-      console.log('se esta intentando crear la tabla');
-      console.log(`${nombreEsquema}.${nombreTabla}`);
       const data = { nombreEsquema, nombreTabla, indices, fileData}
       const result = await etlService.registerTable(data);
       res.status(201).json(result);

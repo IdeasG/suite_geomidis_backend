@@ -22,6 +22,11 @@ export class EtlService {
       await sequelize.query(createTableQuery, { transaction });
       console.log(`Tabla ${nombreTabla} creada en el esquema ${nombreEsquema}`);
 
+      // Eliminar todos los datos antiguos antes de insertar los nuevos
+      const deleteQuery = `DELETE FROM ${nombreEsquema}.${nombreTabla}`;
+      await sequelize.query(deleteQuery, { transaction });
+      console.log(`Datos antiguos eliminados de la tabla ${nombreTabla}`);
+
       // Insertar datos en lotes
       for (let i = 0; i < fileData.length; i += batchSize) {
         const batch = fileData.slice(i, i + batchSize);

@@ -2,16 +2,8 @@ import cors from "cors";
 
 const ACCEPTED_ORIGINS = [
   "http://localhost:3000",
-  "https://backend.geoportalmidis.pe",
-  "https://geoportalmidis.pe",
-  "https://geomidis23.ideasg.org",
-  // "https://suite.juegodepalabras.com.pe",
-  // "https://suite-nextjs.vercel.app",
-  "https://geomidis2024.ideasg.org",
-  "https://geomidis.ideasg.org",
-  "https://suite-geomidis-nextjs.vercel.app",
-  // "https://glgissuite.ideasg.org",
-  // "https://www.glgissuite.ideasg.org",
+  "https://geoportal.midis.gob.pe",
+  "https://geomidis23.ideasg.org"
 ];
 
 export const corsMiddleware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) =>

@@ -111,10 +111,11 @@ export class MapfishController {
     let json = req.body;
     const outputFormat = json.outputFormat || 'pdf'; // Establece 'pdf' como valor predeterminado si no se especifica
     try {
+      const tomcat = process.env.TOMCAT;
       // Configura la URL de MapFish dependiendo del formato solicitado
       const url = outputFormat === 'png'
-        ? "http://localhost:8080/print/print/buildreport.png" 
-        : "http://localhost:8080/print/print/buildreport.pdf"; // Usa .pdf como valor predeterminado
+        ? tomcat + "/print/print/buildreport.png" 
+        : tomcat + "/print/print/buildreport.pdf"; // Usa .pdf como valor predeterminado
   
       // Enviar solicitud a MapFish para generar el reporte
       let ss = await axios.post(url, json, {
