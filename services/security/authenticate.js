@@ -386,7 +386,7 @@ export class AuthenticateService {
       });
 
       const solicitudes = await Solicitud.findAll({
-        where: { fk_geoportal: id },
+        where: { fk_geoportal: id, estado: false},
       });
       const data = await TgUsuario.findAll({
         where: {

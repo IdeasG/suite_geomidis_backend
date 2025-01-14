@@ -5,6 +5,7 @@ import "dotenv/config";
 import { createUbicacionPredioRouter } from "./routes/fichas/individual/ubicacionPredio.js";
 import { createServicioPredioRouter } from "./routes/fichas/individual/servicioPredio.js";
 
+import { setupServiciosGeoserverRouter } from "./setup/routeServiciosGeoserverSetup.js";
 import { setupMaestroRoutes } from "./setup/routeMaestroSetup.js";
 import { setupMapfishRoutes } from "./setup/routerImpresionMapfish.js";
 import { setupPruebasRoutes } from "./setup/routePruebasSetup.js";
@@ -48,7 +49,7 @@ cron.schedule('0 0 1 1 * *', () => {
   callServicesAnual();
   // Aquí puedes llamar a la función o realizar cualquier tarea que necesites ejecutar
 });
-
+setupServiciosGeoserverRouter(app);
 setupPruebasRoutes(app);
 setupMaestroRoutes(app);
 setupEspacialesRoutes(app);
