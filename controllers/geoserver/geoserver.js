@@ -13,27 +13,32 @@ export class GeoserverController {
       // Codificar credenciales en Base64
       const encodedCredentials = Buffer.from(`${username}:${password}`).toString("base64");
 
-      // Realizar solicitud GET al GeoServer usando fetch
-      const response = await fetch(url, {
+      // Crear una nueva promesa para fetch
+      const fetchPromise = fetch(url, {
         method: "GET",
         headers: {
           Authorization: `Basic ${encodedCredentials}`, // Autenticación básica
         },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error en la respuesta: ${response.statusText}`);
+        }
+        return response.json(); // Suponiendo que la respuesta es JSON
+      })
+      .then(data => {
+        // Manejar los datos de GeoServer como necesites
+        // console.log('Datos de GeoServer:', data);
+        return res.json(data); // Retorna los datos al cliente si es necesario
+      })
+      .catch(error => {
+        console.error('Error al hacer fetch a GeoServer:', error);
+        return next(error); // En caso de error, pasa al siguiente middleware
       });
 
-      // Verificar si la solicitud fue exitosa
-      if (!response.ok) {
-        throw new Error(`Error al solicitar datos de GeoServer: ${response.status} ${response.statusText}`);
-      }
+      // Espera a que la promesa se resuelva y se procesen los datos
+      await fetchPromise;
 
-      // Obtener los datos como un buffer
-      const data = await response.arrayBuffer();
-
-      // Enviar la respuesta al cliente
-      res.set({
-        "Content-Type": response.headers.get("content-type"), // Mantener el tipo de contenido original
-      });
-      return res.end(Buffer.from(data));
     } catch (err) {
       console.error("Error al solicitar datos de GeoServer:", err.message);
       return next(err);
