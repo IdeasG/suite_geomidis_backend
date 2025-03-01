@@ -111,6 +111,7 @@ export const createRouteCapas = () => {
   CapaRouter.post("/filtro/afiliados/area", capasController.filtroAfiliadosArea);
   CapaRouter.post("/filtro/ccpp/area/datosgeneral", capasController.filtroCCPPDatosGeneralArea);
   CapaRouter.post("/excel/filtros/area", capasController.descargarExcelFiltros);
+  CapaRouter.post("/excel/filtros/ccpp", capasController.descargarExcelFiltrosCCPP);
   CapaRouter.get("/validaciondata", capasController.validacionData);
   CapaRouter.get("/json/fallido/:id", capasController.jsonFallido);
   CapaRouter.post("/archivojson", capasController.archivoJson);

@@ -338,6 +338,28 @@ export class AuthenticateController {
     }
   }
 
+  async putRolDescarga(req, res) {
+    const { id_rol, b_descargas} = req.body;
+    try {
+      const data = await authenticateService.putRolDescarga(id_rol, b_descargas);
+      res.status(200).json(data);
+    } catch (error) {
+      console.log(error);
+      
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getRolPermitirDescarga(req, res) {
+    const { id_rol } = req.user;
+    try {
+      const data = await authenticateService.getRolPermitirDescarga(id_rol);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getToolsByRol(req, res) {
     const { id } = req.params;
     try {

@@ -18,6 +18,9 @@ const Rol = sequelize.define(
     b_rol: {
       type: DataTypes.BOOLEAN,
     },
+    b_descargas: {
+      type: DataTypes.BOOLEAN,
+    },
   },
   {
     schema: "seguridad",

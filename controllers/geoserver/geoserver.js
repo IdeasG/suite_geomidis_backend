@@ -1,4 +1,5 @@
-import "dotenv/config";
+import fetch from "node-fetch";
+import https from "https";
 
 export class GeoserverController {
   constructor() {}
@@ -13,12 +14,18 @@ export class GeoserverController {
       // Codificar credenciales en Base64
       const encodedCredentials = Buffer.from(`${username}:${password}`).toString("base64");
 
-      // Crear una nueva promesa para fetch
+      // Configurar un agente HTTPS que ignore la verificación de SSL (si es necesario)
+      const agent = new https.Agent({  
+        rejectUnauthorized: false,  // Permite conexiones con certificados no verificados
+      });
+
+      // Crear una nueva promesa para fetch con el agente HTTPS
       const fetchPromise = fetch(url, {
         method: "GET",
         headers: {
           Authorization: `Basic ${encodedCredentials}`, // Autenticación básica
         },
+        agent,  // Usar el agente HTTPS configurado
       })
       .then(response => {
         if (!response.ok) {
@@ -28,7 +35,6 @@ export class GeoserverController {
       })
       .then(data => {
         // Manejar los datos de GeoServer como necesites
-        // console.log('Datos de GeoServer:', data);
         return res.json(data); // Retorna los datos al cliente si es necesario
       })
       .catch(error => {

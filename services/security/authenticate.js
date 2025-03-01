@@ -740,14 +740,42 @@ export class AuthenticateService {
           id_cliente: id_cliente,
         },
       });
-      // for (const rol of roles) {
-      //   const tools = await this.getToolsByRol(rol.id);
-      //   rol.dataValues.tools = tools;
-      // }
       return { roles };
     } catch (error) {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getRolPermitirDescarga(id_rol) {
+    try {
+      const roles = await Rol.findAll({
+        attributes: ["b_descargas"],
+        where: {
+          id_rol,
+        },
+      });
+      return { roles };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async putRolDescarga(id_rol, b_descargas) {
+    try {
+      const roles = await Rol.update(
+        { b_descargas }, // Datos a actualizar
+        {
+          where: {
+            id_rol, // Asegúrate de que la columna en la DB sea `id_rol`
+          },
+        }
+      );
+      return { roles };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al actualizar el rol.");
     }
   }
 

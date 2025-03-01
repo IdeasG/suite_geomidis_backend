@@ -124,27 +124,28 @@ export class ManagerController {
   async deleteActividadesFotos(req, res) {
     const { id_foto } = req.params;
     try {
-      // console.log(id_foto);
-      const data2 = await managerService.getActividadesFotosIdFoto(
-        id_foto
-      );
+      const data2 = await managerService.getActividadesFotosIdFoto(id_foto);
+  
       if (data2) {
         const imagen = data2.c_ruta_foto.split("/actividades/").pop();
         const folderPath = path.join(process.cwd(), "actividades");
-        // Eliminar cada imagen
+  
         if (imagen) {
           const imagePathGrande = path.join(folderPath, imagen);
-          fs.unlinkSync(imagePathGrande);
+          if (fs.existsSync(imagePathGrande)) {
+            fs.unlinkSync(imagePathGrande);
+          }
         }
       }
-      const data = await managerService.deleteActividadesFotos(
-        id_foto
-      );
+  
+      // Eliminar el registro de la base de datos
+      const data = await managerService.deleteActividadesFotos(id_foto);
       res.status(200).json(data);
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error: error.message });
     }
-  }
+  }  
 
   async saveGrupoSistema(req, res) {
     const { pk_modulo, c_nombre, url } = req.body;

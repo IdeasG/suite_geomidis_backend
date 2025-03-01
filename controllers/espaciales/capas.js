@@ -1252,25 +1252,7 @@ export class CapasController {
   async descargarExcelFiltros(req, res) {
     const { tipoServicio,categoria,distancia,nivel,idccpp,datosResumen} = req.body;
     const titulo = 'Filtro demanda.'
-    // console.log(columnas);
     try {
-      // body.datosResumen = {
-      //   tipoDibujoActual,
-      //   newDataTable,
-      //   newDataTableCercanos,
-      //   nombreDepartamento,
-      //   nombreProvincia,
-      //   nombreDistrito,
-      //   conteoTotalCCPP,
-      //   conteoPoblacionTotal,
-      //   conteoPersoCober,
-      //   conteoEstablecimientos,
-      //   porcePoblacion,
-      //   porcePersoCober,
-      //   selectedCategorias,
-      //   nivelSeleccionado,
-      //   labelDistanciaSeleccionado
-      // }
       let workbook = new excel.Workbook();
       let worksheetRG = workbook.addWorksheet('Resumen general.');
       const columnasRG = []
@@ -1546,6 +1528,102 @@ export class CapasController {
       });
     }
   }
+
+  async descargarExcelFiltrosCCPP(req, res) {
+    const { tipoServicio, datosResumen } = req.body;
+    const titulo = 'Filtro demanda';
+  
+    try {
+      let workbook = new excel.Workbook();
+      let worksheetRG = workbook.addWorksheet('Resumen general');
+      const columnasRG = [
+        { header: '', key: '1', width: 30 },
+        { header: '', key: '2', width: 30 },
+        { header: '', key: '3', width: 30 },
+        { header: '', key: '4', width: 30 },
+        { header: '', key: '5', width: 30 }
+      ];
+      worksheetRG.columns = columnasRG;
+  
+      // Determinar el tipo de institución
+      const tipoInstitucion = tipoServicio === "S" ? "establecimiento de salud" : "institución educativa";
+      const tipoInsitucionDos = tipoServicio === "S" ? "E.S." : "I.E.";
+
+      // Añadir el título en la parte superior
+      worksheetRG.mergeCells('A1:E1'); 
+      worksheetRG.getCell('A1').value = `Cobertura de Servicios de ${tipoInstitucion} ${
+        tipoServicio === "S"
+          ? `públicos categorías ${datosResumen.selectedCategorias}`
+          : `públicos nivel ${datosResumen.nivelSeleccionado}`
+      } dentro de ${datosResumen.labelDistanciaSeleccionado.toUpperCase()}`;
+      
+      worksheetRG.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+      worksheetRG.getCell('A1').font = { bold: true };
+  
+      console.log(datosResumen.tipoDibujoActual, 'tipo polígono?');
+  
+      worksheetRG.getCell(2, 1).value = 'REGIÓN:'; worksheetRG.getCell(2, 2).value = datosResumen.nombreDepartamento;
+      worksheetRG.getCell(3, 1).value = 'PROVINCIA:'; worksheetRG.getCell(3, 2).value = datosResumen.nombreProvincia;
+      worksheetRG.getCell(4, 1).value = 'DISTRITO:'; worksheetRG.getCell(4, 2).value = datosResumen.nombreDistrito;
+      worksheetRG.getCell(5, 1).value = 'Código CCPP:'; worksheetRG.getCell(5, 2).value = datosResumen.selectedCCPP;
+      worksheetRG.getCell(6, 1).value = 'Nombre CCPP:'; worksheetRG.getCell(6, 2).value = datosResumen.nombreCCPP;
+      
+      worksheetRG.getCell(8, 1).value = `Tiene cobertura de servicio por ${datosResumen.numeroEstablecimientos} ${tipoInstitucion}(es)`;
+  
+      const tablaResumen = datosResumen.newDataTable.map(item => ({
+        "1": item.nombre,
+        "2": item.cantidad
+      }));
+  
+      const borderStyles = {
+        top: { style: 'thin', color: { argb: '61c5c0' } },
+        left: { style: 'thin', color: { argb: '61c5c0' } },
+        bottom: { style: 'thin', color: { argb: '61c5c0' } },
+        right: { style: 'thin', color: { argb: '61c5c0' } }
+      };
+  
+      // Agregar los datos de resumen y aplicar bordes a cada celda
+      tablaResumen.forEach((row, index) => {
+        const rowIndex = index + 9;
+        const rowAdded = worksheetRG.addRow(row);
+        for (let i = 1; i <= 2; i++) {
+          const cell = worksheetRG.getCell(`${String.fromCharCode(64 + i)}${rowIndex}`);
+          cell.border = borderStyles;
+        }
+      });
+  
+      worksheetRG.getCell(20, 1).value = `El ${tipoInsitucionDos} más cercano:`;
+      worksheetRG.getCell(20, 2).value = datosResumen.campoCercano;
+      worksheetRG.getCell(21, 1).value = `Código modular de ${tipoInsitucionDos}`;
+      worksheetRG.getCell(21, 2).value = datosResumen.codigoEs;
+      worksheetRG.getCell(22, 1).value = `Nivel del ${tipoInsitucionDos}:`;
+      worksheetRG.getCell(22, 2).value = datosResumen.categoriaEs;
+      worksheetRG.getCell(23, 1).value = 'Localizado a';
+      worksheetRG.getCell(23, 2).value = datosResumen.distanciaLocalizado;
+  
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename=${titulo}.xlsx`
+      );
+  
+      return workbook.xlsx.write(res).then(function () {
+        res.status(200).end();
+      });
+    } catch (error) {
+      console.log({
+        status: "error",
+        message: "Error en el servidor " + error,
+      });
+      res.json({
+        status: "error",
+        message: "Error en el servidor " + error,
+      });
+    }
+  }  
 
   async descargarExcelSimple(req, res) {
     const { data, columnas, titulo } = req.body;

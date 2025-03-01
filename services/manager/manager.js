@@ -37,6 +37,14 @@ import { log } from "console";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+Actividades.hasMany(ActividadesFotos, {
+  foreignKey: "id_actividad",
+  as: "fotos", // Alias único para la relación
+});
+
+ActividadesFotos.belongsTo(Actividades, {
+  foreignKey: "id_actividad",
+});
 export class ManagerService {
   async saveActividadesFoto(id_actividad, c_ruta_foto) {
     try {
@@ -94,7 +102,7 @@ export class ManagerService {
 
   async getActividadesFotosIdFoto(id_foto) {
     try {
-      const data = await ActividadesFotos.findOne({ where: { id_foto } });
+      const data = await ActividadesFotos.findOne({ where: { id_foto } }); 
       return data;
     } catch (error) {
       console.log(error);
@@ -410,12 +418,17 @@ async getRolByIdCliente(id_cliente) {
     }
   }
 
-  async getActividades() {
+  async getActividades() {  
     try {
       const data = await Actividades.findAll({
-        order: [
-          ['id_actividad', 'DESC']
-        ]
+        order: [['id_actividad', 'DESC']],
+        include: [
+          {
+            model: ActividadesFotos,
+            as: "fotos", // Usa el alias definido en la relación
+            attributes: ["id_foto", "c_ruta_foto"], // Solo obtenemos la ruta de la foto
+          },
+        ],
       });
       return data;
     } catch (error) {
@@ -839,8 +852,6 @@ async getRolByIdCliente(id_cliente) {
     }
   }
 
-
-
   async sendMessage(fk_geoportal, email) {
     try {
       function generarCadenaAleatoria() {
@@ -869,6 +880,7 @@ async getRolByIdCliente(id_cliente) {
       }
       return data;
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }

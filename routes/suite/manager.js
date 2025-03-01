@@ -12,10 +12,7 @@ export const createManagerRouter = () => {
   managerRouter.get("/sistemas/:id", managerController.getSistemabyId);
   managerRouter.get("/capas/:id", managerController.getCapasById);
   managerRouter.get("/actividades", managerController.getActividades);
-  managerRouter.get(
-    "/actividades/fotos",
-    managerController.getActividadesFotos
-  );
+  managerRouter.get("/actividades/fotos", managerController.getActividadesFotos);
   //POST
   managerRouter.post("/sistemas/modulo", managerController.saveModuloSistema);
   managerRouter.post("/sistemas/grupo", managerController.saveGrupoSistema);

@@ -26,6 +26,8 @@ export const createAuthenticateRouter = () => {
 
   //ROLES
   AuthenticateRouter.get("/rol", validarToken, authenticateController.getRol);
+  AuthenticateRouter.put("/rol/descarga", validarToken, authenticateController.putRolDescarga);
+  AuthenticateRouter.get("/rol/descarga", validarToken, authenticateController.getRolPermitirDescarga); 
   AuthenticateRouter.get(
     "/rol/tools/:id",
     authenticateController.getToolsByRol
