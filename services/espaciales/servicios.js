@@ -18,6 +18,7 @@ export class ServiciosService {
             [Op.or]: [
               { codlocal: { [Op.iLike]: `%${searchText}%` } },
               { cen_ed_etq: { [Op.iLike]: `%${searchText}%` } },
+              { dir_cen: { [Op.iLike]: `%${searchText}%` } },
             ],
           },
           limit: 10,
@@ -29,6 +30,7 @@ export class ServiciosService {
             [Op.or]: [
               { codunico: { [Op.iLike]: `%${searchText}%` } },
               { nombestabl: { [Op.iLike]: `%${searchText}%` } },
+              { direccion: { [Op.iLike]: `%${searchText}%` } },
             ],
           },
           limit: 10,

@@ -13,12 +13,23 @@ export async function sendMail({ to, name, subject, body }) {
 
   console.log(SMTP_EMAIL, SMTP_PASSWORD);
   const transport = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465, // Prueba también con 587 si 465 falla
+    secure: true, // true para 465, false para 587 con STARTTLS
     auth: {
-      user: SMTP_EMAIL,
-      pass: SMTP_PASSWORD,
+        user: SMTP_EMAIL,
+        pass: SMTP_PASSWORD, // Usa una contraseña de aplicaciones en lugar de la normal
     },
   });
+
+  transport.verify((error, success) => {
+    if (error) {
+        console.error("Error de conexión SMTP:", error);
+    } else {
+        console.log("Servidor SMTP listo para enviar correos");
+    }
+  });
+
   try {
     const testResult = await transport.verify();
     console.log(testResult);
