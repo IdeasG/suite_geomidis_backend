@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { cacheMiddleware } from "../../../middlewares/redis.js";
 
 import { UbicacionPredioController } from "../../../controllers/fichas/individual/ubicacionPredio.js";
 

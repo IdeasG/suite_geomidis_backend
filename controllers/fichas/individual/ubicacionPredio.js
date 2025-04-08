@@ -2,8 +2,6 @@ import "dotenv/config";
 
 import { UbicacionPredioService } from "../../../services/fichas/individual/ubicacionPredio.js";
 
-import { redisClient } from "../../../config/redis/redis.js";
-
 const ubicacionPredioService = new UbicacionPredioService();
 
 export class UbicacionPredioController {

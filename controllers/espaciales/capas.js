@@ -3,9 +3,6 @@ import "dotenv/config";
 import { validatePagination } from "../../schemas/generales/pagination.js";
 
 import { CapasService } from "../../services/espaciales/capas.js";
-
-import { redisClient } from "../../config/redis/redis.js";
-
 import { sequelize } from "../../config/postgres/sequelize.js";
 import excel from "exceljs/dist/es5/index.js";
 import zip from "shp-write/src/zip.js";

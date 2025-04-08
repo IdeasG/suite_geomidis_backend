@@ -1,7 +1,5 @@
 import { Router } from "express";
 import { CapasController } from "../../controllers/espaciales/capas.js";
-
-import { cacheMiddleware } from "../../middlewares/redis.js";
 import { validarToken } from "../../middlewares/auth.js";
 
 export const createRouteCapas = () => {
@@ -10,13 +8,13 @@ export const createRouteCapas = () => {
   const capasController = new CapasController();
   // obtener capas
   CapaRouter.get("/publicados/geoportal", capasController.getPublicadosGeoportal);
-  CapaRouter.get("/table", cacheMiddleware, capasController.getAllCapasTable);
+  CapaRouter.get("/table",  capasController.getAllCapasTable);
   CapaRouter.get(
     "/table/externo",
-    cacheMiddleware,
+    
     capasController.getAllCapasTableExterno
   );
-  CapaRouter.get("/", cacheMiddleware, capasController.getAllCapas);
+  CapaRouter.get("/",  capasController.getAllCapas);
   CapaRouter.get(
     "/interno",
     validarToken,
@@ -24,70 +22,70 @@ export const createRouteCapas = () => {
   );
   CapaRouter.get(
     "/atributos/:tabla",
-    cacheMiddleware,
+    
     capasController.getAtributos
   );
-  CapaRouter.get("/grupos", cacheMiddleware, capasController.getAllCapasGrupos);
+  CapaRouter.get("/grupos",  capasController.getAllCapasGrupos);
   CapaRouter.get(
     "/supergrupos",
-    cacheMiddleware,
+    
     capasController.getAllCapasSupergrupos
   );
   CapaRouter.get(
     "/tablas/esquema",
-    cacheMiddleware,
+    
     capasController.getAllTablasEspaciales
   );
   // registrar capas
-  CapaRouter.post("/", cacheMiddleware, validarToken, capasController.getAllCapasPost);
+  CapaRouter.post("/",  validarToken, capasController.getAllCapasPost);
   CapaRouter.post(
     "/grupos",
-    cacheMiddleware,
+    
     capasController.getAllCapasGruposPost
   );
   CapaRouter.post(
     "/supergrupos",
-    cacheMiddleware,
+    
     capasController.getAllCapasSupergruposPost
   );
   // actualizar capas
-  CapaRouter.put("/", cacheMiddleware, validarToken, capasController.getAllCapasPut);
+  CapaRouter.put("/",  validarToken, capasController.getAllCapasPut);
   CapaRouter.put(
     "/grupos",
-    cacheMiddleware,
+    
     capasController.getAllCapasGruposPut
   );
   CapaRouter.put(
     "/supergrupos",
-    cacheMiddleware,
+    
     capasController.getAllCapasSupergruposPut
   );
   // eliminar capas
   CapaRouter.delete(
     "/:id_capa",
-    cacheMiddleware,
+    
     validarToken,
     capasController.getAllCapasDelete
   );
   CapaRouter.delete(
     "/grupos/:id_grupo",
-    cacheMiddleware,
+    
     capasController.getAllCapasGruposDelete
   );
   CapaRouter.delete(
     "/supergrupos/:id_super_grupo",
-    cacheMiddleware,
+    
     capasController.getAllCapasSupergruposDelete
   );
 
-  CapaRouter.get("/vistas", cacheMiddleware, capasController.getVistas);
+  CapaRouter.get("/vistas",  capasController.getVistas);
   CapaRouter.delete(
     "/vistas/:id_vista",
-    cacheMiddleware,
+    
     capasController.deleteVistas
   );
-  CapaRouter.post("/vistas", cacheMiddleware, capasController.postVistas);
-  // CapaRouter.get("/estructura", cacheMiddleware, capasController.getStructure);
+  CapaRouter.post("/vistas",  capasController.postVistas);
+  // CapaRouter.get("/estructura",  capasController.getStructure);
   CapaRouter.get("/estructura", validarToken, capasController.getStructure);
   CapaRouter.get(
     "/estructura/:id_geoportal",

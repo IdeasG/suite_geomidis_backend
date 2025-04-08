@@ -4,8 +4,6 @@ import { validatePagination } from "../../../schemas/generales/pagination.js";
 
 import { CapasSuperGrupoService } from "../../../services/maestros/administracion/capasSuperGrupo.js";
 
-import { redisClient } from "../../../config/redis/redis.js";
-
 const tipoViaService = new CapasSuperGrupoService();
 
 export class CapasSuperGrupoController {

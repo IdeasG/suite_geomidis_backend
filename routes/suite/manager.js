@@ -99,11 +99,7 @@ export const createManagerRouter = () => {
   managerRouter.post("/clientes", managerController.saveCliente);
 
   //DELETE CLIENTES
-  managerRouter.delete(
-    "/clientes/sistemas/:id_cliente/:id",
-    managerController.deleteSistemasByCliente
-  );
-
+  managerRouter.delete("/clientes/sistemas/:id_cliente/:id", managerController.deleteSistemasByCliente);
   managerRouter.delete("/clientes/:id", managerController.deleteCliente);
 
   //GEOPORTALES

@@ -4,8 +4,6 @@ import { validatePagination } from "../../../schemas/generales/pagination.js";
 
 import { TipoViaService } from "../../../services/maestros/general/tipoVias.js";
 
-import { redisClient } from "../../../config/redis/redis.js";
-
 const tipoViaService = new TipoViaService();
 
 export class TipoViaController {
@@ -18,16 +16,7 @@ export class TipoViaController {
     }
     const { page = 1, pageSize = 5 } = result.data;
     try {
-      const cacheKey = req.originalUrl;
-      const cachedResponse = await redisClient.get(cacheKey);
-      if (cachedResponse) {
-        const parsedResponse = JSON.parse(cachedResponse);
-        return res.json(parsedResponse);
-      }
       const tipoVias = await tipoViaService.getAllTipoVias(page, pageSize);
-      const cacheExpiry = process.env.REDIS_TIME_CACHE;
-      await redisClient.setex(cacheKey, cacheExpiry, JSON.stringify(tipoVias));
-
       res.json(tipoVias);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -103,14 +92,6 @@ export class TipoViaController {
   };
   async clearCache(req, res) {
     try {
-      const cacheKey = req.originalUrl;
-      const deletedKeysCount = await redisClient.del(cacheKey);
-
-      if (deletedKeysCount === 1) {
-        return res.json({ message: "Caché eliminado con éxito" });
-      } else {
-        return res.json({ message: "La clave de caché no fue encontrada" });
-      }
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

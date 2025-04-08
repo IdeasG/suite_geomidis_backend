@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { redisClient } from "../../../config/redis/redis.js";
 import { CondDeclaranteService } from "../../../services/maestros/general/condDeclarante.js";
 
 const controllerService = new CondDeclaranteService();
@@ -78,14 +77,6 @@ export class CondDeclaranteController {
   };
   async clearCache(req, res) {
     try {
-      const cacheKey = req.originalUrl;
-      const deletedKeysCount = await redisClient.del(cacheKey);
-
-      if (deletedKeysCount === 1) {
-        return res.json({ message: "Caché eliminado con éxito" });
-      } else {
-        return res.json({ message: "La clave de caché no fue encontrada" });
-      }
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

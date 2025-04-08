@@ -1,6 +1,4 @@
 import { CondNumeracionService } from "../../../services/maestros/general/condNumeracion.js";
-import { redisClient } from "../../../config/redis/redis.js";
-
 const condNumeracionService = new CondNumeracionService();
 
 export class CondNumeracionController {
@@ -8,17 +6,7 @@ export class CondNumeracionController {
 
   async getAll(req, res) {
     try {
-      const cacheKey = req.originalUrl;
-      const deletedKeysCount = await redisClient.del(cacheKey);
-      const cachedResponse = await redisClient.get(cacheKey);
-      if (cachedResponse) {
-        const parsedResponse = JSON.parse(cachedResponse);
-        return res.json(parsedResponse);
-      }
       const data = await condNumeracionService.getAllCondNumeracion();
-      const cacheExpiry = process.env.REDIS_TIME_CACHE;
-      await redisClient.setex(cacheKey, cacheExpiry, JSON.stringify(data));
-
       res.json(data);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -42,14 +30,7 @@ export class CondNumeracionController {
   }
   async clearCache(req, res) {
     try {
-      const cacheKey = req.originalUrl;
-      const deletedKeysCount = await redisClient.del(cacheKey);
 
-      if (deletedKeysCount === 1) {
-        return res.json({ message: "Caché eliminado con éxito" });
-      } else {
-        return res.json({ message: "La clave de caché no fue encontrada" });
-      }
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

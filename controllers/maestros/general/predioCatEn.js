@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { redisClient } from "../../../config/redis/redis.js";
 import { PredioCatEnService } from "../../../services/maestros/general/predioCatEn.js";
 
 const controllerService = new PredioCatEnService();
@@ -79,14 +78,6 @@ export class PredioCatEnController {
   };
   async clearCache(req, res) {
     try {
-      const cacheKey = req.originalUrl;
-      const deletedKeysCount = await redisClient.del(cacheKey);
-
-      if (deletedKeysCount === 1) {
-        return res.json({ message: "Caché eliminado con éxito" });
-      } else {
-        return res.json({ message: "La clave de caché no fue encontrada" });
-      }
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
