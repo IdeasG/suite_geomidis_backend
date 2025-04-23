@@ -602,17 +602,17 @@ export class CapasService {
 
   async filtroServiciosAreaNoCob(tabla, where, leftjoin, nombEst) {
     try {
-      console.log(`
-        select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,pobl.area as area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital,cp.geom, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
-        left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
-        left join espaciales.poblaciones pobl on espaciales.${tabla}.id_ccpp = pobl.cod_ccpp
-        left join ${leftjoin}
-        WHERE ${where}
-        order by id_ccpp, distancia_km asc
-        )
-        as newTable
-        order by distancia_km asc
-      `);
+      // console.log(`
+      //   select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,pobl.area as area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital,cp.geom, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
+      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+      //   left join espaciales.poblaciones pobl on espaciales.${tabla}.id_ccpp = pobl.cod_ccpp
+      //   left join ${leftjoin}
+      //   WHERE ${where}
+      //   order by id_ccpp, distancia_km asc
+      //   )
+      //   as newTable
+      //   order by distancia_km asc
+      // `);
       
       const [results, metadata] = await sequelize.query(`
         select newTable.* from (SELECT DISTINCT ON (id_ccpp) id_ccpp as id_grupo, espaciales.${tabla}.*,cp.nombccpp,pobl.area as area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital,cp.geom, nomb.${nombEst} as nombre_lugar  FROM espaciales.${tabla}
