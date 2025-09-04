@@ -8,35 +8,43 @@ import IieeEducacionGeog from "../../models/espaciales/iieeEducacionGeog.js";
 export class ServiciosService {
   async buscarServicios(tipo, searchText) {
     try {
-      console.log(searchText);
-
       let results;
       if (tipo == 'E') {
-        // Búsqueda en espaciales.iiee por `vcodmodula` usando ILIKE y limitando a 10 resultados
+        // Búsqueda avanzada: todas las palabras deben estar en al menos uno de los campos
+        const palabras = searchText.trim().split(/\s+/);
         results = await IieeEducacionGeog.findAll({
           where: {
-            [Op.or]: [
-              { codlocal: { [Op.iLike]: `%${searchText}%` } },
-              { cen_ed_etq: { [Op.iLike]: `%${searchText}%` } },
-              { dir_cen: { [Op.iLike]: `%${searchText}%` } },
-            ],
+            [Op.and]: palabras.map(palabra => ({
+              [Op.or]: [
+                { cen_ed_etq: { [Op.iLike]: `%${palabra}%` } },
+                { dir_cen: { [Op.iLike]: `%${palabra}%` } },
+                { codlocal: { [Op.iLike]: `%${palabra}%` } },
+                { d_dpto: { [Op.iLike]: `%${palabra}%` } },
+                { d_prov: { [Op.iLike]: `%${palabra}%` } },
+                { d_dist: { [Op.iLike]: `%${palabra}%` } },
+              ]
+            }))
           },
           limit: 10,
         });
       } else if (tipo == 'S') {
-        // Búsqueda en espaciales.eess por `código_ú` usando ILIKE y limitando a 10 resultados
+        const palabras = searchText.trim().split(/\s+/);
         results = await EessIpresSaludGeog.findAll({
           where: {
-            [Op.or]: [
-              { codunico: { [Op.iLike]: `%${searchText}%` } },
-              { nombestabl: { [Op.iLike]: `%${searchText}%` } },
-              { direccion: { [Op.iLike]: `%${searchText}%` } },
-            ],
+            [Op.and]: palabras.map(palabra => ({
+              [Op.or]: [
+                { nombestabl: { [Op.iLike]: `%${palabra}%` } },
+                { direccion: { [Op.iLike]: `%${palabra}%` } },
+                { codunico: { [Op.iLike]: `%${palabra}%` } },
+                { departamen: { [Op.iLike]: `%${palabra}%` } },
+                { provincia: { [Op.iLike]: `%${palabra}%` } },
+                { distrito: { [Op.iLike]: `%${palabra}%` } },
+              ]
+            }))
           },
           limit: 10,
         });
       }
-
       return {
         status: "success",
         data: results,

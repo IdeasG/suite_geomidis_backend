@@ -207,7 +207,7 @@ export class AuthenticateService {
           id: id_geoportal,
         },
       });
-
+      console.log(geoportal);
       let data = [];
 
       const rol = await TgUsuario.findOne({

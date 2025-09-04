@@ -1,5 +1,7 @@
 import express from "express";
+import expressStatusMonitor from "express-status-monitor";
 import { corsMiddleware } from "./middlewares/cors.js";
+import { validarToken } from "./middlewares/auth.js";
 import "dotenv/config";
 
 import { createUbicacionPredioRouter } from "./routes/fichas/individual/ubicacionPredio.js";
@@ -29,11 +31,16 @@ import { setupRasterRoutes } from "./setup/routeRasterSetup.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+
 const app = express();
+app.use(expressStatusMonitor());
 app.use(express.json({ limit: "500mb" }));
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use(corsMiddleware());
 app.use(express.static(path.join(__dirname, "")));
+
+// Ruta protegida para el monitor de estado
+app.get("/status-monitor", validarToken, expressStatusMonitor().pageRoute);
 
 app.disable("x-powered-by");
 

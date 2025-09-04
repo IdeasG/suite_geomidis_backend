@@ -10,6 +10,10 @@ export class ManagerController {
 
   async getSistemas(req, res) {
     try {
+      const { n_acceso } = req.user;
+      if (!n_acceso||n_acceso < 10) {
+        return res.status(401).json({ error: "Acceso denegado" });
+      }
       const data = await managerService.getSistemas();
       res.status(200).json(data);
     } catch (error) {
@@ -407,6 +411,11 @@ export class ManagerController {
       terminos_condiciones
     } = req.body;
     try {
+      const { n_acceso } = req.user;
+      if (!n_acceso||n_acceso < 10) {
+        return res.status(401).json({ error: "Acceso denegado" });
+      }
+
       const data = await managerService.saveGeoportales(
         nombre,
         color_primary,
@@ -515,6 +524,10 @@ export class ManagerController {
     } = req.body;
     const { id } = req.params;
     try {
+      const { n_acceso } = req.user;
+      if (!n_acceso||n_acceso < 10) {
+        return res.status(401).json({ error: "Acceso denegado" });
+      }
       const data = await managerService.editGeoportales(
         id,
         nombre,
@@ -536,6 +549,10 @@ export class ManagerController {
   async deleteGeoportales(req, res) {
     const { id } = req.params;
     try {
+      const { n_acceso } = req.user;
+      if (!n_acceso || n_acceso < 10) {
+        return res.status(401).json({ error: "Acceso denegado" });
+      }
       const data = await managerService.deleteGeoportales(id);
       res.status(200).json(data);
     } catch (error) {
