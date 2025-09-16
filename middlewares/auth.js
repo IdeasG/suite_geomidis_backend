@@ -17,6 +17,7 @@ export function validarToken(req, res, next) {
       id: decoded.id,
       id_cliente: decoded.id_cliente,
       id_rol: decoded.id_rol ?? 0,
+      n_acceso: decoded.n_acceso ?? 1,
     };
     next();
   } catch (error) {

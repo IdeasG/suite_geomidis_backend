@@ -6,6 +6,7 @@ export function generarToken(usuario, expiredIn = "1d") {
     id: usuario.id_usuario,
     id_cliente: usuario.id_cliente,
     id_rol: usuario.rol_id ?? 0,
+    n_acceso: usuario.n_acceso ?? 1,
   };
 
   const opciones = {

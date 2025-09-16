@@ -1,3 +1,4 @@
+
 import { generarToken, refreshTokenUser } from "../../helpers/auth.js";
 import {
   comparePassword,
@@ -207,7 +208,7 @@ export class AuthenticateService {
           id: id_geoportal,
         },
       });
-      console.log(geoportal);
+      // console.log(geoportal);
       let data = [];
 
       const rol = await TgUsuario.findOne({
@@ -402,6 +403,23 @@ export class AuthenticateService {
       console.log(error);
       throw new Error("Error al obtener el servicio.");
     }
+  }
+
+  async buscarUsuariosInternosPorNombre(nombre, id_cliente) {
+    // Busca por nombres, ape_paterno, ape_materno usando ILIKE y limit 10
+    return await IntAuthenticate.findAll({
+      params: ["id_usuario", "nombres", "ape_paterno", "ape_materno", "usuario"],
+      where: {
+        id_cliente,
+        [Op.or]: [
+          { nombres: { [Op.iLike]: `%${nombre}%` } },
+          { ape_paterno: { [Op.iLike]: `%${nombre}%` } },
+          { ape_materno: { [Op.iLike]: `%${nombre}%` } },
+          { usuario: { [Op.iLike]: `%${nombre}%` } }
+        ]
+      },
+      limit: 10
+    });
   }
 
   async createUsuariosByGeoportal(id, usuario, contrasena) {

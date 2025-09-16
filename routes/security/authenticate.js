@@ -1,3 +1,4 @@
+// Buscar usuarios internos por nombre
 import { Router } from "express";
 import { AuthenticateController } from "../../controllers/security/authenticate.js";
 import { validarRefreshToken, validarToken } from "../../middlewares/auth.js";
@@ -40,6 +41,8 @@ export const createAuthenticateRouter = () => {
   AuthenticateRouter.delete("/geoportal/usuarios/:id", validarToken, authenticateController.deleteUsuariosByGeoportal);
 
   AuthenticateRouter.get("/geoportal/internos", validarToken, authenticateController.getUsuariosInternoByGeoportal);
+  
+  AuthenticateRouter.get("/geoportal/internos/buscar/:nombre", validarToken, authenticateController.buscarUsuariosInternosPorNombre);
 
   AuthenticateRouter.put("/geoportal/internos/:id_usuario", validarToken, authenticateController.updateUsuariosInternoByGeoportal);
 

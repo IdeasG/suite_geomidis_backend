@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../config/postgres/sequelize.js";
 
-const Authenticate = sequelize.define(
+const   Authenticate = sequelize.define(
   "tseg_usuarios",
   {
     id_usuario: {
@@ -30,6 +30,9 @@ const Authenticate = sequelize.define(
     },
     d_usuario: {
       type: DataTypes.TIME,
+    },
+    n_acceso: {
+      type: DataTypes.INTEGER,
     },
   },
   {

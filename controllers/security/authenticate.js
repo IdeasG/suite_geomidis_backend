@@ -133,6 +133,17 @@ export class AuthenticateController {
     }
   }
 
+  async buscarUsuariosInternosPorNombre(req, res) {
+    const { nombre } = req.params;
+    const { id_cliente } = req.user;
+    try {
+      const data = await authenticateService.buscarUsuariosInternosPorNombre(nombre, id_cliente);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async createUsuariosByGeoportal(req, res) {
     const { id, usuario, contrasena } = req.body;
     try {
