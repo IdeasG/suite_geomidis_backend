@@ -86,6 +86,7 @@ export const createRouteCapas = () => {
   );
   CapaRouter.post("/vistas",  capasController.postVistas);
   // CapaRouter.get("/estructura",  capasController.getStructure);
+  // console.log("RUTA CAPAS");
   CapaRouter.get("/estructura", validarToken, capasController.getStructure);
   CapaRouter.get(
     "/estructura/:id_geoportal",
