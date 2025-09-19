@@ -1257,10 +1257,11 @@ export class CapasController {
         { key: 'B', width: 30 },
         { key: 'C', width: 30 },
         { key: 'D', width: 30 },
-        { key: 'E', width: 30 }
+        { key: 'E', width: 30 },
+        { key: 'F', width: 30 }
       ];
       // Título principal (A1:E1)
-      worksheetRG.mergeCells('A1:E1');
+      worksheetRG.mergeCells('A1:F1');
       worksheetRG.getCell('A1').value = 'Análisis de la demanda por área geográfica';
       worksheetRG.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
       worksheetRG.getCell('A1').font = { bold: true, color: { argb: 'FFFFFF' }, size: 14 };
@@ -1272,7 +1273,7 @@ export class CapasController {
       worksheetRG.getRow(1).height = 25;
 
       // Subtítulo (A2:E2)
-      worksheetRG.mergeCells('A2:E2');
+      worksheetRG.mergeCells('A2:F2');
       worksheetRG.getCell('A2').value = 'Cobertura de Servicios de Educación públicos nivel secundaria dentro de 10 km / 2 horas';
       worksheetRG.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
       worksheetRG.getCell('A2').font = { bold: true, color: { argb: '1F4E78' }, size: 12 };
@@ -1327,10 +1328,11 @@ export class CapasController {
       });
       const tablaDatosCercanos = datosResumen.newDataTableCercanos.map(item => ({
         "1": item.ubigeo,
-        "2": item.nombre,
-        "3": item.codigo,
-        "4": item.tipo,
-        "5": item.kil,
+        "2": item.nombccpp,
+        "3": item.nombre,
+        "4": item.codigo,
+        "5": item.tipo,
+        "6": item.kil,
       })); 
       const borderStylesCercanos = {
         top: { style: 'thin', color: { argb: '0070f0' } },
@@ -1345,19 +1347,22 @@ export class CapasController {
       worksheetRG.getCell('A22').font = { bold: true };
       worksheetRG.getCell(23,1).value = 'IDCCPP'
       worksheetRG.getCell(23,2).value = 'Nombre de centro poblado'
-      worksheetRG.getCell(23,3).value = 'Código modular'
-      worksheetRG.getCell(23,4).value = tipoServicio == "S" ? 'Categoría':'Nivel'
-      worksheetRG.getCell(23,5).value = 'Kilómetro(s)/minuto(s)'
+      worksheetRG.getCell(23,3).value = 'Código ' + (tipoServicio == "S" ? 'EE.SS.':'modular')
+      worksheetRG.getCell(23,4).value = 'Nombre de ' + (tipoServicio == "S" ? 'establecimiento de salud':'institución educativa')
+      worksheetRG.getCell(23,5).value = tipoServicio == "S" ? 'Categoría':'Nivel'
+      worksheetRG.getCell(23,6).value = 'Kilómetro(s)/minuto(s)'
       worksheetRG.getCell(23,1).border = borderStylesCercanos
       worksheetRG.getCell(23,2).border = borderStylesCercanos
       worksheetRG.getCell(23,3).border = borderStylesCercanos
       worksheetRG.getCell(23,4).border = borderStylesCercanos
       worksheetRG.getCell(23,5).border = borderStylesCercanos
+      worksheetRG.getCell(23,6).border = borderStylesCercanos
       worksheetRG.getCell(23,1).font = { bold: true };
       worksheetRG.getCell(23,2).font = { bold: true };
       worksheetRG.getCell(23,3).font = { bold: true };
       worksheetRG.getCell(23,4).font = { bold: true };
       worksheetRG.getCell(23,5).font = { bold: true };
+      worksheetRG.getCell(23,6).font = { bold: true };
       // Agregar los datos de resumen y aplicar bordes verdes a cada celda
       tablaDatosCercanos.forEach((row, index) => {
         const rowIndex = index + 24; // Fila 23 en adelante
@@ -1366,7 +1371,11 @@ export class CapasController {
         worksheetRG.getCell(`C${rowIndex}`).value = row["3"];
         worksheetRG.getCell(`D${rowIndex}`).value = row["4"];
         worksheetRG.getCell(`E${rowIndex}`).value = row["5"];
-        for (let i = 1; i <= 5; i++) {
+        worksheetRG.getCell(`F${rowIndex}`).value = row["6"];
+        for (let i = 1; i <= 6; i++) {
+          worksheetRG.getCell(rowIndex, i).alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+        }
+        for (let i = 1; i <= 6; i++) {
           worksheetRG.getCell(rowIndex, i).border = borderStylesCercanos;
         }
       });
@@ -1421,7 +1430,7 @@ export class CapasController {
         })
       }
       const fuenteStartRow = tablaDatosCercanos.length + 25;
-      worksheetRG.mergeCells(`A${fuenteStartRow}:E${fuenteStartRow + 4}`);
+      worksheetRG.mergeCells(`A${fuenteStartRow}:F${fuenteStartRow + 4}`);
       worksheetRG.getCell(`A${fuenteStartRow}`).value =
         "Fuente:\nPlataforma de Estadística de la Calidad Educativa (ESCALE), 2023.\nRegistro Nacional de Instituciones Prestadoras de Servicios de Salud (RENIPRESS), 2024.\nCentros poblados del Instituto Nacional de Estadística e Informática (INEI), 2023.\nProgramas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2024.";
       worksheetRG.getCell(`A${fuenteStartRow}`).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
