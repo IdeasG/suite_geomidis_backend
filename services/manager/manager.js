@@ -259,9 +259,51 @@ async getRolByIdCliente(id_cliente) {
           fk_rol: fk_rol,
         },
       });
+      
       if (orden) {
-        orden = orden.dataValues.j_orden
+        orden = orden.dataValues.j_orden;
+        
+        // Obtener solo los IDs de capas de tipo "interno" para consultar sus estilos
+        const capaInternaIds = [];
+        for (const supergrupo of orden) {
+          for (const grupo of supergrupo.grupos || []) {
+            for (const capa of grupo.capas || []) {
+              if (capa.c_tipo === "interno") {
+                capaInternaIds.push(capa.id_capa);
+              }
+            }
+          }
+        }
+        
+        // Consultar estilos solo de capas internas
+        let estilosPorCapa = {};
+        if (capaInternaIds.length > 0) {
+          const [estilosResults] = await sequelize.query(`
+            SELECT id_capa, c_estilo
+            FROM administracion.tadm_capas_estilos
+            WHERE id_capa IN (${capaInternaIds.join(',')})
+            ORDER BY id_capa, id
+          `);
+          
+          // Agrupar estilos por id_capa
+          estilosResults.forEach(estilo => {
+            if (!estilosPorCapa[estilo.id_capa]) {
+              estilosPorCapa[estilo.id_capa] = [];
+            }
+            estilosPorCapa[estilo.id_capa].push(estilo.c_estilo);
+          });
+        }
+        
+        // Agregar estilos a cada capa (solo las internas tendrán estilos, las externas tendrán array vacío)
+        for (const supergrupo of orden) {
+          for (const grupo of supergrupo.grupos || []) {
+            for (const capa of grupo.capas || []) {
+              capa.estilos = estilosPorCapa[capa.id_capa] || [];
+            }
+          }
+        }
       }
+      
       return orden;
     } catch (error) {
       throw new Error("Error al crear " + error);
@@ -278,6 +320,7 @@ async getRolByIdCliente(id_cliente) {
           where fk_rol=${fk_rol}`
           );
           const dbResponse = superGrupos;
+          
           for (let index = 0; index < superGrupos.length; index++) {
             const element = superGrupos[index];
             const [grupos, metadata] = await sequelize.query(
@@ -296,10 +339,52 @@ async getRolByIdCliente(id_cliente) {
                 inner join administracion.rol_capas rc on tc.id_capa=rc.fk_capa
                 where fk_rol=${fk_rol} and tc.id_grupo = ${element.id_grupo}`
               );
+              
               element.capas = capas;
             }
             element.grupos = grupos;
           }
+          
+          // Obtener solo los IDs de capas de tipo "interno" para consultar sus estilos
+          const capaInternaIds = [];
+          for (const supergrupo of dbResponse) {
+            for (const grupo of supergrupo.grupos || []) {
+              for (const capa of grupo.capas || []) {
+                if (capa.c_tipo === "interno") {
+                  capaInternaIds.push(capa.id_capa);
+                }
+              }
+            }
+          }
+          
+          // Consultar estilos solo de capas internas
+          let estilosPorCapa = {};
+          if (capaInternaIds.length > 0) {
+            const [estilosResults] = await sequelize.query(`
+              SELECT id_capa, c_estilo
+              FROM administracion.tadm_capas_estilos
+              WHERE id_capa IN (${capaInternaIds.join(',')})
+              ORDER BY id_capa, id
+            `);
+            
+            // Agrupar estilos por id_capa
+            estilosResults.forEach(estilo => {
+              if (!estilosPorCapa[estilo.id_capa]) {
+                estilosPorCapa[estilo.id_capa] = [];
+              }
+              estilosPorCapa[estilo.id_capa].push(estilo.c_estilo);
+            });
+          }
+          
+          // Agregar estilos a cada capa (solo las internas tendrán estilos, las externas tendrán array vacío)
+          for (const supergrupo of dbResponse) {
+            for (const grupo of supergrupo.grupos || []) {
+              for (const capa of grupo.capas || []) {
+                capa.estilos = estilosPorCapa[capa.id_capa] || [];
+              }
+            }
+          }
+          
         await OrdenCapa.create({
           fk_rol,
           j_orden: dbResponse,

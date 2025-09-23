@@ -122,7 +122,8 @@ export class CapasController {
       c_url,
       c_servicio,
       c_url_seleccionado,
-      b_geoportal
+      b_geoportal,
+      estilos
     } = req.body;
     const {id,id_rol} = req.user;
     try {
@@ -140,7 +141,8 @@ export class CapasController {
         id,
         id_rol,
         c_url_seleccionado,
-        b_geoportal
+        b_geoportal,
+        estilos
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {
@@ -189,7 +191,8 @@ export class CapasController {
       c_url,
       c_servicio,
       c_url_seleccionado,
-      c_sql_capa
+      c_sql_capa,
+      estilos
     } = req.body;
     const {id,id_rol} = req.user;
     try {
@@ -208,7 +211,8 @@ export class CapasController {
         id,
         id_rol,
         c_url_seleccionado,
-        c_sql_capa
+        c_sql_capa,
+        estilos
       );
       res.status(200).json({ status: "success", data: capas });
     } catch (error) {

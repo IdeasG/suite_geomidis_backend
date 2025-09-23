@@ -40,7 +40,8 @@ app.use(corsMiddleware());
 app.use(express.static(path.join(__dirname, "")));
 
 // Ruta protegida para el monitor de estado
-app.get("/status-monitor", validarToken, expressStatusMonitor().pageRoute);
+// app.get("/status-monitor", validarToken, expressStatusMonitor().pageRoute);
+app.get("/status-monitor", expressStatusMonitor().pageRoute);
 
 app.disable("x-powered-by");
 

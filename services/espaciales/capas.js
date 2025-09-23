@@ -3,6 +3,7 @@ import { sequelize } from "../../config/postgres/sequelize.js";
 import Capas from "../../models/maestros/administracion/capas.js";
 import CapasGrupo from "../../models/maestros/administracion/capasGrupo.js";
 import CapasSuperGrupo from "../../models/maestros/administracion/capasSuperGrupo.js";
+import CapasEstilos from "../../models/maestros/administracion/capasEstilos.js";
 import Vistas from "../../models/manager/vistas.js";
 import InformacionRegistro from "../../models/manager/informacionRegistros.js";
 export class CapasService {
@@ -51,28 +52,58 @@ export class CapasService {
 
   async getAllCapasTable(offset,pageSize,currentPage) {
     try {
+      // Obtener capas con información básica
       const [results, metadata] = await sequelize.query(`
-      select * from administracion.tadm_capas_supergrupo sg
-      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'interno'
-      order by sg.c_nombre_super_grupo asc`
-      // limit `+ pageSize + ` offset ` + offset
-      );
-      const [resultsConteo, metadataConteo] = await sequelize.query(`
-      select count(*) as conteo from administracion.tadm_capas_supergrupo sg
-      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'interno'
+        select c.*, sg.c_nombre_super_grupo, g.c_nombre_grupo
+        from administracion.tadm_capas c
+        left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
+        left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
+        where c.c_tipo = 'interno'
+        order by sg.c_nombre_super_grupo asc, g.c_nombre_grupo asc, c.c_nombre_public_capa asc
       `);
-      const totalItems = parseInt(resultsConteo[0].conteo)
+
+      // Obtener todos los estilos de las capas
+      const [estilosResults, estilosMetadata] = await sequelize.query(`
+        select id_capa, c_estilo
+        from administracion.tadm_capas_estilos
+        where id_capa IN (${results.map(r => r.id_capa).join(',') || '0'})
+        order by id_capa, id
+      `);
+
+      // Agrupar estilos por capa
+      const estilosPorCapa = {};
+      estilosResults.forEach(estilo => {
+        if (!estilosPorCapa[estilo.id_capa]) {
+          estilosPorCapa[estilo.id_capa] = [];
+        }
+        estilosPorCapa[estilo.id_capa].push(estilo.c_estilo);
+      });
+
+      // Combinar datos de capas con sus estilos
+      const transformedData = results.map(capa => ({
+        ...capa,
+        estilos: estilosPorCapa[capa.id_capa] || []
+      }));
+
+      // Contar total de registros
+      const [resultsConteo, metadataConteo] = await sequelize.query(`
+        select count(*) as conteo 
+        from administracion.tadm_capas c
+        left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
+        left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
+        where c.c_tipo = 'interno'
+      `);
+
+      const totalItems = parseInt(resultsConteo[0].conteo);
       const totalPages = Math.ceil(totalItems / pageSize);
+      
       const data = {
-        data: results,
-        currentPage:1,
-        totalPages:1,
-        totalItems:totalItems
-      }
+        data: transformedData,
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: totalItems
+      };
+      
       return data;
     } catch (error) {
       throw new Error("Error al obtener los resultados..." + error);
@@ -81,28 +112,58 @@ export class CapasService {
 
   async getAllCapasTableExterno(offset,pageSize,currentPage) {
     try {
+      // Obtener capas externas con información básica
       const [results, metadata] = await sequelize.query(`
-      select * from administracion.tadm_capas_supergrupo sg
-      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'externo'
-      order by sg.c_nombre_super_grupo asc`
-      // limit `+ pageSize + ` offset ` + offset
-      );
-      const [resultsConteo, metadataConteo] = await sequelize.query(`
-      select count(*) as conteo from administracion.tadm_capas_supergrupo sg
-      left join administracion.tadm_capas_grupo g on sg.id_super_grupo = g.id_super_grupo
-      left join administracion.tadm_capas c on g.id_grupo = c.id_grupo
-      where c_tipo = 'externo'
+        select c.*, sg.c_nombre_super_grupo, g.c_nombre_grupo
+        from administracion.tadm_capas c
+        left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
+        left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
+        where c.c_tipo = 'externo'
+        order by sg.c_nombre_super_grupo asc, g.c_nombre_grupo asc, c.c_nombre_public_capa asc
       `);
-      const totalItems = parseInt(resultsConteo[0].conteo)
+
+      // Obtener todos los estilos de las capas externas
+      const [estilosResults, estilosMetadata] = await sequelize.query(`
+        select id_capa, c_estilo
+        from administracion.tadm_capas_estilos
+        where id_capa IN (${results.map(r => r.id_capa).join(',') || '0'})
+        order by id_capa, id
+      `);
+
+      // Agrupar estilos por capa
+      const estilosPorCapa = {};
+      estilosResults.forEach(estilo => {
+        if (!estilosPorCapa[estilo.id_capa]) {
+          estilosPorCapa[estilo.id_capa] = [];
+        }
+        estilosPorCapa[estilo.id_capa].push(estilo.c_estilo);
+      });
+
+      // Combinar datos de capas con sus estilos
+      const transformedData = results.map(capa => ({
+        ...capa,
+        estilos: estilosPorCapa[capa.id_capa] || []
+      }));
+
+      // Contar total de registros
+      const [resultsConteo, metadataConteo] = await sequelize.query(`
+        select count(*) as conteo 
+        from administracion.tadm_capas c
+        left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
+        left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
+        where c.c_tipo = 'externo'
+      `);
+
+      const totalItems = parseInt(resultsConteo[0].conteo);
       const totalPages = Math.ceil(totalItems / pageSize);
+      
       const data = {
-        data: results,
-        currentPage:1,
-        totalPages:1,
-        totalItems:totalItems
-      }
+        data: transformedData,
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: totalItems
+      };
+      
       return data;
     } catch (error) {
       throw new Error("Error al obtener los resultados..." + error);
@@ -233,10 +294,13 @@ export class CapasService {
     id_usuario_auditoria,
     id_rol_auditoria,
     c_url_seleccionado,
-    b_geoportal
+    b_geoportal,
+    estilos = []
   ) {
+    const transaction = await sequelize.transaction();
     try {
-      const response = await Capas.create({
+      // Registrar la capa
+      const capa = await Capas.create({
         id_grupo,
         c_nombre_tabla_capa,
         c_nombre_public_capa,
@@ -251,10 +315,23 @@ export class CapasService {
         id_rol_auditoria,
         c_url_seleccionado,
         b_geoportal
-      });
-      return response;
+      }, { transaction });
+
+      // Registrar los estilos si existen
+      if (estilos && estilos.length > 0) {
+        const estilosData = estilos.map(estilo => ({
+          id_capa: capa.id_capa,
+          c_estilo: estilo
+        }));
+
+        await CapasEstilos.bulkCreate(estilosData, { transaction });
+      }
+
+      await transaction.commit();
+      return capa;
     } catch (error) {
-      throw new Error("Error al obtener las capas visibles con el id_capa:");
+      await transaction.rollback();
+      throw new Error("Error al registrar la capa y sus estilos: " + error.message);
     }
   }
 
@@ -298,9 +375,12 @@ export class CapasService {
     id_usuario_auditoria,
     id_rol_auditoria,
     c_url_seleccionado,
-    c_sql_capa
+    c_sql_capa,
+    estilos = []
   ) {
+    const transaction = await sequelize.transaction();
     try {
+      // Actualizar la capa
       const response = await Capas.update(
         {
           id_grupo,
@@ -318,11 +398,30 @@ export class CapasService {
           c_url_seleccionado,
           c_sql_capa
         },
-        { where: { id_capa } }
+        { where: { id_capa }, transaction }
       );
+
+      // Eliminar estilos anteriores
+      await CapasEstilos.destroy({
+        where: { id_capa },
+        transaction
+      });
+
+      // Registrar los nuevos estilos si existen
+      if (estilos && estilos.length > 0) {
+        const estilosData = estilos.map(estilo => ({
+          id_capa: id_capa,
+          c_estilo: estilo
+        }));
+
+        await CapasEstilos.bulkCreate(estilosData, { transaction });
+      }
+
+      await transaction.commit();
       return response;
     } catch (error) {
-      throw new Error("Error al actualizar capas");
+      await transaction.rollback();
+      throw new Error("Error al actualizar la capa y sus estilos: " + error.message);
     }
   }
 

@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../../../config/postgres/sequelize.js";
+import CapasSuperGrupo from "./capasSuperGrupo.js";
 
 const capasGrupo = sequelize.define('tadm_capas_grupo', {
   // Model attributes are defined here
@@ -27,6 +28,11 @@ const capasGrupo = sequelize.define('tadm_capas_grupo', {
   schema: 'administracion',
   // Other model options go here
 });
+
+// Configurar relaciones
+capasGrupo.belongsTo(CapasSuperGrupo, { foreignKey: 'id_super_grupo', as: 'supergrupo' });
+CapasSuperGrupo.hasMany(capasGrupo, { foreignKey: 'id_super_grupo', as: 'grupos' });
+
 // `sequelize.define` also returns the model
 // console.log(User === sequelize.models.User); // true
 export default capasGrupo;

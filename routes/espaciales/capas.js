@@ -52,7 +52,6 @@ export const createRouteCapas = () => {
   CapaRouter.put("/",  validarToken, capasController.getAllCapasPut);
   CapaRouter.put(
     "/grupos",
-    
     capasController.getAllCapasGruposPut
   );
   CapaRouter.put(
