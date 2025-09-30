@@ -61,6 +61,10 @@ const capasGrupo = sequelize.define('tadm_capas', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  c_nombre_esquema:{
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   id_usuario_auditoria:{
     type: DataTypes.INTEGER,
     allowNull: true

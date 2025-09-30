@@ -100,9 +100,19 @@ export class CapasController {
     }
   }
 
-  async getAllTablasEspaciales(req, res) {
+  async getAllEsquemas(req, res) {
     try {
-      const response = await capasService.getAllTablasEspaciales();
+      const response = await capasService.getAllEsquemas();
+      res.status(200).json({ status: "success", data: response });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getAllTablasEspaciales(req, res) {
+    const { esquema } = req.params;
+    try {
+      const response = await capasService.getAllTablasEspaciales(esquema);
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -123,6 +133,7 @@ export class CapasController {
       c_servicio,
       c_url_seleccionado,
       b_geoportal,
+      c_nombre_esquema,
       estilos
     } = req.body;
     const {id,id_rol} = req.user;
@@ -142,6 +153,7 @@ export class CapasController {
         id_rol,
         c_url_seleccionado,
         b_geoportal,
+        c_nombre_esquema,
         estilos
       );
       res.status(200).json({ status: "success", data: capas });
@@ -192,6 +204,7 @@ export class CapasController {
       c_servicio,
       c_url_seleccionado,
       c_sql_capa,
+      c_nombre_esquema,
       estilos
     } = req.body;
     const {id,id_rol} = req.user;
@@ -212,6 +225,7 @@ export class CapasController {
         id_rol,
         c_url_seleccionado,
         c_sql_capa,
+        c_nombre_esquema,
         estilos
       );
       res.status(200).json({ status: "success", data: capas });

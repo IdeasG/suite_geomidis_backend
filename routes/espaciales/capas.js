@@ -32,7 +32,12 @@ export const createRouteCapas = () => {
     capasController.getAllCapasSupergrupos
   );
   CapaRouter.get(
-    "/tablas/esquema",
+    "/esquemas",
+    
+    capasController.getAllEsquemas
+  );
+  CapaRouter.get(
+    "/tablas/esquema/:esquema",
     
     capasController.getAllTablasEspaciales
   );

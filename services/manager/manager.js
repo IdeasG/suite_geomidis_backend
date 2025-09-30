@@ -602,6 +602,8 @@ async getRolByIdCliente(id_cliente) {
         "id_rol_auditoria": c.id_rol_auditoria,
         "c_url_seleccionado": c.c_url_seleccionado,
         "b_geoportal": c.b_geoportal,
+        "c_nombre_esquema": c.c_nombre_esquema,
+        "c_workspace": c.c_workspace,
       }))));
     
 

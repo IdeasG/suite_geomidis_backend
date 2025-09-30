@@ -169,17 +169,31 @@ export class CapasService {
       throw new Error("Error al obtener los resultados..." + error);
     }
   }
-  async getAllTablasEspaciales() {
+  async getAllEsquemas() {
+    try {
+      const [results, metadata] = await sequelize.query(`
+        SELECT schema_name
+        FROM information_schema.schemata
+        WHERE schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast')
+        ORDER BY schema_name ASC
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los esquemas..." + error);
+    }
+  }
+
+  async getAllTablasEspaciales(esquema) {
     try {
       const [results, metadata] = await sequelize.query(`
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema='espaciales'
-        order by table_name asc
+        WHERE table_schema='${esquema}'
+        ORDER BY table_name ASC
       `);
       return results;
     } catch (error) {
-      throw new Error("Error al obtener los resultados..." + error);
+      throw new Error("Error al obtener las tablas del esquema..." + error);
     }
   }
   async getAllCapasGrupos() {
@@ -255,6 +269,51 @@ export class CapasService {
   async getCapasVisibles(id_capa,id_rol) {
     try {
       const response = await CapasMostrar.findAll({ where: { id_capa, id_rol } });
+      
+      // Si existe respuesta, obtener información de la tabla y tipos de datos
+      if (response && response.length > 0) {
+        // Obtener información de la capa para conocer la tabla
+        const [capaInfo] = await sequelize.query(`
+          select c_nombre_tabla_capa, c_nombre_esquema from administracion.tadm_capas 
+          where id_capa = ${id_capa}
+        `);
+
+        if (capaInfo && capaInfo.length > 0) {
+          const nombreTabla = capaInfo[0].c_nombre_tabla_capa;
+          const esquema = capaInfo[0].c_nombre_esquema || 'espaciales';
+
+          // Obtener tipos de datos de los campos
+          const [tiposCampos] = await sequelize.query(`
+            SELECT column_name, data_type 
+            FROM information_schema.columns
+            WHERE table_name = '${nombreTabla}' AND table_schema = '${esquema}'
+          `);
+
+          // Crear un mapa de tipos de datos por nombre de campo
+          const tiposPorCampo = {};
+          tiposCampos.forEach(campo => {
+            tiposPorCampo[campo.column_name] = campo.data_type;
+          });
+
+          // Agregar tipo de dato a cada campo en c_array_campos
+          const responseConTipos = response.map(item => {
+            const itemData = item.toJSON ? item.toJSON() : item;
+            const camposConTipos = itemData.c_array_campos.map(campo => ({
+              ...campo,
+              c_tipo_dato: tiposPorCampo[campo.c_campo_original] || 'unknown'
+            }));
+
+            return {
+              ...itemData,
+              c_array_campos: camposConTipos
+            };
+          });
+
+          console.log(responseConTipos);
+          return responseConTipos;
+        }
+      }
+
       console.log(response);
       return response;
     } catch (error) {
@@ -271,7 +330,49 @@ export class CapasService {
         left join seguridad.tseg_roles tr on cm.id_rol = tr.id_rol
         where tr.id_cliente = `+ id_cliente +` and tr.c_nombre_rol ilike '%invitado%' and id_capa = `+ id_capa +`;
       `);
-      // console.log(response);
+
+      // Si existe respuesta, obtener información de la tabla y tipos de datos
+      if (response && response.length > 0) {
+        // Obtener información de la capa para conocer la tabla
+        const [capaInfo] = await sequelize.query(`
+          select c_nombre_tabla_capa, c_nombre_esquema from administracion.tadm_capas 
+          where id_capa = ${id_capa}
+        `);
+
+        if (capaInfo && capaInfo.length > 0) {
+          const nombreTabla = capaInfo[0].c_nombre_tabla_capa;
+          const esquema = capaInfo[0].c_nombre_esquema || 'espaciales';
+
+          // Obtener tipos de datos de los campos
+          const [tiposCampos] = await sequelize.query(`
+            SELECT column_name, data_type 
+            FROM information_schema.columns
+            WHERE table_name = '${nombreTabla}' AND table_schema = '${esquema}'
+          `);
+
+          // Crear un mapa de tipos de datos por nombre de campo
+          const tiposPorCampo = {};
+          tiposCampos.forEach(campo => {
+            tiposPorCampo[campo.column_name] = campo.data_type;
+          });
+
+          // Agregar tipo de dato a cada campo en c_array_campos
+          const responseConTipos = response.map(item => {
+            const camposConTipos = item.c_array_campos.map(campo => ({
+              ...campo,
+              c_tipo_dato: tiposPorCampo[campo.c_campo_original] || 'unknown'
+            }));
+
+            return {
+              ...item,
+              c_array_campos: camposConTipos
+            };
+          });
+
+          return responseConTipos;
+        }
+      }
+
       return response;
     } catch (error) {
       throw new Error(
@@ -295,6 +396,7 @@ export class CapasService {
     id_rol_auditoria,
     c_url_seleccionado,
     b_geoportal,
+    c_nombre_esquema,
     estilos = []
   ) {
     const transaction = await sequelize.transaction();
@@ -314,7 +416,8 @@ export class CapasService {
         id_usuario_auditoria,
         id_rol_auditoria,
         c_url_seleccionado,
-        b_geoportal
+        b_geoportal,
+        c_nombre_esquema
       }, { transaction });
 
       // Registrar los estilos si existen
@@ -376,6 +479,7 @@ export class CapasService {
     id_rol_auditoria,
     c_url_seleccionado,
     c_sql_capa,
+    c_nombre_esquema,
     estilos = []
   ) {
     const transaction = await sequelize.transaction();
@@ -396,7 +500,8 @@ export class CapasService {
           id_usuario_auditoria,
           id_rol_auditoria,
           c_url_seleccionado,
-          c_sql_capa
+          c_sql_capa,
+          c_nombre_esquema
         },
         { where: { id_capa }, transaction }
       );
@@ -791,17 +896,21 @@ export class CapasService {
         `select * from administracion.tadm_capas where id_capa = ${id_capa}`
       );
       const c_nombre_tabla_capa = results[0].c_nombre_tabla_capa;
+      const c_nombre_esquema = results[0].c_nombre_esquema || 'espaciales';
+      
       const [results2, metadata2] = await sequelize.query(`
-      SELECT column_name FROM information_schema.columns
-      WHERE table_schema = 'espaciales' AND table_name = '${c_nombre_tabla_capa}'`);
+      SELECT column_name, data_type FROM information_schema.columns
+      WHERE table_schema = '${c_nombre_esquema}' AND table_name = '${c_nombre_tabla_capa}'`);
+      
       let nuevasColumnas = [];
       for (let index in results2) {
-        const element = results2[index].column_name;
-        if (element !== "geom" && element !== "CODOBJ" && element !== "gid" && element !== "ideasg") {
+        const element = results2[index];
+        if (element.column_name !== "geom" && element.column_name !== "CODOBJ" && element.column_name !== "gid" && element.column_name !== "ideasg") {
           const registrados = {
-            c_campo_original: element,
-            c_campo_alias: element,
+            c_campo_original: element.column_name,
+            c_campo_alias: element.column_name,
             b_campo: false,
+            c_tipo_dato: element.data_type
           }
           nuevasColumnas.push(registrados);
         }
@@ -826,17 +935,21 @@ export class CapasService {
         `select * from administracion.tadm_capas where id_capa = ${id_capa}`
       );
       const c_nombre_tabla_capa = results[0].c_nombre_tabla_capa;
+      const c_nombre_esquema = results[0].c_nombre_esquema || 'espaciales';
+      
       const [results2, metadata2] = await sequelize.query(`
-      SELECT column_name FROM information_schema.columns
-      WHERE table_schema = 'espaciales' AND table_name = '${c_nombre_tabla_capa}'`);
+      SELECT column_name, data_type FROM information_schema.columns
+      WHERE table_schema = '${c_nombre_esquema}' AND table_name = '${c_nombre_tabla_capa}'`);
+      
       let nuevasColumnas = [];
       for (let index in results2) {
-        const element = results2[index].column_name;
-        if (element !== "geom" && element !== "CODOBJ" && element !== "gid" && element !== "ideasg") {
+        const element = results2[index];
+        if (element.column_name !== "geom" && element.column_name !== "CODOBJ" && element.column_name !== "gid" && element.column_name !== "ideasg") {
           const registrados = {
-            c_campo_original: element,
-            c_campo_alias: element,
+            c_campo_original: element.column_name,
+            c_campo_alias: element.column_name,
             b_campo: false,
+            c_tipo_dato: element.data_type
           }
           nuevasColumnas.push(registrados);
         }

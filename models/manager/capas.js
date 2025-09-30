@@ -46,6 +46,10 @@ const Capa = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    c_nombre_esquema: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     id_usuario_auditoria: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -61,6 +65,10 @@ const Capa = sequelize.define(
     b_geoportal: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
+    },
+    c_workspace: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
