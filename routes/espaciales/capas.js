@@ -82,13 +82,13 @@ export const createRouteCapas = () => {
     capasController.getAllCapasSupergruposDelete
   );
 
-  CapaRouter.get("/vistas",  capasController.getVistas);
+  CapaRouter.get("/vistas", validarToken, capasController.getVistas);
   CapaRouter.delete(
     "/vistas/:id_vista",
-    
+    validarToken,
     capasController.deleteVistas
   );
-  CapaRouter.post("/vistas",  capasController.postVistas);
+  CapaRouter.post("/vistas", validarToken, capasController.postVistas);
   // CapaRouter.get("/estructura",  capasController.getStructure);
   // console.log("RUTA CAPAS");
   CapaRouter.get("/estructura", validarToken, capasController.getStructure);

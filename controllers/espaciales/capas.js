@@ -10,6 +10,7 @@ import axios from "axios";
 import TgUsuario from "../../models/security/tgUsuario.js";
 import { Sequelize } from "sequelize";
 import Rol from "../../models/security/rol.js";
+import Vistas from "../../models/manager/vistas.js";
 import fs from "fs";
 import { log } from "console";
 
@@ -18,6 +19,56 @@ const capasService = new CapasService();
 export class CapasController {
   constructor() {}
 
+  // // Función helper para generar la fecha de reporte
+  // generarFechaReporte() {
+  //   try {
+  //     const ahora = new Date();
+      
+  //     // Crear fecha en zona horaria de Lima
+  //     const fechaLima = new Date(ahora.toLocaleString("en-US", {timeZone: "America/Lima"}));
+      
+  //     const meses = [
+  //       'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  //       'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  //     ];
+      
+  //     const dia = fechaLima.getDate().toString().padStart(2, '0');
+  //     const mes = meses[fechaLima.getMonth()];
+  //     const año = fechaLima.getFullYear();
+  //     const hora = fechaLima.getHours().toString().padStart(2, '0');
+  //     const minutos = fechaLima.getMinutes().toString().padStart(2, '0');
+      
+  //     return `Generado el ${dia} de ${mes} de ${año}, a las ${hora}:${minutos}H`;
+  //   } catch (error) {
+  //     console.error('Error en generarFechaReporte:', error);
+  //     return 'Fecha de generación no disponible';
+  //   }
+  // }
+
+  generarFechaReporte() {
+    try {
+      const ahora = new Date();
+      
+      // Crear fecha en zona horaria de Lima
+      const fechaLima = new Date(ahora.toLocaleString("en-US", {timeZone: "America/Lima"}));
+      
+      const meses = [
+        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      ];
+      
+      const dia = fechaLima.getDate().toString().padStart(2, '0');
+      const mes = meses[fechaLima.getMonth()];
+      const año = fechaLima.getFullYear();
+      const hora = fechaLima.getHours().toString().padStart(2, '0');
+      const minutos = fechaLima.getMinutes().toString().padStart(2, '0');
+      
+      return `Generado el ${dia} de ${mes} de ${año}, a las ${hora}:${minutos}H`;
+    } catch (error) {
+      console.error('Error en generarFechaReporte:', error);
+      return 'Fecha de generación no disponible';
+    }
+  }
   async getPublicadosGeoportal(req, res) {
     try {
       const response = await capasService.getPublicadosGeoportalIn()
@@ -503,41 +554,6 @@ export class CapasController {
     }
   }
 
-  async getVistas(req, res) {
-    // const { id_capa } = req.params;
-    try {
-      let dbResponse = await capasService.getVistas();
-      res.status(200).json({ status: "success", data: dbResponse });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  async deleteVistas(req, res) {
-    const { id_vista } = req.params;
-    try {
-      let dbResponse = await capasService.deleteVistas(id_vista);
-      res.status(200).json({ status: "success", data: dbResponse });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
-  async postVistas(req, res) {
-    const { c_extent, c_capas, c_mapa_base, c_nombre } = req.body;
-    try {
-      let dbResponse = await capasService.postVistas(
-        c_extent,
-        c_capas,
-        c_mapa_base,
-        c_nombre
-      );
-      res.status(200).json({ status: "success", data: dbResponse });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-
   async putVisibles(req, res) {
     const { id, c_array_campos } = req.body;
     try {
@@ -932,6 +948,8 @@ export class CapasController {
   }
 
   async descargarExcel(req, res) {
+    // Función local para generar fecha - se define más abajo
+    
     function acortarTexto(texto, longitudMaxima) {
       if (texto.length > longitudMaxima) {
         return texto.substring(0, longitudMaxima - 3) + "...";
@@ -939,6 +957,32 @@ export class CapasController {
         return texto;
       }
     }
+
+    function generarFechaReporte() {
+      try {
+        const ahora = new Date();
+        
+        // Crear fecha en zona horaria de Lima
+        const fechaLima = new Date(ahora.toLocaleString("en-US", {timeZone: "America/Lima"}));
+        
+        const meses = [
+          'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        ];
+        
+        const dia = fechaLima.getDate().toString().padStart(2, '0');
+        const mes = meses[fechaLima.getMonth()];
+        const año = fechaLima.getFullYear();
+        const hora = fechaLima.getHours().toString().padStart(2, '0');
+        const minutos = fechaLima.getMinutes().toString().padStart(2, '0');
+        
+        return `Generado el ${dia} de ${mes} de ${año}, a las ${hora}:${minutos}H`;
+      } catch (error) {
+        console.error('Error en generarFechaReporte:', error);
+        return 'Fecha de generación no disponible';
+      }
+    }
+
     const { table, datosCapas } = req.body;
     try {
       let exportarTemp = [];
@@ -967,52 +1011,186 @@ export class CapasController {
         });
       }
       let workbook = new excel.Workbook();
-      let worksheet = workbook.addWorksheet("Reporte general");
+      let worksheet = workbook.addWorksheet("Resumen General");
 
+      // Configurar el ancho de las columnas - columna B más ancha para nombres de capas
       worksheet.columns = [
-        { header: "Nombre Grupo", key: "1", width: 30 },
-        { header: "Nombre Titulo", key: "2", width: 50 },
-        { header: "Cantidad CCPP", key: "3", width: 50 },
-        { header: "Cantidad Población", key: "4", width: 50 },
-        { header: "Cantidad CCPP Fuera Cobertura", key: "5", width: 50 },
-        { header: "Cantidad Población Fuera Cobertura", key: "6", width: 50 },
+        { key: "A", width: 25 },
+        { key: "B", width: 50 },
+        { key: "C", width: 25 },
+        { key: "D", width: 25 }
       ];
 
-      worksheet.getCell("A1").fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "A3E4D7" },
+      // Título principal - extendido hasta la columna C
+      worksheet.mergeCells('A1:C1');
+      worksheet.getCell('A1').value = 'Visor Geográfico - Tabla de resumen';
+      worksheet.getCell('A1').font = { 
+        bold: true, 
+        size: 14, 
+        color: { argb: 'FFFFFF' } 
       };
-      worksheet.getCell("B1").fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "A3E4D7" },
+      worksheet.getCell('A1').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '4472C4' }
       };
-      worksheet.getCell("C1").fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "A3E4D7" },
-      };
-      worksheet.getCell("D1").fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "A3E4D7" },
+      worksheet.getCell('A1').alignment = { 
+        horizontal: 'center', 
+        vertical: 'middle' 
       };
 
-      worksheet.getCell("E1").fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "A3E4D7" },
+      // Información de ubicación - sin espacios en blanco, extendiéndose hasta C
+      worksheet.mergeCells('A2:B2');
+      worksheet.getCell('A2').value = 'Departamento:';
+      worksheet.getCell('A2').font = { bold: true };
+      worksheet.getCell('A2').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'B4C6E7' }
       };
-      worksheet.getCell("F1").fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "A3E4D7" },
+      worksheet.getCell('C2').value = req.body.departamento || 'Madre de Dios';
+      worksheet.getCell('C2').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'B4C6E7' }
       };
 
+      worksheet.mergeCells('A3:B3');
+      worksheet.getCell('A3').value = 'Provincia:';
+      worksheet.getCell('A3').font = { bold: true };
+      worksheet.getCell('A3').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'B4C6E7' }
+      };
+      worksheet.getCell('C3').value = req.body.provincia || 'Tambopata';
+      worksheet.getCell('C3').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'B4C6E7' }
+      };
 
-      // Add Array Rows
-      worksheet.addRows(exportarTemp);
+      worksheet.mergeCells('A4:B4');
+      worksheet.getCell('A4').value = 'Distrito:';
+      worksheet.getCell('A4').font = { bold: true };
+      worksheet.getCell('A4').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'B4C6E7' }
+      };
+      worksheet.getCell('C4').value = req.body.distrito || 'Tambopata';
+      worksheet.getCell('C4').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'B4C6E7' }
+      };
+
+      // Espacios en blanco
+      worksheet.getCell('A5').value = '';
+      
+      // Encabezados de la tabla de datos (fila 6) - color azul como el título
+      worksheet.getCell('A6').value = 'Programa Social';
+      worksheet.getCell('A6').font = { bold: true, color: { argb: 'FFFFFF' } };
+      worksheet.getCell('A6').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '4472C4' }
+      };
+
+      worksheet.getCell('B6').value = 'Nombre de capa';
+      worksheet.getCell('B6').font = { bold: true, color: { argb: 'FFFFFF' } };
+      worksheet.getCell('B6').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '4472C4' }
+      };
+
+      worksheet.getCell('C6').value = 'Número de usuarios y/o locales';
+      worksheet.getCell('C6').font = { bold: true, color: { argb: 'FFFFFF' } };
+      worksheet.getCell('C6').fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '4472C4' }
+      };
+
+      // Agregar los datos empezando desde la fila 7
+      let currentRow = 7;
+      
+      // Agregar sección de Programas Sociales
+      exportarTemp.forEach(item => {
+        worksheet.getCell(`A${currentRow}`).value = item[1]; // grupo
+        worksheet.getCell(`B${currentRow}`).value = item[2]; // titulo 
+        worksheet.getCell(`C${currentRow}`).value = item[4] || item[3]; // cantidad población o CCPP
+        currentRow++;
+      });
+
+      // Agregar separador y sección de Cartografía base - color azul como el título
+      currentRow += 1;
+      worksheet.getCell(`A${currentRow}`).value = 'Cartografía base';
+      worksheet.getCell(`A${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' } };
+      worksheet.getCell(`A${currentRow}`).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '4472C4' }
+      };
+
+      worksheet.getCell(`B${currentRow}`).value = 'Nombre de capa';
+      worksheet.getCell(`B${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' } };
+      worksheet.getCell(`B${currentRow}`).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '4472C4' }
+      };
+
+      worksheet.getCell(`C${currentRow}`).value = 'Cantidad';
+      worksheet.getCell(`C${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' } };
+      worksheet.getCell(`C${currentRow}`).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '4472C4' }
+      };
+
+      currentRow++;
+      
+      // Ejemplo de cartografía base (puedes agregar datos reales si están disponibles)
+      worksheet.getCell(`A${currentRow}`).value = 'Centros poblados';
+      worksheet.getCell(`B${currentRow}`).value = 'Centros poblados';
+      worksheet.getCell(`C${currentRow}`).value = 333;
+      currentRow += 2;
+
+      // Agregar fuente y fecha - extendido hasta la columna C
+      worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+      worksheet.getCell(`A${currentRow}`).value = 'Fuente:';
+      worksheet.getCell(`A${currentRow}`).font = { bold: true, italic: true };
+      worksheet.getCell(`A${currentRow}`).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFEB9C' }
+      };
+      
+      currentRow++;
+      worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+      worksheet.getCell(`A${currentRow}`).value = 'Programas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2025';
+      worksheet.getCell(`A${currentRow}`).font = { italic: true };
+      worksheet.getCell(`A${currentRow}`).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFEB9C' }
+      };
+      worksheet.getCell(`A${currentRow}`).alignment = { 
+        wrapText: true,
+        vertical: 'top'
+      };
+
+      // Agregar la fecha en una fila separada sin fondo amarillo
+      currentRow++;
+      worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+      worksheet.getCell(`A${currentRow}`).value = generarFechaReporte();
+      worksheet.getCell(`A${currentRow}`).font = { italic: true, bold: true };
+      worksheet.getCell(`A${currentRow}`).alignment = { 
+        wrapText: true,
+        vertical: 'top'
+      };
 
       let nombresExistentes = [];
       function nombreUnico(nombresExistentes, titulo) {
@@ -1114,7 +1292,12 @@ export class CapasController {
             worksheet.getCell(celda[0].celda).fill = {
               type: "pattern",
               pattern: "solid",
-              fgColor: { argb: "A3E4D7" },
+              fgColor: { argb: "4472C4" }, // Cambiado a azul para coincidir con la primera página
+            };
+            // Agregar texto en blanco para mejor contraste
+            worksheet.getCell(celda[0].celda).font = { 
+              bold: true, 
+              color: { argb: 'FFFFFF' } 
             };
           }
         }
@@ -1128,13 +1311,14 @@ export class CapasController {
       );
       res.setHeader(
         "Content-Disposition",
-        "attachment; filename=" + "Reporte filtro.xlsx"
+        "attachment; filename=" + "Visor_Geografico_Resumen.xlsx"
       );
 
       return workbook.xlsx.write(res).then(function () {
         res.status(200).end();
       });
     } catch (error) {
+      console.log(error);
       res.json({
         status: "error",
         message: "Error en el servidor " + error,
@@ -1267,6 +1451,32 @@ export class CapasController {
   async descargarExcelFiltros(req, res) {
     const { tipoServicio,categoria,distancia,nivel,idccpp,datosResumen} = req.body;
     const titulo = 'Filtro demanda.'
+
+    function generarFechaReporte() {
+      try {
+        const ahora = new Date();
+        
+        // Crear fecha en zona horaria de Lima
+        const fechaLima = new Date(ahora.toLocaleString("en-US", {timeZone: "America/Lima"}));
+        
+        const meses = [
+          'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        ];
+        
+        const dia = fechaLima.getDate().toString().padStart(2, '0');
+        const mes = meses[fechaLima.getMonth()];
+        const año = fechaLima.getFullYear();
+        const hora = fechaLima.getHours().toString().padStart(2, '0');
+        const minutos = fechaLima.getMinutes().toString().padStart(2, '0');
+        
+        return `Generado el ${dia} de ${mes} de ${año}, a las ${hora}:${minutos}H`;
+      } catch (error) {
+        console.error('Error en generarFechaReporte:', error);
+        return 'Fecha de generación no disponible';
+      }
+    }
+
     try {
       let workbook = new excel.Workbook();
       let worksheetRG = workbook.addWorksheet('Resumen general.');
@@ -1459,6 +1669,17 @@ export class CapasController {
       };
       worksheetRG.getCell(`A${fuenteStartRow}`).font = { italic: true, color: { argb: '000000' }, size: 10 };
 
+      // Agregar la fecha en una fila separada sin fondo amarillo
+      const fechaRow = fuenteStartRow + 5;
+      worksheetRG.mergeCells(`A${fechaRow}:F${fechaRow}`);
+      worksheetRG.getCell(`A${fechaRow}`).value = generarFechaReporte();
+      worksheetRG.getCell(`A${fechaRow}`).font = { italic: true, bold: true };
+      worksheetRG.getCell(`A${fechaRow}`).alignment = { 
+        vertical: 'top', 
+        horizontal: 'left',
+        wrapText: true 
+      };
+
       let worksheet = workbook.addWorksheet('Tabla de atributos.');
       const columnas = [];
 
@@ -1597,6 +1818,32 @@ export class CapasController {
     const { tipoServicio, datosResumen } = req.body;
     const titulo = 'Filtro demanda';
     // console.log(datosResumen,'datos resumen');
+
+    function generarFechaReporte() {
+      try {
+        const ahora = new Date();
+        
+        // Crear fecha en zona horaria de Lima
+        const fechaLima = new Date(ahora.toLocaleString("en-US", {timeZone: "America/Lima"}));
+        
+        const meses = [
+          'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        ];
+        
+        const dia = fechaLima.getDate().toString().padStart(2, '0');
+        const mes = meses[fechaLima.getMonth()];
+        const año = fechaLima.getFullYear();
+        const hora = fechaLima.getHours().toString().padStart(2, '0');
+        const minutos = fechaLima.getMinutes().toString().padStart(2, '0');
+        
+        return `Generado el ${dia} de ${mes} de ${año}, a las ${hora}:${minutos}H`;
+      } catch (error) {
+        console.error('Error en generarFechaReporte:', error);
+        return 'Fecha de generación no disponible';
+      }
+    }
+
     try {
       let workbook = new excel.Workbook();
       let worksheet = workbook.addWorksheet('Resumen general');
@@ -1675,7 +1922,7 @@ export class CapasController {
 
       // Fuente
       worksheet.mergeCells('A25:B29');
-      worksheet.getCell('A25').value = `Fuente:\nPlataforma de Estadística de la Calidad Educativa (ESCALE), 2023.\nRegistro Nacional de Instituciones Prestadoras de Servicios de Salud (RENIPRESS), 2024.\nCentros poblados del Instituto Nacional de Estadística e Informática (INEI), 2023.\nProgramas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2025.`;
+      worksheet.getCell('A25').value = 'Fuente:\nPlataforma de Estadística de la Calidad Educativa (ESCALE), 2023.\nRegistro Nacional de Instituciones Prestadoras de Servicios de Salud (RENIPRESS), 2024.\nCentros poblados del Instituto Nacional de Estadística e Informática (INEI), 2023.\nProgramas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2025.';
       worksheet.getCell('A25').alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
       worksheet.getCell('A25').fill = {
         type: 'pattern',
@@ -1683,6 +1930,16 @@ export class CapasController {
         fgColor: { argb: 'FFF9E5' }
       };
       worksheet.getCell('A25').font = { italic: true, color: { argb: '000000' }, size: 10 };
+
+      // Agregar la fecha en una fila separada sin fondo amarillo
+      worksheet.mergeCells('A30:B30');
+      worksheet.getCell('A30').value = generarFechaReporte();
+      worksheet.getCell('A30').font = { italic: true, bold: true };
+      worksheet.getCell('A30').alignment = { 
+        vertical: 'top', 
+        horizontal: 'left',
+        wrapText: true 
+      };
 
       // Ajustar ancho de columnas
       worksheet.columns = [
@@ -1712,6 +1969,7 @@ export class CapasController {
 
   async descargarExcelOfertaPorServicios(req, res) {
     const {
+      tipoServicio,
       departamento,
       provincia,
       distrito,
@@ -1737,6 +1995,31 @@ export class CapasController {
       cuna,
       juntos
     } = req.body;
+
+    function generarFechaReporte() {
+      try {
+        const ahora = new Date();
+        
+        // Crear fecha en zona horaria de Lima
+        const fechaLima = new Date(ahora.toLocaleString("en-US", {timeZone: "America/Lima"}));
+        
+        const meses = [
+          'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        ];
+        
+        const dia = fechaLima.getDate().toString().padStart(2, '0');
+        const mes = meses[fechaLima.getMonth()];
+        const año = fechaLima.getFullYear();
+        const hora = fechaLima.getHours().toString().padStart(2, '0');
+        const minutos = fechaLima.getMinutes().toString().padStart(2, '0');
+        
+        return `Generado el ${dia} de ${mes} de ${año}, a las ${hora}:${minutos}H`;
+      } catch (error) {
+        console.error('Error en generarFechaReporte:', error);
+        return 'Fecha de generación no disponible';
+      }
+    }
 
     try {
       const workbook = new excel.Workbook();
@@ -1764,8 +2047,9 @@ export class CapasController {
 
       // Subtítulo
       worksheet.mergeCells("A2:E2");
-      worksheet.getCell("A2").value =
-        "Centros poblados con cobertura de servicios de Institución Educativas (II.EE.) públicos de nivel secundaria dentro del rango de 10 km / 2 horas";
+      worksheet.getCell("A2").value = tipoServicio === "S" 
+        ? "Centros poblados con cobertura de servicios de Establecimientos de Salud (EE.SS.) públicos dentro del rango de 10 km / 2 horas"
+        : "Centros poblados con cobertura de servicios de Institución Educativas (II.EE.) públicos de nivel secundaria dentro del rango de 10 km / 2 horas";
       worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center", wrapText: true };
       worksheet.getCell("A2").font = { bold: true, color: { argb: "1F4E78" }, size: 12 };
       worksheet.getCell("A2").fill = {
@@ -1784,9 +2068,9 @@ export class CapasController {
       worksheet.getCell("B6").value = provincia;
       worksheet.getCell("A7").value = "Distrito:";
       worksheet.getCell("B7").value = distrito;
-      worksheet.getCell("A8").value = "Código modular de la II.EE.:";
+      worksheet.getCell("A8").value = tipoServicio === "S" ? "Código único de la EE.SS.:" : "Código modular de la II.EE.:";
       worksheet.getCell("B8").value = codigo;
-      worksheet.getCell("A9").value = "Nombre de la II.EE.:";
+      worksheet.getCell("A9").value = tipoServicio === "S" ? "Nombre de la EE.SS.:" : "Nombre de la II.EE.:";
       worksheet.getCell("B9").value = nombre;
       worksheet.getCell("A10").value = "Categoría:";
       worksheet.getCell("B10").value = categoria;
@@ -1848,6 +2132,16 @@ export class CapasController {
         fgColor: { argb: "FFF9E5" }
       };
       worksheet.getCell("A34").font = { italic: true, color: { argb: "000000" }, size: 10 };
+
+      // Agregar la fecha en una fila separada sin fondo amarillo
+      worksheet.mergeCells("A39:E39");
+      worksheet.getCell("A39").value = generarFechaReporte();
+      worksheet.getCell("A39").font = { italic: true, bold: true };
+      worksheet.getCell("A39").alignment = { 
+        vertical: "top", 
+        horizontal: "left",
+        wrapText: true 
+      };
 
       // Respuesta
       res.setHeader(
@@ -2118,10 +2412,47 @@ export class CapasController {
         res.status(200).end();
       });
     } catch (error) {
-      res.json({
+        res.json({
         status: "error",
         message: "Error en el servidor " + error,
       });
+    }
+  }
+
+  // ===== MÉTODOS PARA VISTAS =====
+  
+  async getVistas(req, res) {
+    try {
+      const id_usuario = req.user.id; // Obtenido del validarToken
+      const response = await capasService.getVistasByUsuario(id_usuario);
+      res.status(200).json({ status: "success", data: response });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async postVistas(req, res) {
+    try {
+      const id_usuario = req.user.id; // Obtenido del validarToken
+      const vistaData = {
+        ...req.body,
+        id_usuario: id_usuario
+      };
+      const response = await capasService.createVista(vistaData);
+      res.status(201).json({ status: "success", data: response });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteVistas(req, res) {
+    try {
+      const id_usuario = req.user.id; // Obtenido del validarToken
+      const { id_vista } = req.params;
+      const response = await capasService.deleteVista(id_vista, id_usuario);
+      res.status(200).json({ status: "success", data: response });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   }
 }

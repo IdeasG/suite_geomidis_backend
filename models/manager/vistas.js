@@ -24,6 +24,14 @@ const Vistas = sequelize.define(
         c_nombre: {
             type: DataTypes.STRING,
             allowNull: true
+        },
+        id_usuario: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'tg_usuario',
+                key: 'id_usuario'
+            }
         }
     },
     {

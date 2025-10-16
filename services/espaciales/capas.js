@@ -972,4 +972,54 @@ export class CapasService {
       );
     }
   }
+
+  // ===== MÉTODOS PARA VISTAS =====
+  
+  async getVistasByUsuario(id_usuario) {
+    try {
+      const response = await Vistas.findAll({
+        where: { id_usuario: id_usuario },
+        order: [['id_vistas', 'DESC']]
+      });
+      return response;
+    } catch (error) {
+      throw new Error("Error al obtener las vistas del usuario: " + error);
+    }
+  }
+
+  async createVista(vistaData) {
+    try {
+      const response = await Vistas.create(vistaData);
+      return response;
+    } catch (error) {
+      throw new Error("Error al crear la vista: " + error);
+    }
+  }
+
+  async deleteVista(id_vista, id_usuario) {
+    try {
+      // Verificar que la vista pertenezca al usuario antes de eliminar
+      const vista = await Vistas.findOne({
+        where: { 
+          id_vistas: id_vista,
+          id_usuario: id_usuario 
+        }
+      });
+      
+      if (!vista) {
+        throw new Error("Vista no encontrada o no pertenece al usuario");
+      }
+      
+      const response = await Vistas.destroy({
+        where: { 
+          id_vistas: id_vista,
+          id_usuario: id_usuario 
+        }
+      });
+      
+      return response;
+    } catch (error) {
+      throw new Error("Error al eliminar la vista: " + error);
+    }
+  }
 }
