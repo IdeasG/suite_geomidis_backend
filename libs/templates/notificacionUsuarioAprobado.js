@@ -54,7 +54,7 @@ export const notificacionUsuarioAprobadoTemplate = `
     }
     .button {
       background-color: #0056b3;
-      color: #fff;
+      color: #ffffff !important;
       text-decoration: none;
       padding: 14px 28px;
       border-radius: 6px;

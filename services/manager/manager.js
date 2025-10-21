@@ -930,7 +930,7 @@ async getRolByIdCliente(id_cliente) {
         institucion_trabajo,
         cargo,
         motivacion_geovisor,
-        password,
+        password: generatePasswordHash(password),
       });
       if (data) {
         await sendMail({
