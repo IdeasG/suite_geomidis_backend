@@ -54,6 +54,7 @@ export const createManagerRouter = () => {
 
   //SOLICITUDES DE ACCESO
   managerRouter.post("/register/geoportal", managerController.saveSolicitud);
+  managerRouter.post("/generate-token-reset-password", managerController.generateTokenResetPassword);
   managerRouter.post("/reset/password", managerController.sendMessage);
   managerRouter.post("/admin/newuser", managerController.adminNewUser);
 

@@ -87,6 +87,14 @@ const TgUsuario = sequelize.define(
     id_rol_auditoria:{
       type: DataTypes.INTEGER,
       allowNull: true
+    },
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE,
+      allowNull: true,
     }
   },
   {

@@ -23,7 +23,18 @@ import {
   compileRechazaSolicitud,
   compileWelcomeTemplate,
   sendMail,
+  compileNotificacionUsuarioAprobadoTemplate,
+  compileNotificacionRegistroManualTemplate,
 } from "../../helpers/sendMail.js";
+
+function generateRandomPassword(length = 10) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
 export class AuthenticateService {
   async signIn(c_usuario, c_contrasena, id) {
     try {
@@ -547,7 +558,7 @@ export class AuthenticateService {
     }
   }
 
-  async createUsuarioInternosByGeoportal(
+  async createUsuarioInternosByGeoportal({
     dni,
     nombres,
     ape_paterno,
@@ -559,11 +570,31 @@ export class AuthenticateService {
     id_cliente,
     id_usuario_auditoria,
     id_rol_auditoria
-  ) {
+  }) {
     try {
+      console.log(
+      {
+        dni,
+        nombres,
+        ape_paterno,
+        ape_materno,
+        email,
+        celular,
+        tipo_usuario,
+        rol_id,
+        id_cliente,
+        id_usuario_auditoria,
+        id_rol_auditoria
+      });
+      // Generar contraseña aleatoria
+      const randomPassword = generateRandomPassword(12);
+      // Buscar el rol para mostrar el nombre en el correo
+      const rolObj = await Rol.findOne({ where: { id_rol: rol_id } });
+      const nombreRol = rolObj ? rolObj.c_nombre_rol : '';
+      // Crear usuario con contraseña encriptada
       const usuario = await TgUsuario.create({
         usuario: dni,
-        clave: generatePasswordHash(dni),
+        clave: generatePasswordHash(randomPassword),
         dni,
         nombres,
         ape_paterno,
@@ -576,6 +607,19 @@ export class AuthenticateService {
         id_cliente,
         id_usuario_auditoria,
         id_rol_auditoria,
+      });
+      // Enviar correo con credenciales
+      const htmlBody = compileNotificacionRegistroManualTemplate(
+        nombres,
+        dni,
+        randomPassword,
+        nombreRol
+      );
+      await sendMail({
+        to: email,
+        name: nombres,
+        subject: "Acceso habilitado – Geoportal MIDIS",
+        body: htmlBody,
       });
       return usuario;
     } catch (error) {
@@ -626,16 +670,13 @@ export class AuthenticateService {
             },
             { where: { fk_geoportal: fk_geoportal, numero_documento: dni } }
           );
+          // Send new user notification email
+          const htmlBody = compileNotificacionUsuarioAprobadoTemplate(nombres, user);
           await sendMail({
             to: email,
-            name: "GEOMIDIS",
-            subject: "Solicitud aceptada",
-            body: compileAceptaSolicitud(
-              mensaje,
-              rol.c_nombre_rol,
-              user,
-              password
-            ),
+            name: nombres,
+            subject: "Acceso aprobado – Geoportal MIDIS",
+            body: htmlBody,
           });
         }
       } else {

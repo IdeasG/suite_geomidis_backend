@@ -242,19 +242,19 @@ export class AuthenticateController {
       id_rol,
     } = req.body;
     try {
-      const data = await authenticateService.createUsuarioInternosByGeoportal(
+      const data = await authenticateService.createUsuarioInternosByGeoportal({
         dni,
         nombres,
         ape_paterno,
         ape_materno,
-        correo,
+        email: correo,
         celular,
         tipo_usuario,
-        id_rol,
+        rol_id: id_rol,
         id_cliente,
-        id,
+        id_usuario_auditoria: id,
         id_rol_auditoria
-      );
+      });
       res.status(201).json(data);
     } catch (error) {
       res.status(500).json({ error: "Error: " + error });

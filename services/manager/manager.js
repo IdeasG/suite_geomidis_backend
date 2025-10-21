@@ -59,6 +59,27 @@ export class ManagerService {
     }
   }
 
+    // Buscar usuario por email y geoportal
+  async findUsuarioByEmail(email, fk_geoportal) {
+    // Ajusta el modelo y campos según tu estructura
+      const response = await TgUsuario.findOne({ where: { email, id_cliente: fk_geoportal } });
+    // console.log('Usuario encontrado:', response);
+    return response;
+  }
+
+  // Guardar token temporal para reset password
+  async saveResetPasswordToken({ userId, token, expires }) {
+    // Crea un modelo ResetPasswordToken si no existe, aquí ejemplo simple con sequelize
+    // Si tienes un modelo, usa: await ResetPasswordToken.create({ userId, token, expires });
+    // Si no, puedes guardar en el usuario (no recomendado para producción)
+    const usuario = await TgUsuario.findByPk(userId);
+    if (!usuario) throw new Error("Usuario no encontrado para guardar token");
+    usuario.resetPasswordToken = token;
+    usuario.resetPasswordExpires = expires;
+    await usuario.save();
+    return true;
+  }
+
   async saveActividades(c_titulo, c_subtitulo, c_descripcion) {
     try {
       const data = await Actividades.create({
@@ -1111,6 +1132,26 @@ async getRolByIdCliente(id_cliente) {
       console.log(error);
       throw new Error("Error al obtener el servicio: " + error);
     }
+  }
+
+  async resetPasswordWithToken(token, newPassword) {
+    // Buscar usuario por token
+    console.log("Token recibido:", token);
+    console.log("Nueva contraseña recibida:", newPassword);
+    const usuario = await TgUsuario.findOne({ where: { resetPasswordToken: token } });
+    if (!usuario) {
+      return { success: false, error: "Token inválido" };
+    }
+    // Validar expiración
+    if (!usuario.resetPasswordExpires || usuario.resetPasswordExpires < Date.now()) {
+      return { success: false, error: "Token expirado" };
+    }
+    // Actualizar contraseña y limpiar token
+    usuario.clave = generatePasswordHash(newPassword);
+    usuario.resetPasswordToken = null;
+    usuario.resetPasswordExpires = null;
+    await usuario.save();
+    return { success: true };
   }
 
   async editGeoportales(

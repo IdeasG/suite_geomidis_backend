@@ -1,3 +1,6 @@
+import { notificacionRegistroManualTemplate } from "../libs/templates/notificacionRegistroManual.js";
+import { notificacionRecuperarPasswordTemplate } from "../libs/templates/notificacionRecuperarPassword.js";
+import { notificacionUsuarioAprobadoTemplate } from "../libs/templates/notificacionUsuarioAprobado.js";
 import nodemailer from "nodemailer";
 import handlebars from "handlebars";
 import { welcomeTemplate } from "../libs/templates/welcome.js";
@@ -7,6 +10,50 @@ import { rechazaTemplate } from "../libs/templates/rechazar.js";
 import { reseteoTemplate } from "../libs/templates/reseteo.js";
 import { nuevoUsuarioTemplate } from "../libs/templates/usuario.js";
 import { gmailDiarioTemplate } from "../libs/templates/gmailDiario.js";
+import { notificacionSolicitudAdminTemplate } from "../libs/templates/notificacionSolicitudAdmin.js";
+
+export function compileNotificacionRegistroManualTemplate(nombre, usuario, contrasena, rol) {
+  const template = handlebars.compile(notificacionRegistroManualTemplate);
+  const baseUrl = process.env.URL_PUBLIC_FRONT || "https://geoportal.midis.gob.pe";
+  const htmlBody = template({
+    nombre,
+    usuario,
+    contrasena,
+    rol,
+    baseUrl
+  });
+  return htmlBody;
+}
+
+export function compileNotificacionRecuperarPasswordTemplate({ nombre, enlace_recuperacion, baseUrl }) {
+  const template = handlebars.compile(notificacionRecuperarPasswordTemplate);
+  return template({ nombre, enlace_recuperacion, baseUrl });
+}
+
+export function compileNotificacionSolicitudAdminTemplate(nombres, apellidos, correo, institucion, cargo) {
+  const template = handlebars.compile(notificacionSolicitudAdminTemplate);
+  const baseUrl = process.env.URL_PUBLIC_FRONT || "https://geoportal.midis.gob.pe";
+  const htmlBody = template({
+    nombres,
+    apellidos,
+    correo,
+    institucion,
+    cargo,
+    baseUrl
+  });
+  return htmlBody;
+}
+
+export function compileNotificacionUsuarioAprobadoTemplate(nombre, usuario) {
+  const template = handlebars.compile(notificacionUsuarioAprobadoTemplate);
+  const baseUrl = process.env.URL_PUBLIC_FRONT || "https://geoportal.midis.gob.pe";
+  const htmlBody = template({
+    nombre,
+    usuario,
+    baseUrl
+  });
+  return htmlBody;
+}
 
 export async function sendMail({ to, name, subject, body }) {
   const { SMTP_EMAIL, SMTP_PASSWORD } = process.env;
