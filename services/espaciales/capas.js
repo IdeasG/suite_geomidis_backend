@@ -50,17 +50,27 @@ export class CapasService {
     }
   }
 
-  async getAllCapasTable(offset,pageSize,currentPage) {
+  async getAllCapasTable(offset,pageSize,currentPage, filter = "") {
     try {
       // Obtener capas con información básica
+      // add optional filter
+      const whereFilter = filter && filter.trim() !== "" ? `AND (
+        c.c_nombre_public_capa ILIKE :filter OR
+        g.c_nombre_grupo ILIKE :filter OR
+        sg.c_nombre_super_grupo ILIKE :filter OR
+        c.c_nombre_geoserver ILIKE :filter
+      )` : "";
+
       const [results, metadata] = await sequelize.query(`
-        select c.*, sg.c_nombre_super_grupo, g.c_nombre_grupo
+        select c.*, sg.c_nombre_super_grupo, sg.id_super_grupo, g.c_nombre_grupo
         from administracion.tadm_capas c
         left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
         left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
         where c.c_tipo = 'interno'
+        ${whereFilter}
         order by sg.c_nombre_super_grupo asc, g.c_nombre_grupo asc, c.c_nombre_public_capa asc
-      `);
+        LIMIT ${pageSize} OFFSET ${offset}
+      `, { replacements: { filter: `%${filter}%` } });
 
       // Obtener todos los estilos de las capas
       const [estilosResults, estilosMetadata] = await sequelize.query(`
@@ -91,17 +101,17 @@ export class CapasService {
         from administracion.tadm_capas c
         left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
         left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
-        where c.c_tipo = 'interno'
-      `);
+        where c.c_tipo = 'interno' ${whereFilter}
+      `, { replacements: { filter: `%${filter}%` } });
 
       const totalItems = parseInt(resultsConteo[0].conteo);
       const totalPages = Math.ceil(totalItems / pageSize);
       
       const data = {
         data: transformedData,
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: totalItems
+        currentPage: Number(currentPage) || 1,
+        totalPages: totalPages,
+        totalItems: totalItems,
       };
       
       return data;
@@ -110,17 +120,27 @@ export class CapasService {
     }
   }
 
-  async getAllCapasTableExterno(offset,pageSize,currentPage) {
+  async getAllCapasTableExterno(offset,pageSize,currentPage, filter = "") {
     try {
       // Obtener capas externas con información básica
+      // add optional filter
+      const whereFilter = filter && filter.trim() !== "" ? `AND (
+        c.c_nombre_public_capa ILIKE :filter OR
+        g.c_nombre_grupo ILIKE :filter OR
+        sg.c_nombre_super_grupo ILIKE :filter OR
+        c.c_nombre_geoserver ILIKE :filter
+      )` : "";
+
       const [results, metadata] = await sequelize.query(`
-        select c.*, sg.c_nombre_super_grupo, g.c_nombre_grupo
+        select c.*, sg.c_nombre_super_grupo, sg.id_super_grupo, g.c_nombre_grupo
         from administracion.tadm_capas c
         left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
         left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
         where c.c_tipo = 'externo'
+        ${whereFilter}
         order by sg.c_nombre_super_grupo asc, g.c_nombre_grupo asc, c.c_nombre_public_capa asc
-      `);
+        LIMIT ${pageSize} OFFSET ${offset}
+      `, { replacements: { filter: `%${filter}%` } });
 
       // Obtener todos los estilos de las capas externas
       const [estilosResults, estilosMetadata] = await sequelize.query(`
@@ -151,17 +171,17 @@ export class CapasService {
         from administracion.tadm_capas c
         left join administracion.tadm_capas_grupo g on c.id_grupo = g.id_grupo
         left join administracion.tadm_capas_supergrupo sg on g.id_super_grupo = sg.id_super_grupo
-        where c.c_tipo = 'externo'
-      `);
+        where c.c_tipo = 'externo' ${whereFilter}
+      `, { replacements: { filter: `%${filter}%` } });
 
       const totalItems = parseInt(resultsConteo[0].conteo);
       const totalPages = Math.ceil(totalItems / pageSize);
       
       const data = {
         data: transformedData,
-        currentPage: 1,
-        totalPages: 1,
-        totalItems: totalItems
+        currentPage: Number(currentPage) || 1,
+        totalPages: totalPages,
+        totalItems: totalItems,
       };
       
       return data;

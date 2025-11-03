@@ -89,7 +89,7 @@ export const notificacionRegistroManualTemplate = `
 
       <p>Estimado/a <strong>{{nombre}}</strong>,</p>
 
-      <p>Le informamos que un <strong>administrador del Geoportal MIDIS</strong> ha habilitado su acceso al sistema. A partir de este momento, puede iniciar sesión con las credenciales asignadas que se detallan a continuación.</p>
+      <p>Le informamos que se ha habilitado su acceso al Geoportal MIDIS. A partir de este momento, puede iniciar sesión con las credenciales asignadas que se detallan a continuación</p>
 
       <div class="highlight">
         <p><strong>Datos de acceso:</strong></p>
@@ -97,8 +97,6 @@ export const notificacionRegistroManualTemplate = `
         Contraseña: <strong>{{contrasena}}</strong><br>
         Rol asignado: <strong>{{rol}}</strong></p>
       </div>
-
-      <p>Por motivos de seguridad, se recomienda <strong>cambiar su contraseña</strong> al ingresar por primera vez.</p>
 
       <div class="button-container">
         <a href="{{baseUrl}}/" class="button" target="_blank">Ingresar al Geoportal</a>
@@ -111,7 +109,7 @@ export const notificacionRegistroManualTemplate = `
 
     <div class="footer">
       <p>Este mensaje ha sido generado automáticamente por el <strong>Geoportal MIDIS</strong>.</p>
-      <p>Para consultas o soporte técnico, escriba a: <a href="mailto:soporte@geoportal.midis.gob.pe">soporte@geoportal.midis.gob.pe</a></p>
+      <p>Para consultas o soporte técnico, comuníquese al teléfono: (01) 6318000 anexo 1718</p>
     </div>
   </div>
 </body>

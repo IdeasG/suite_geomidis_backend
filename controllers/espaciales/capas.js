@@ -79,10 +79,10 @@ export class CapasController {
   }
 
   async getAllCapasTable(req, res) {
-    const { page = 1, pageSize = 5 } = req.query;
+    const { page = 1, pageSize = 5, filter = "" } = req.query;
     try {
       const offset = (page - 1) * pageSize;
-      const response = await capasService.getAllCapasTable(offset, pageSize,page)
+      const response = await capasService.getAllCapasTable(offset, pageSize, page, filter)
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -90,10 +90,10 @@ export class CapasController {
   }
 
   async getAllCapasTableExterno(req, res) {
-    const { page = 1, pageSize = 5 } = req.query;
+    const { page = 1, pageSize = 5, filter = "" } = req.query;
     try {
       const offset = (page - 1) * pageSize;
-      const response = await capasService.getAllCapasTableExterno(offset, pageSize,page)
+      const response = await capasService.getAllCapasTableExterno(offset, pageSize, page, filter)
       res.status(200).json({ status: "success", data: response });
     } catch (error) {
       res.status(500).json({ error: error.message });

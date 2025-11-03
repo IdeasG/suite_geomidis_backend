@@ -112,7 +112,7 @@ export const notificacionRecuperarPasswordTemplate = `
 
     <div class="footer">
       <p>Este mensaje ha sido generado automáticamente por el <strong>Geoportal MIDIS</strong>.</p>
-      <p>Para consultas o soporte técnico, escriba a: <a href="mailto:soporte@geoportal.midis.gob.pe">soporte@geoportal.midis.gob.pe</a></p>
+      <p>Para consultas o soporte técnico, comuníquese al teléfono: (01) 6318000 anexo 1718</p>
     </div>
   </div>
 </body>
