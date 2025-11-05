@@ -61,10 +61,15 @@ export class ManagerService {
 
     // Buscar usuario por email y geoportal
   async findUsuarioByEmail(email, fk_geoportal) {
-    // Ajusta el modelo y campos según tu estructura
+    try {
+      // Ajusta el modelo y campos según tu estructura
       const response = await TgUsuario.findOne({ where: { email, id_cliente: fk_geoportal } });
-    // console.log('Usuario encontrado:', response);
-    return response;
+      // console.log('Usuario encontrado:', response);
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
   }
 
   // Guardar token temporal para reset password

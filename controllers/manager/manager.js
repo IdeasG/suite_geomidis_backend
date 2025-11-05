@@ -14,8 +14,8 @@ export class ManagerController {
   async generateTokenResetPassword(req, res) {
     const { email, fk_geoportal } = req.body;
     try {
-      console.log('Email recibido para reseteo:', email);
-      console.log('FK Geoportal recibido para reseteo:', fk_geoportal);
+      // console.log('Email recibido para reseteo:', email);
+      // console.log('FK Geoportal recibido para reseteo:', fk_geoportal);
       if (!email) {
         return res.status(400).json({ error: "Email requerido" });
       }
@@ -23,6 +23,7 @@ export class ManagerController {
       const usuario = await managerService.findUsuarioByEmail(email, fk_geoportal);
       // console.log('Usuario encontrado para reseteo:', usuario);
       if (!usuario) {
+        // console.log('Usuario no encontrado para reseteo con email:', email, 'y fk_geoportal:', fk_geoportal);
         return res.status(404).json({ error: "Usuario no encontrado" });
       }
       // Generar token temporal
@@ -30,7 +31,7 @@ export class ManagerController {
       // Guardar token en BD con expiración (ejemplo: 1 hora)
       await managerService.saveResetPasswordToken({ userId: usuario.id_usuario, token, expires: Date.now() + 3600 * 1000 });
       // Construir enlace de recuperación
-      const baseUrl = process.env.BASE_URL || "https://geoportal.midis.gob.pe";
+      const baseUrl = process.env.URL_PUBLIC_FRONT || "https://geoportal.midis.gob.pe";
       const enlace_recuperacion = `${baseUrl}/reset-password?token=${token}`;
       // Compilar template
       const htmlBody = compileNotificacionRecuperarPasswordTemplate({
@@ -39,6 +40,7 @@ export class ManagerController {
         baseUrl
       });
       // Enviar correo
+      // console.log('Enviando correo de recuperación a:', email);
       await sendMail({
         to: email,
         subject: "Recuperación de contraseña – Geoportal MIDIS",
