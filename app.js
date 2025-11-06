@@ -21,7 +21,7 @@ import { createManagerRouter } from "./routes/suite/manager.js";
 import { createAutomatizacionRouter } from "./routes/automatizacion/automatizacion.js";
 import cron from 'node-cron';
 import { checkAndExecuteServices } from './controllers/automatizacion/automatizacion_mejorado.js';
-
+ 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import path from "path";
