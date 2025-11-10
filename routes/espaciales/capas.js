@@ -67,7 +67,6 @@ export const createRouteCapas = () => {
   // eliminar capas
   CapaRouter.delete(
     "/:id_capa",
-    
     validarToken,
     capasController.getAllCapasDelete
   );
