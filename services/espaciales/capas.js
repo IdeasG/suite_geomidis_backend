@@ -761,6 +761,14 @@ export class CapasService {
         WHERE ${where}
         order by distancia_km asc
       `);
+      // console.log(`
+      //   SELECT espaciales.${tabla}.*,cp.nombccpp,pobl.area as area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar ${clasicacionCS} FROM espaciales.${tabla}
+      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+      //   left join espaciales.poblaciones pobl on espaciales.${tabla}.id_ccpp = pobl.cod_ccpp
+      //   left join ${leftjoin}
+      //   WHERE ${where}
+      //   order by distancia_km asc
+      // `);
       // console.log(results);
       return results;
     } catch (error) {

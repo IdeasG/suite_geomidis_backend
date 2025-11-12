@@ -1774,7 +1774,7 @@ async descargarExcelUbigeo(req, res) {
       worksheetRG.getCell("A12").value = datosResumen.conteoTotalCCPP + ' centros poblados (' + datosResumen.porcePoblacion +'%) y ' + datosResumen.conteoPersoCober +' personas (' + datosResumen.porcePersoCober +'%) tienen cobertura de servicio'
       worksheetRG.getCell('A12').alignment = { vertical: 'middle', horizontal: 'left' };
   worksheetRG.getCell('A12').font = { bold: true, name: 'Arial Narrow', size: 10 };
-      // console.log(datosResumen.newDataTable,'data resumen?');
+      console.log(datosResumen.newDataTable,'data resumen?');
       const tablaResumen = datosResumen.newDataTable.map(item => ({
         "1": item.nombre,
         "2": item.cantidad
@@ -2140,58 +2140,70 @@ async descargarExcelUbigeo(req, res) {
 
       // Indicadores censales
       worksheet.getCell('A12').value = 'Indicadores censales del centro poblado (Censo INEI, 2017):';
-  worksheet.getCell('A12').font = { bold: true, name: 'Arial Narrow', size: 10 };
+      worksheet.getCell('A12').font = { bold: true, name: 'Arial Narrow', size: 10 };
       worksheet.getCell('A12').alignment = { vertical: 'middle', horizontal: 'left' };
 
-      worksheet.getCell('A13').value = 'Población Total';
-      worksheet.getCell('B13').value = datosResumen.conteoPoblacionTotal;
-      worksheet.getCell('A14').value = 'Población de 3 a 5 años';
-      worksheet.getCell('B14').value = datosResumen.pob_3_5a;
-      worksheet.getCell('A15').value = 'Población de 6 a 11 años';
-      worksheet.getCell('B15').value = datosResumen.pob_6_11a;
-      worksheet.getCell('A16').value = 'Población de 12 a 16 años';
-      worksheet.getCell('B16').value = datosResumen.pob_12_16a;
-      worksheet.getCell('A17').value = 'Hogares afiliados juntos';
-      worksheet.getCell('B17').value = datosResumen.hogaresAfiliadosJuntos;
-      for (let i = 13; i <= 17; i++) {
+      // Usar los datos de newDataTable dinámicamente
+      let currentRow = 13;
+      if (datosResumen.newDataTable && Array.isArray(datosResumen.newDataTable)) {
+        datosResumen.newDataTable.forEach((item) => {
+          worksheet.getCell(`A${currentRow}`).value = item.nombre;
+          worksheet.getCell(`B${currentRow}`).value = item.cantidad || 0;
+          worksheet.getCell(`A${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+          worksheet.getCell(`B${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+          currentRow++;
+        });
+      } else {
+        // Fallback en caso de que no haya newDataTable
+        worksheet.getCell('A13').value = 'Datos no disponibles';
+        worksheet.getCell('B13').value = '';
+        worksheet.getCell('A13').font = { name: 'Arial Narrow', size: 10 };
+        worksheet.getCell('B13').font = { name: 'Arial Narrow', size: 10 };
+        currentRow = 14;
+      }
+
+      // Oferta más cercana (ajustar según el tipo de servicio)
+      const serviceTitulo = tipoServicio === "S" ? 'Oferta de salud más cercana al centro poblado de interés:' : 'Oferta educativa más cercana al centro poblado de interés:';
+      const serviceCampo = tipoServicio === "S" ? 'E.S.' : 'I.E.';
+      const codigoCampo = tipoServicio === "S" ? 'Código único del E.S.:' : 'Código modular de la I.E.:';
+      const categoriaCampo = tipoServicio === "S" ? 'Categoría del E.S.:' : 'Nivel de la I.E.:';
+      
+      worksheet.getCell(`A${currentRow + 1}`).value = serviceTitulo;
+      worksheet.getCell(`A${currentRow + 1}`).font = { bold: true, name: 'Arial Narrow', size: 10 };
+      worksheet.getCell(`A${currentRow + 1}`).alignment = { vertical: 'middle', horizontal: 'left' };
+
+      worksheet.getCell(`A${currentRow + 2}`).value = `El ${serviceCampo} más cercano:`;
+      worksheet.getCell(`B${currentRow + 2}`).value = datosResumen.campoCercano || '';
+      worksheet.getCell(`A${currentRow + 3}`).value = codigoCampo;
+      worksheet.getCell(`B${currentRow + 3}`).value = datosResumen.codigoEs || '';
+      worksheet.getCell(`A${currentRow + 4}`).value = categoriaCampo;
+      worksheet.getCell(`B${currentRow + 4}`).value = datosResumen.categoriaEs || '';
+      worksheet.getCell(`A${currentRow + 5}`).value = `Localizado a:`;
+      worksheet.getCell(`B${currentRow + 5}`).value = datosResumen.distanciaLocalizado || '';
+      
+      for (let i = currentRow + 2; i <= currentRow + 5; i++) {
         worksheet.getCell(`A${i}`).font = { name: 'Arial Narrow', size: 10 };
         worksheet.getCell(`B${i}`).font = { name: 'Arial Narrow', size: 10 };
       }
 
-      // Oferta educativa más cercana
-      worksheet.getCell('A19').value = 'Oferta educativa más cercana al centro poblado de interés:';
-  worksheet.getCell('A19').font = { bold: true, name: 'Arial Narrow', size: 10 };
-      worksheet.getCell('A19').alignment = { vertical: 'middle', horizontal: 'left' };
-
-      worksheet.getCell('A20').value = `La I.E. más cercana:`;
-      worksheet.getCell('B20').value = datosResumen.campoCercano;
-      worksheet.getCell('A21').value = `Código modular de la I.E.:`;
-      worksheet.getCell('B21').value = datosResumen.codigoEs;
-      worksheet.getCell('A22').value = `Nivel de la I.E.:`;
-      worksheet.getCell('B22').value = datosResumen.categoriaEs;
-      worksheet.getCell('A23').value = `Localizado a:`;
-      worksheet.getCell('B23').value = datosResumen.distanciaLocalizado;
-      for (let i = 20; i <= 23; i++) {
-        worksheet.getCell(`A${i}`).font = { name: 'Arial Narrow', size: 10 };
-        worksheet.getCell(`B${i}`).font = { name: 'Arial Narrow', size: 10 };
-      }
-
-      // Fuente
-      worksheet.mergeCells('A25:B29');
-      worksheet.getCell('A25').value = 'Fuente:\nPlataforma de Estadística de la Calidad Educativa (ESCALE), 2023.\nRegistro Nacional de Instituciones Prestadoras de Servicios de Salud (RENIPRESS), 2024.\nCentros poblados del Instituto Nacional de Estadística e Informática (INEI), 2023.\nProgramas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2025.';
-      worksheet.getCell('A25').alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
-      worksheet.getCell('A25').fill = {
+      // Fuente (ajustar la posición dinámicamente)
+      const fuenteRow = currentRow + 7;
+      worksheet.mergeCells(`A${fuenteRow}:B${fuenteRow + 4}`);
+      worksheet.getCell(`A${fuenteRow}`).value = 'Fuente:\nPlataforma de Estadística de la Calidad Educativa (ESCALE), 2023.\nRegistro Nacional de Instituciones Prestadoras de Servicios de Salud (RENIPRESS), 2024.\nCentros poblados del Instituto Nacional de Estadística e Informática (INEI), 2023.\nProgramas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2025.';
+      worksheet.getCell(`A${fuenteRow}`).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
+      worksheet.getCell(`A${fuenteRow}`).fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'FFF9E5' }
       };
-  worksheet.getCell('A25').font = { italic: true, color: { argb: '000000' }, size: 10, name: 'Arial Narrow' };
+      worksheet.getCell(`A${fuenteRow}`).font = { italic: true, color: { argb: '000000' }, size: 10, name: 'Arial Narrow' };
 
       // Agregar la fecha en una fila separada sin fondo amarillo
-      worksheet.mergeCells('A30:B30');
-      worksheet.getCell('A30').value = generarFechaReporte();
-  worksheet.getCell('A30').font = { italic: true, bold: true, name: 'Arial Narrow', size: 10 };
-      worksheet.getCell('A30').alignment = { 
+      const fechaRow = fuenteRow + 5;
+      worksheet.mergeCells(`A${fechaRow}:B${fechaRow}`);
+      worksheet.getCell(`A${fechaRow}`).value = generarFechaReporte();
+      worksheet.getCell(`A${fechaRow}`).font = { italic: true, bold: true, name: 'Arial Narrow', size: 10 };
+      worksheet.getCell(`A${fechaRow}`).alignment = { 
         vertical: 'top', 
         horizontal: 'left',
         wrapText: true 

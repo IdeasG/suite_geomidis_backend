@@ -64,10 +64,6 @@ export const notificacionSolicitudAdminTemplate = `
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <img src="{{baseUrl}}/assets/images/geoportal-01.jpg" alt="Logo Geoportal MIDIS">
-    </div>
-
     <div class="content">
       <h2>Nueva solicitud de registro en el Geoportal MIDIS</h2>
 
