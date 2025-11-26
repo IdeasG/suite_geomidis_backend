@@ -581,6 +581,10 @@ export class CapasService {
 
   async EliminarCapas(id_capa,id_usuario_auditoria,id_rol_auditoria) {
     try {
+      // Primero eliminar los estilos relacionados con la capa
+      await CapasEstilos.destroy({ where: { id_capa } });
+      
+      // Luego actualizar la auditoria de la capa
       await Capas.update(
         {
           id_usuario_auditoria,
@@ -588,11 +592,14 @@ export class CapasService {
         },
         { where: { id_capa } }
       );
+      
+      // Finalmente eliminar la capa
       const response = await Capas.destroy({ where: { id_capa } });
       // console.log(response);
       return response;
     } catch (error) {
-      throw new Error("Error al actualizar capas");
+      console.error("Error en EliminarCapas:", error);
+      throw new Error("Error al eliminar capa: " + error.message);
     }
   }
 
