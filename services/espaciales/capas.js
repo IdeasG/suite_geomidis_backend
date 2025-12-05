@@ -309,19 +309,23 @@ export class CapasService {
             WHERE table_name = '${nombreTabla}' AND table_schema = '${esquema}'
           `);
 
-          // Crear un mapa de tipos de datos por nombre de campo
+
+          // Crear un mapa de tipos de datos por nombre de campo (normalizado en lowercase)
           const tiposPorCampo = {};
           tiposCampos.forEach(campo => {
-            tiposPorCampo[campo.column_name] = campo.data_type;
+            tiposPorCampo[(campo.column_name || '').toLowerCase()] = campo.data_type;
           });
 
-          // Agregar tipo de dato a cada campo en c_array_campos
+          // Agregar tipo de dato a cada campo en c_array_campos (lookup case-insensitive)
           const responseConTipos = response.map(item => {
             const itemData = item.toJSON ? item.toJSON() : item;
-            const camposConTipos = itemData.c_array_campos.map(campo => ({
-              ...campo,
-              c_tipo_dato: tiposPorCampo[campo.c_campo_original] || 'unknown'
-            }));
+            const camposConTipos = itemData.c_array_campos.map(campo => {
+              const key = (campo.c_campo_original || '').toString().toLowerCase();
+              return {
+                ...campo,
+                c_tipo_dato: tiposPorCampo[key] || 'unknown'
+              };
+            });
 
             return {
               ...itemData,
@@ -378,10 +382,13 @@ export class CapasService {
 
           // Agregar tipo de dato a cada campo en c_array_campos
           const responseConTipos = response.map(item => {
-            const camposConTipos = item.c_array_campos.map(campo => ({
-              ...campo,
-              c_tipo_dato: tiposPorCampo[campo.c_campo_original] || 'unknown'
-            }));
+            const camposConTipos = item.c_array_campos.map(campo => {
+              const key = (campo.c_campo_original || '').toString().toLowerCase();
+              return {
+                ...campo,
+                c_tipo_dato: tiposPorCampo[key] || 'unknown'
+              };
+            });
 
             return {
               ...item,
@@ -940,7 +947,8 @@ export class CapasService {
       let nuevasColumnas = [];
       for (let index in results2) {
         const element = results2[index];
-        if (element.column_name !== "geom" && element.column_name !== "CODOBJ" && element.column_name !== "gid" && element.column_name !== "ideasg") {
+        const colLower = (element.column_name || '').toString().toLowerCase();
+        if (!['geom', 'codobj', 'gid', 'ideasg'].includes(colLower)) {
           const registrados = {
             c_campo_original: element.column_name,
             c_campo_alias: element.column_name,
@@ -979,7 +987,8 @@ export class CapasService {
       let nuevasColumnas = [];
       for (let index in results2) {
         const element = results2[index];
-        if (element.column_name !== "geom" && element.column_name !== "CODOBJ" && element.column_name !== "gid" && element.column_name !== "ideasg") {
+        const colLower = (element.column_name || '').toString().toLowerCase();
+        if (!['geom', 'codobj', 'gid', 'ideasg'].includes(colLower)) {
           const registrados = {
             c_campo_original: element.column_name,
             c_campo_alias: element.column_name,
@@ -1005,6 +1014,185 @@ export class CapasService {
       throw new Error(
         "Error al obtener las capas visibles con el id_capa:" + id_capa + error
       );
+    }
+  }
+
+  /**
+   * Sincroniza el registro de campos visibles para una capa/rol.
+   * - Si la tabla no existe, guarda/actualiza el registro con un array vacío.
+   * - Si la tabla existe, crea el arreglo de columnas actual y lo compara con el
+   *   registro existente; si hay diferencias lo actualiza.
+   * Devuelve el registro actualizado (en un arreglo) con el campo `c_tipo_dato` incluido.
+   */
+  async syncCapasVisibles(id_capa, id_rol) {
+    try {
+      // buscar registro actual
+      const registroExistente = await CapasMostrar.findOne({ where: { id_capa, id_rol } });
+
+      // obtener info de la capa (tabla y esquema)
+      const [results, metadata] = await sequelize.query(
+        `select * from administracion.tadm_capas where id_capa = ${id_capa}`
+      );
+
+      if (!results || results.length === 0) {
+        // si no existe la capa en maestros, garantizar que exista un registro vacío
+        if (registroExistente) {
+          await CapasMostrar.update({ c_array_campos: [] }, { where: { id_capa, id_rol } });
+          return [await CapasMostrar.findOne({ where: { id_capa, id_rol } })];
+        }
+        const creado = await CapasMostrar.create({ id_capa, c_array_campos: [], id_rol });
+        return [creado];
+      }
+
+      const c_nombre_tabla_capa = results[0].c_nombre_tabla_capa;
+      const c_nombre_esquema = results[0].c_nombre_esquema || 'espaciales';
+
+      // verificar existencia de la tabla
+      const [tablaExists] = await sequelize.query(`
+        SELECT EXISTS (
+          SELECT 1 FROM information_schema.tables
+          WHERE table_schema = '${c_nombre_esquema}' AND table_name = '${c_nombre_tabla_capa}'
+        ) as exists
+      `);
+
+      const exists = tablaExists && tablaExists[0] && tablaExists[0].exists;
+
+      if (!exists) {
+        // tabla eliminada: dejar registro vacío
+        if (registroExistente) {
+          await CapasMostrar.update({ c_array_campos: [] }, { where: { id_capa, id_rol } });
+          return [await CapasMostrar.findOne({ where: { id_capa, id_rol } })];
+        }
+        const creado = await CapasMostrar.create({ id_capa, c_array_campos: [], id_rol });
+        return [creado];
+      }
+
+      // obtener columnas actuales de la tabla
+      const [cols] = await sequelize.query(`
+        SELECT column_name, data_type FROM information_schema.columns
+        WHERE table_schema = '${c_nombre_esquema}' AND table_name = '${c_nombre_tabla_capa}'
+      `);
+
+      // construir arreglo nuevo de columnas filtrando geom/GID y similares (case-insensitive)
+      const nuevasColumnas = [];
+      for (let i in cols) {
+        const el = cols[i];
+        const colLower = (el.column_name || '').toString().toLowerCase();
+        if (!['geom', 'codobj', 'gid', 'ideasg'].includes(colLower)) {
+          nuevasColumnas.push({
+            c_campo_original: el.column_name,
+            c_campo_alias: el.column_name,
+            b_campo: false,
+            c_tipo_dato: el.data_type
+          });
+        }
+      }
+
+      // si no hay registro previo, crear
+      if (!registroExistente) {
+        const creado = await CapasMostrar.create({ id_capa, c_array_campos: nuevasColumnas, id_rol });
+        return [creado];
+      }
+
+      // comparar nombres de campo para decidir actualización
+      const existentes = registroExistente.c_array_campos || [];
+      const nombresExistentes = existentes.map(e => e.c_campo_original).sort();
+      const nombresNuevos = nuevasColumnas.map(e => e.c_campo_original).sort();
+
+      const iguales = JSON.stringify(nombresExistentes) === JSON.stringify(nombresNuevos);
+
+      if (!iguales) {
+        // actualizar el registro con las nuevas columnas
+        await CapasMostrar.update({ c_array_campos: nuevasColumnas }, { where: { id_capa, id_rol } });
+        const actualizado = await CapasMostrar.findOne({ where: { id_capa, id_rol } });
+        return [actualizado];
+      }
+
+      // si son iguales, devolver el registro enriquecido con tipos (por compatibilidad)
+      const registroJSON = registroExistente.toJSON ? registroExistente.toJSON() : registroExistente;
+      // asegurarse de incluir c_tipo_dato si falta (lookup case-insensitive)
+      const tiposPorCampo = {};
+      cols.forEach(c => { tiposPorCampo[(c.column_name || '').toLowerCase()] = c.data_type; });
+      const camposConTipos = registroJSON.c_array_campos.map(campo => {
+        const key = (campo.c_campo_original || '').toString().toLowerCase();
+        return {
+          ...campo,
+          c_tipo_dato: campo.c_tipo_dato || tiposPorCampo[key] || 'unknown'
+        };
+      });
+
+      return [{ ...registroJSON, c_array_campos: camposConTipos }];
+    } catch (error) {
+      throw new Error('Error al sincronizar capas visibles: ' + error.message);
+    }
+  }
+
+  /**
+   * Sincroniza el registro de campos visibles para una capa/cliente invitado.
+   * Busca el rol 'invitado' del cliente y delega en `syncCapasVisibles`.
+   */
+  async syncCapasVisiblesInvitado(id_capa, id_cliente) {
+    try {
+      const [roles] = await sequelize.query(`
+        select * from seguridad.tseg_roles
+        where id_cliente = ${id_cliente} and c_nombre_rol ilike '%invitado%';
+      `);
+
+      if (roles && roles.length > 0) {
+        const id_rol = roles[0].id_rol;
+        return await this.syncCapasVisibles(id_capa, id_rol);
+      }
+
+      // Si no se encontró rol invitado, devolver cualquier registro existente (sincrear)
+      const [response, metadata] = await sequelize.query(`
+        select cm.* from administracion.tadm_capas_campos_mostrar cm
+        left join seguridad.tseg_roles tr on cm.id_rol = tr.id_rol
+        where tr.id_cliente = ${id_cliente} and tr.c_nombre_rol ilike '%invitado%' and id_capa = ${id_capa};
+      `);
+
+      if (response && response.length > 0) {
+        // intentar enriquecer tipos igual que getCapasVisiblesInvitado
+        const [capaInfo] = await sequelize.query(`
+          select c_nombre_tabla_capa, c_nombre_esquema from administracion.tadm_capas 
+          where id_capa = ${id_capa}
+        `);
+
+        if (capaInfo && capaInfo.length > 0) {
+          const nombreTabla = capaInfo[0].c_nombre_tabla_capa;
+          const esquema = capaInfo[0].c_nombre_esquema || 'espaciales';
+          const [tiposCampos] = await sequelize.query(`
+            SELECT column_name, data_type 
+            FROM information_schema.columns
+            WHERE table_name = '${nombreTabla}' AND table_schema = '${esquema}'
+          `);
+
+          const tiposPorCampo = {};
+          tiposCampos.forEach(campo => {
+            tiposPorCampo[(campo.column_name || '').toLowerCase()] = campo.data_type;
+          });
+
+          const responseConTipos = response.map(item => {
+            const camposConTipos = item.c_array_campos.map(campo => {
+              const key = (campo.c_campo_original || '').toString().toLowerCase();
+              return {
+                ...campo,
+                c_tipo_dato: tiposPorCampo[key] || 'unknown'
+              };
+            });
+
+            return {
+              ...item,
+              c_array_campos: camposConTipos
+            };
+          });
+
+          return responseConTipos;
+        }
+      }
+
+      return response;
+    } catch (error) {
+      throw new Error('Error al sincronizar capas visibles invitado: ' + error.message);
     }
   }
 

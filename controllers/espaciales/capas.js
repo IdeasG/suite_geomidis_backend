@@ -505,7 +505,7 @@ export class CapasController {
   }
 
   async getVisibles(req, res) {
-    // console.log('prueba');
+    // console.log('prueba campos');
     const { id_capa, id_rol } = req.params;
     const {id_rol:id_rol_usuario} = req.user;
     console.log(id_capa,id_rol,id_rol_usuario);
@@ -516,19 +516,13 @@ export class CapasController {
       } else {
         id_rol_enviar = id_rol_usuario.toString()
       }
-      // console.log('ID_CAPA Y ROL FINAL:' + id_capa, id_rol_enviar);
-      let dbResponse = await capasService.getCapasVisibles(id_capa, id_rol_enviar);
-      if (dbResponse.length == 0) {
-        const responseCreate = await capasService.postCapasVisibles(
-          id_capa,
-          id_rol_enviar
-        );
-        // console.log(responseCreate);
-        dbResponse = responseCreate;
-      }
+      // sincronizar las columnas/JSON antes de devolver
+      const dbResponse = await capasService.syncCapasVisibles(id_capa, id_rol_enviar);
+      // syncCapasVisibles devuelve un arreglo similar a getCapasVisibles/postCapasVisibles
       console.log(dbResponse);
       res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -536,18 +530,8 @@ export class CapasController {
   async getVisiblesInvitado(req, res) {
     const { id_capa, id_cliente } = req.params;
     try {
-      // console.log('ID_CAPA Y ROL FINAL:' + id_capa, id_cliente);
-      let dbResponse = await capasService.getCapasVisiblesInvitado(id_capa, id_cliente);
-      if (dbResponse.length == 0) {
-        // console.log('vamos a crear una capa');
-        const responseCreate = await capasService.postCapasVisiblesInvitado(
-          id_capa,
-          id_cliente
-        );
-        // console.log(responseCreate);
-        dbResponse = responseCreate;
-      }
-      // console.log(dbResponse);
+      // sincronizar los campos para el rol invitado antes de devolver
+      const dbResponse = await capasService.syncCapasVisiblesInvitado(id_capa, id_cliente);
       res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       res.status(500).json({ error: error.message });
