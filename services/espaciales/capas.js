@@ -775,14 +775,14 @@ export class CapasService {
         WHERE ${where}
         order by distancia_km asc
       `);
-      // console.log(`
-      //   SELECT espaciales.${tabla}.*,cp.nombccpp,pobl.area as area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar ${clasicacionCS} FROM espaciales.${tabla}
-      //   left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
-      //   left join espaciales.poblaciones pobl on espaciales.${tabla}.id_ccpp = pobl.cod_ccpp
-      //   left join ${leftjoin}
-      //   WHERE ${where}
-      //   order by distancia_km asc
-      // `);
+      console.log(`
+        SELECT espaciales.${tabla}.*,cp.nombccpp,pobl.area as area_17,cp.ubigeo,cp.coddpto,cp.codprov,cp.coddist,cp.codccpp,cp.nombdep,cp.nombprov,cp.nombdist,cp.capital, nomb.${nombEst} as nombre_lugar ${clasicacionCS} FROM espaciales.${tabla}
+        left join espaciales.sp_centros_poblados cp on espaciales.${tabla}.id_ccpp = cp.idccpp_21
+        left join espaciales.poblaciones pobl on espaciales.${tabla}.id_ccpp = pobl.cod_ccpp
+        left join ${leftjoin}
+        WHERE ${where}
+        order by distancia_km asc
+      `);
       // console.log(results);
       return results;
     } catch (error) {
@@ -843,6 +843,31 @@ export class CapasService {
       return results;
     } catch (error) {
       throw new Error("Error al obtener los resultados..." + error);
+    }
+  }
+
+  async filtroServiciosAreaGeneralesPoblaciones(ccppFormato) {
+    try {
+      const [results, metadata] = await sequelize.query(`
+        SELECT
+          pobl.cod_ccpp as id_ccpp,
+          pobl.codccpp as codccpp,
+          pobl.nomccpp as nombccpp,
+          pobl.area,
+          pobl.ubigeo,
+          SUM(COALESCE(pobl.pobtotal,0)) as pob_total_cpv2017,
+          SUM(COALESCE(pobl.edad_me1,0)) as pob_menor_1_anio_pnominal,
+          SUM(COALESCE(pobl.edad_me3,0)) as pob_menor_3_anios_pnominal,
+          SUM(COALESCE(pobl.edad3a5,0)) as pob_3_5_anios_cpv2017,
+          SUM(COALESCE(pobl.edad6a11,0)) as pob_6_11_anios_cpv2017,
+          SUM(COALESCE(pobl.edad12a16,0)) as pob_12_16_anios_cpv2017
+        FROM espaciales.poblaciones pobl
+        WHERE pobl.cod_ccpp in (${ccppFormato})
+        GROUP BY pobl.cod_ccpp, pobl.codccpp, pobl.nomccpp, pobl.area, pobl.ubigeo
+      `);
+      return results;
+    } catch (error) {
+      throw new Error("Error al obtener los resultados (poblaciones):" + error);
     }
   }
 

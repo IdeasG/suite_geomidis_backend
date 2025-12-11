@@ -647,33 +647,14 @@ export class CapasController {
   async filtroServiciosAreaGenerales(req,res) {
     const { idccpp, tipoServicio} = req.body;
     // console.log(req.body);
-    const ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+    // adaptado: ahora usamos una única tabla `espaciales.poblaciones` y devolvemos
+    // las cantidades con los mismos alias que esperaba el frontend
     try {
-      let tabla
-      let where
-      let leftjoin
-      let nombEst
-      let clasicacionCS = ''
-      switch (tipoServicio) {
-        case "S":
-          tabla = "ccpp_eess_total_atributos"
-          where = "id_ccpp in ("+ccppFormato+")"
-          leftjoin = 'espaciales.eess as nomb on nomb."código_ú" = espaciales.ccpp_eess_total_atributos.codigo_eess'
-          nombEst = "nombre_del"
-          clasicacionCS = ',nomb.clasificac'
-          break;
-        case "E":
-          tabla = "ccpp_iiee_total_atributos"
-          where = "id_ccpp in ("+ccppFormato+")"
-          leftjoin = 'espaciales.iiee as nomb on nomb."vcodlocal" = espaciales.ccpp_iiee_total_atributos.codlocal_iiee'
-          nombEst = "vinseducat"
-        break;
-        default:
-          break;
+      if (!Array.isArray(idccpp) || idccpp.length === 0) {
+        return res.status(200).json({ status: "success", data: [] });
       }
-      const respuesta = await capasService.filtroServicios(
-        tabla, where,leftjoin,nombEst,clasicacionCS
-      );
+      const ccppFormato = idccpp.map(item => `'${item}'`).join(', ');
+      const respuesta = await capasService.filtroServiciosAreaGeneralesPoblaciones(ccppFormato);
       res.status(200).json({ status: "success", data: respuesta });
     } catch (error) {
       res.status(500).json({ error: error.message });
