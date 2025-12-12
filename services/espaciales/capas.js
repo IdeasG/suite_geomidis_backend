@@ -1103,7 +1103,7 @@ export class CapasService {
       for (let i in cols) {
         const el = cols[i];
         const colLower = (el.column_name || '').toString().toLowerCase();
-        if (!['geom', 'codobj', 'gid', 'ideasg'].includes(colLower)) {
+        if (!['geom', 'codobj', 'gid', 'ideasg', 'fid', 'id'].includes(colLower)) {
           nuevasColumnas.push({
             c_campo_original: el.column_name,
             c_campo_alias: el.column_name,
