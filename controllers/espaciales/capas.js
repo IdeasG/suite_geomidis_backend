@@ -1704,7 +1704,7 @@ async descargarExcelUbigeo(req, res) {
 
       // Subtítulo (A2:F2)
       worksheetRG.mergeCells('A2:F2');
-      worksheetRG.getCell('A2').value = 'Cobertura de Servicios de Educación públicos nivel secundaria dentro de 10 km / 2 horas';
+      worksheetRG.getCell('A2').value = tipoServicio == "S" ? 'Cobertura de Servicios de Salud públicos nivel secundaria dentro de ' + distancia : 'Cobertura de Servicios de Educación públicos nivel secundaria dentro de ' + distancia;
       worksheetRG.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
       worksheetRG.getCell('A2').font = { bold: true, color: { argb: '000000' }, size: 10, name: 'Arial Narrow' };
       worksheetRG.getCell('A2').fill = {
@@ -1715,9 +1715,9 @@ async descargarExcelUbigeo(req, res) {
       worksheetRG.getRow(2).height = 22;
 
       worksheetRG.mergeCells('A4:E4');
-      worksheetRG.getCell("A4").value = 'Datos generales de los centros poblados e instituciones educativas en consulta:';
-  worksheetRG.getCell('A4').alignment = { vertical: 'middle', horizontal: 'left' };
-  worksheetRG.getCell('A4').font = { bold: true, name: 'Arial Narrow', size: 10 };
+      worksheetRG.getCell("A4").value = tipoServicio == "S" ? 'Datos generales de los centros poblados y establecimientos de salud en consulta:' : 'Datos generales de los centros poblados e instituciones educativas en consulta:';
+    worksheetRG.getCell('A4').alignment = { vertical: 'middle', horizontal: 'left' };
+    worksheetRG.getCell('A4').font = { bold: true, name: 'Arial Narrow', size: 10 };
 
       console.log(datosResumen.tipoDibujoActual,'tipo poligono?');
       if (datosResumen.tipoDibujoActual != 'dibujo') {
@@ -1863,8 +1863,7 @@ async descargarExcelUbigeo(req, res) {
       }
       const fuenteStartRow = tablaDatosCercanos.length + 25;
       worksheetRG.mergeCells(`A${fuenteStartRow}:F${fuenteStartRow + 4}`);
-      worksheetRG.getCell(`A${fuenteStartRow}`).value =
-        "Fuente:\nPlataforma de Estadística de la Calidad Educativa (ESCALE), 2023.\nRegistro Nacional de Instituciones Prestadoras de Servicios de Salud (RENIPRESS), 2024.\nCentros poblados del Instituto Nacional de Estadística e Informática (INEI), 2023.\nProgramas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2024.";
+      worksheetRG.getCell(`A${fuenteStartRow}`).value = "Fuente:\nPlataforma de Estadística de la Calidad Educativa (ESCALE), 2023.\nRegistro Nacional de Instituciones Prestadoras de Servicios de Salud (RENIPRESS), 2024.\nCentros poblados del Instituto Nacional de Estadística e Informática (INEI), 2023.\nProgramas Nacionales del Ministerio de Desarrollo e Inclusión Social (MIDIS), 2024.";
       worksheetRG.getCell(`A${fuenteStartRow}`).alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
       worksheetRG.getCell(`A${fuenteStartRow}`).fill = {
         type: 'pattern',
