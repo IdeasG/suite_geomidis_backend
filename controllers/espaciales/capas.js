@@ -402,7 +402,7 @@ export class CapasController {
 
   async getStructureInvitado(req, res) {
     const { id_geoportal } = req.params;
-    console.log(id_geoportal);
+    // console.log(id_geoportal);
     try {
       const rol = await Rol.findOne({
         where: {
@@ -522,7 +522,7 @@ export class CapasController {
     // console.log('prueba campos');
     const { id_capa, id_rol } = req.params;
     const {id_rol:id_rol_usuario} = req.user;
-    console.log(id_capa,id_rol,id_rol_usuario);
+    // console.log(id_capa,id_rol,id_rol_usuario);
     try {
       let id_rol_enviar
       if (id_rol != "undefined") {
@@ -533,7 +533,7 @@ export class CapasController {
       // sincronizar las columnas/JSON antes de devolver
       const dbResponse = await capasService.syncCapasVisibles(id_capa, id_rol_enviar);
       // syncCapasVisibles devuelve un arreglo similar a getCapasVisibles/postCapasVisibles
-      console.log(dbResponse);
+      // console.log(dbResponse);
       res.status(200).json({ status: "success", data: dbResponse });
     } catch (error) {
       console.log(error);
@@ -1857,7 +1857,7 @@ async descargarExcelSeleccionArea(req, res) {
 
   async descargarExcelFiltros(req, res) {
     const { tipoServicio,categoria,distancia,nivel,idccpp,datosResumen} = req.body;
-    console.log('datosResumen en excel filtro',datosResumen);
+    // console.log('datosResumen en excel filtro',datosResumen);
     const titulo = 'Filtro demanda.'
 
     function generarFechaReporte() {
@@ -1910,7 +1910,17 @@ async descargarExcelSeleccionArea(req, res) {
 
       // Subtítulo (A2:F2)
       worksheetRG.mergeCells('A2:F2');
-      worksheetRG.getCell('A2').value = tipoServicio == "S" ? 'Cobertura de Servicios de Salud públicos nivel secundaria dentro de ' + datosResumen.labelDistanciaSeleccionado : 'Cobertura de Servicios de Educación públicos nivel secundaria dentro de ' + datosResumen.labelDistanciaSeleccionado;
+      // Para servicios de salud usar las categorías (array `categoria`) separadas por comas.
+      // Para educación usar el campo `nivel`.
+      let subtitleA2 = '';
+      if (tipoServicio == "S") {
+        const categoriasTexto = Array.isArray(categoria) ? categoria.join(', ') : (categoria || '');
+        subtitleA2 = 'Cobertura de Servicios de Salud públicos categoría(s) ' + categoriasTexto + ' dentro de ' + datosResumen.labelDistanciaSeleccionado;
+      } else {
+        const nivelTexto = nivel || '';
+        subtitleA2 = 'Cobertura de Servicios de Educación públicos nivel ' + nivelTexto + ' dentro de ' + datosResumen.labelDistanciaSeleccionado;
+      }
+      worksheetRG.getCell('A2').value = subtitleA2;
       worksheetRG.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
       worksheetRG.getCell('A2').font = { bold: true, color: { argb: '000000' }, size: 10, name: 'Arial Narrow' };
       worksheetRG.getCell('A2').fill = {
@@ -1925,7 +1935,6 @@ async descargarExcelSeleccionArea(req, res) {
     worksheetRG.getCell('A4').alignment = { vertical: 'middle', horizontal: 'left' };
     worksheetRG.getCell('A4').font = { bold: true, name: 'Arial Narrow', size: 10 };
 
-      console.log(datosResumen.tipoDibujoActual,'tipo poligono?');
       if (datosResumen.tipoDibujoActual != 'dibujo') {
         worksheetRG.getCell(5,1).value = 'REGIÓN:'; worksheetRG.getCell(5,2).value = datosResumen.nombreDepartamento;
         worksheetRG.getCell(6,1).value = 'PROVINCIA:'; worksheetRG.getCell(6,2).value = datosResumen.nombreProvincia;
@@ -1945,7 +1954,7 @@ async descargarExcelSeleccionArea(req, res) {
       worksheetRG.getCell("A12").value = datosResumen.conteoTotalCCPP + ' centros poblados (' + datosResumen.porcePoblacion +'%) y ' + datosResumen.conteoPersoCober +' personas (' + datosResumen.porcePersoCober +'%) tienen cobertura de servicio'
       worksheetRG.getCell('A12').alignment = { vertical: 'middle', horizontal: 'left' };
   worksheetRG.getCell('A12').font = { bold: true, name: 'Arial Narrow', size: 10 };
-      console.log(datosResumen.newDataTable,'data resumen?');
+      // console.log(datosResumen.newDataTable,'data resumen?');
       const tablaResumen = datosResumen.newDataTable.map(item => ({
         "1": item.nombre,
         "2": item.cantidad
@@ -2217,10 +2226,10 @@ async descargarExcelSeleccionArea(req, res) {
         res.status(200).end();
       });
     } catch (error) {
-      console.log({
-        status: "error",
-        message: "Error en el servidor " + error,
-      });
+      // console.log({
+      //   status: "error",
+      //   message: "Error en el servidor " + error,
+      // });
       res.json({
         status: "error",
         message: "Error en el servidor " + error,

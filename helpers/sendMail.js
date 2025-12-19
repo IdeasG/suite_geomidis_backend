@@ -56,45 +56,49 @@ export function compileNotificacionUsuarioAprobadoTemplate(nombre, usuario) {
 }
 
 export async function sendMail({ to, name, subject, body }) {
-  const { SMTP_EMAIL, SMTP_PASSWORD } = process.env;
+  const {
+    SMTP_EMAIL,
+    SMTP_PASSWORD,
+    SMTP_HOST,
+    SMTP_PORT,
+    SMTP_SECURE,
+    SMTP_AUTH,
+    SMTP_FROM,
+  } = process.env;
 
-  console.log(SMTP_EMAIL, SMTP_PASSWORD);
-  const transport = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465, // Prueba también con 587 si 465 falla
-    secure: true, // true para 465, false para 587 con STARTTLS
-    auth: {
-        user: SMTP_EMAIL,
-        pass: SMTP_PASSWORD, // Usa una contraseña de aplicaciones en lugar de la normal
-    },
-  });
+  const host = SMTP_HOST || "smtp.gmail.com";
+  const port = SMTP_PORT ? parseInt(SMTP_PORT, 10) : 465;
+  const secure = typeof SMTP_SECURE !== "undefined" ? SMTP_SECURE === "true" : port === 465;
 
+  const transportOptions = { host, port, secure };
+
+  // If explicit auth is disabled (SMTP_AUTH='false') or no password provided, do not include auth
+  const shouldAuth = SMTP_AUTH !== "false" && SMTP_PASSWORD;
+  if (shouldAuth) {
+    transportOptions.auth = { user: SMTP_EMAIL, pass: SMTP_PASSWORD };
+  }
+
+  const transport = nodemailer.createTransport(transportOptions);
+
+  // Verify but do not abort on verify errors — some relays allow send without auth (IP white-listed)
   transport.verify((error, success) => {
     if (error) {
-        console.error("Error de conexión SMTP:", error);
+      console.warn("SMTP verify warning:", error);
     } else {
-        console.log("Servidor SMTP listo para enviar correos");
+      console.log("Servidor SMTP listo para enviar correos");
     }
   });
 
   try {
-    const testResult = await transport.verify();
-    console.log(testResult);
-  } catch (error) {
-    console.error({ error });
-    return;
-  }
-
-  try {
     const sendResult = await transport.sendMail({
-      from: SMTP_EMAIL,
+      from: SMTP_FROM || SMTP_EMAIL,
       to,
       subject,
       html: body,
     });
-    console.log(sendResult);
+    console.log("sendMail result:", sendResult);
   } catch (error) {
-    console.log(error);
+    console.error("Error sending mail:", error);
   }
 }
 
