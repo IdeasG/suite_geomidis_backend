@@ -34,6 +34,7 @@ export const createRouteCapas = () => {
   CapaRouter.post("/vistas", validarToken, capasController.postVistas);
   CapaRouter.post("/excel", capasController.descargarExcel);
   CapaRouter.post("/excel/ubigeo", capasController.descargarExcelUbigeo);
+  CapaRouter.post("/excel/seleccionarea", capasController.descargarExcelSeleccionArea);
   CapaRouter.post("/excel/simple", capasController.descargarExcelSimple);
   CapaRouter.post("/excel/cruzada", capasController.descargarExcelCruzada);
   CapaRouter.post("/excel/solocapas", capasController.descargarExcelSoloCapas);

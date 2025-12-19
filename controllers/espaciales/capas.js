@@ -16,6 +16,20 @@ import { log } from "console";
 
 const capasService = new CapasService();
 
+// Helper: sanitiza nombres de hoja Excel eliminando caracteres inválidos y acortando a 31 chars
+function sanitizeSheetName(texto, maxLen = 31) {
+  if (!texto) return 'Hoja';
+  const cleaned = String(texto)
+    // eliminar caracteres inválidos para nombres de hoja: * ? : \ / [ ]
+    .replace(/[*?:\\\/\[\]]/g, '')
+    // normalizar espacios
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!cleaned) return 'Hoja';
+  if (cleaned.length <= maxLen) return cleaned;
+  return cleaned.substring(0, maxLen - 3).trim() + '...';
+}
+
 export class CapasController {
   constructor() {}
 
@@ -1317,12 +1331,15 @@ export class CapasController {
 
 async descargarExcelUbigeo(req, res) {
   function acortarTexto(texto, longitudMaxima) {
+    if (!texto) return '';
     if (texto.length > longitudMaxima) {
       return texto.substring(0, longitudMaxima - 3) + "...";
     } else {
       return texto;
     }
   }
+
+  // NOTE: use module-level sanitizeSheetName
 
   function generarFechaReporte() {
     try {
@@ -1480,8 +1497,8 @@ async descargarExcelUbigeo(req, res) {
         }
       }
       datosCapas.forEach((element) => {
-        let titulo = (element.grupo ? element.grupo + ' ' : '') + (element.capa || '');
-        titulo = acortarTexto(titulo, 31);
+        const tituloBase = (element.grupo ? element.grupo + ' ' : '') + (element.capa || '');
+        let titulo = sanitizeSheetName(tituloBase, 31);
         if (nombresExistentes.includes(titulo)) {
           titulo = nombreUnico(nombresExistentes, titulo);
           nombresExistentes.push(titulo);
@@ -1515,6 +1532,194 @@ async descargarExcelUbigeo(req, res) {
     res.setHeader(
       "Content-Disposition",
       "attachment; filename=" + "Visor_Geografico_Ubigeo.xlsx"
+    );
+
+    return workbook.xlsx.write(res).then(function () {
+      res.status(200).end();
+    });
+  } catch (error) {
+    res.json({
+      status: "error",
+      message: "Error en el servidor " + error,
+    });
+  }
+}
+
+async descargarExcelSeleccionArea(req, res) {
+  function acortarTexto(texto, longitudMaxima) {
+    if (texto.length > longitudMaxima) {
+      return texto.substring(0, longitudMaxima - 3) + "...";
+    } else {
+      return texto;
+    }
+  }
+
+  function generarFechaReporte() {
+    try {
+      const ahora = new Date();
+      const fechaLima = new Date(ahora.toLocaleString("en-US", {timeZone: "America/Lima"}));
+      const meses = [
+        'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+        'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      ];
+      const dia = fechaLima.getDate().toString().padStart(2, '0');
+      const mes = meses[fechaLima.getMonth()];
+      const año = fechaLima.getFullYear();
+      const hora = fechaLima.getHours().toString().padStart(2, '0');
+      const minutos = fechaLima.getMinutes().toString().padStart(2, '0');
+      return `Generado el ${dia} de ${mes} de ${año}, a las ${hora}:${minutos}H`;
+    } catch (error) {
+      return 'Fecha de generación no disponible';
+    }
+  }
+
+  const { table, datosCapas } = req.body;
+  try {
+    let workbook = new excel.Workbook();
+    let worksheet = workbook.addWorksheet("Resumen General");
+    worksheet.columns = [
+      { key: "A", width: 40 },
+      { key: "B", width: 40 },
+      { key: "C", width: 25 }
+    ];
+
+    // Título principal (A1:C1) - por defecto 'Selección de Área'
+    const titulo = req.body.titulo || 'Selección de Área';
+    worksheet.mergeCells('A1:C1');
+    worksheet.getCell('A1').value = titulo;
+    worksheet.getCell('A1').font = { bold: true, size: 12, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+    worksheet.getCell('A1').fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: '4472C4' }
+    };
+    worksheet.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+
+    // No mostramos Departamento/Provincia/Distrito en este reporte.
+    // colocar encabezados más cerca del título (una sola fila de separación)
+    let currentRow = 3;
+    // Encabezados de la tabla principal
+    worksheet.getCell(`A${currentRow}`).value = 'Grupo';
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+    worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } };
+    worksheet.getCell(`B${currentRow}`).value = 'Nombre de capa';
+    worksheet.getCell(`B${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+    worksheet.getCell(`B${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } };
+    worksheet.getCell(`C${currentRow}`).value = 'Número de elementos';
+    worksheet.getCell(`C${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+    worksheet.getCell(`C${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } };
+
+    currentRow++;
+    // Agregar los datos de la tabla principal
+    for (const item of table) {
+      worksheet.getCell(`A${currentRow}`).value = item.grupo || '';
+      worksheet.getCell(`B${currentRow}`).value = item.titulo || '';
+      worksheet.getCell(`C${currentRow}`).value = item.cantidad || '';
+      worksheet.getCell(`A${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+      worksheet.getCell(`B${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+      worksheet.getCell(`C${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+      currentRow++;
+    }
+    // Espacio visual antes de Cartografía base
+    worksheet.getCell(`A${currentRow}`).value = '';
+    worksheet.getCell(`B${currentRow}`).value = '';
+    worksheet.getCell(`C${currentRow}`).value = '';
+    currentRow++;
+
+    // Cartografía base
+    worksheet.getCell(`A${currentRow}`).value = 'Cartografía base';
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+    worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } };
+    worksheet.getCell(`B${currentRow}`).value = 'Nombre de capa';
+    worksheet.getCell(`B${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+    worksheet.getCell(`B${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } };
+    worksheet.getCell(`C${currentRow}`).value = 'Cantidad';
+    worksheet.getCell(`C${currentRow}`).font = { bold: true, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+    worksheet.getCell(`C${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } };
+
+    currentRow++;
+    // Datos de cartografía base
+    worksheet.getCell(`A${currentRow}`).value = 'Centros poblados';
+    worksheet.getCell(`B${currentRow}`).value = 'Centros poblados';
+    worksheet.getCell(`C${currentRow}`).value = req.body.cantidadCentrosPoblados || '';
+    worksheet.getCell(`A${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+    worksheet.getCell(`B${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+    worksheet.getCell(`C${currentRow}`).font = { name: 'Arial Narrow', size: 10 };
+
+    currentRow += 2;
+    // Fuente
+    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+    worksheet.getCell(`A${currentRow}`).value = 'Fuente:';
+    worksheet.getCell(`A${currentRow}`).font = { bold: true, italic: true, name: 'Arial Narrow' };
+    worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEB9C' } };
+
+    if (Array.isArray(req.body.fuentes)) {
+      req.body.fuentes.forEach(fuente => {
+        currentRow++;
+        worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+        worksheet.getCell(`A${currentRow}`).value = fuente;
+        worksheet.getCell(`A${currentRow}`).font = { italic: true, name: 'Arial Narrow' };
+        worksheet.getCell(`A${currentRow}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEB9C' } };
+        worksheet.getCell(`A${currentRow}`).alignment = { wrapText: true, vertical: 'top' };
+      });
+    }
+
+    currentRow++;
+    worksheet.mergeCells(`A${currentRow}:C${currentRow}`);
+    worksheet.getCell(`A${currentRow}`).value = generarFechaReporte();
+    worksheet.getCell(`A${currentRow}`).font = { italic: true, bold: true, name: 'Arial Narrow' };
+    worksheet.getCell(`A${currentRow}`).alignment = { wrapText: true, vertical: 'top' };
+
+    // Crear una pestaña por cada datosCapas (igual que en ubigeo)
+    if (Array.isArray(datosCapas)) {
+      let nombresExistentes = [];
+      function nombreUnico(nombresExistentes, titulo) {
+        for (let i = 2; ; i++) {
+          const sufijo = `_${i}`;
+          const nuevoNombreConSufijo =
+            acortarTexto(titulo, 31 - sufijo.length) + sufijo;
+          if (!nombresExistentes.includes(nuevoNombreConSufijo)) {
+            return nuevoNombreConSufijo;
+          }
+        }
+      }
+      datosCapas.forEach((element) => {
+        let tituloHojaBase = (element.grupo ? element.grupo + ' ' : '') + (element.capa || '');
+        let tituloHoja = sanitizeSheetName(tituloHojaBase, 31);
+        if (nombresExistentes.includes(tituloHoja)) {
+          // generar un nombre único respetando el máximo
+          tituloHoja = nombreUnico(nombresExistentes, tituloHoja);
+          nombresExistentes.push(tituloHoja);
+        } else {
+          nombresExistentes.push(tituloHoja);
+        }
+        let hoja = workbook.addWorksheet(tituloHoja);
+        const data = element.rows;
+        const columnas = element.campos;
+        hoja.columns = columnas.map(col => ({ header: col, key: col, width: 25 }));
+        // Pintar encabezados
+        columnas.forEach((col, idx) => {
+          const cell = hoja.getCell(1, idx + 1);
+          cell.font = { bold: true, color: { argb: 'FFFFFF' }, name: 'Arial Narrow' };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '4472C4' } };
+        });
+        // Agregar datos
+        data.forEach((row, i) => {
+          columnas.forEach((col, idx) => {
+            hoja.getCell(i + 2, idx + 1).value = row[col];
+            hoja.getCell(i + 2, idx + 1).font = { name: 'Arial Narrow', size: 10 };
+          });
+        });
+      });
+    }
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=" + "Visor_Geografico_SeleccionArea.xlsx"
     );
 
     return workbook.xlsx.write(res).then(function () {
@@ -1652,6 +1857,7 @@ async descargarExcelUbigeo(req, res) {
 
   async descargarExcelFiltros(req, res) {
     const { tipoServicio,categoria,distancia,nivel,idccpp,datosResumen} = req.body;
+    console.log('datosResumen en excel filtro',datosResumen);
     const titulo = 'Filtro demanda.'
 
     function generarFechaReporte() {
@@ -1704,7 +1910,7 @@ async descargarExcelUbigeo(req, res) {
 
       // Subtítulo (A2:F2)
       worksheetRG.mergeCells('A2:F2');
-      worksheetRG.getCell('A2').value = tipoServicio == "S" ? 'Cobertura de Servicios de Salud públicos nivel secundaria dentro de ' + distancia : 'Cobertura de Servicios de Educación públicos nivel secundaria dentro de ' + distancia;
+      worksheetRG.getCell('A2').value = tipoServicio == "S" ? 'Cobertura de Servicios de Salud públicos nivel secundaria dentro de ' + datosResumen.labelDistanciaSeleccionado : 'Cobertura de Servicios de Educación públicos nivel secundaria dentro de ' + datosResumen.labelDistanciaSeleccionado;
       worksheetRG.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
       worksheetRG.getCell('A2').font = { bold: true, color: { argb: '000000' }, size: 10, name: 'Arial Narrow' };
       worksheetRG.getCell('A2').fill = {
@@ -2225,8 +2431,11 @@ async descargarExcelUbigeo(req, res) {
       pension65,
       contigo,
       cuna,
-      juntos
+      juntos,
+      distancia
     } = req.body;
+    // console.log(req.body,'oferta por servicios excel');
+
 
     function generarFechaReporte() {
       try {
@@ -2277,8 +2486,8 @@ async descargarExcelUbigeo(req, res) {
       // Subtítulo (solo hasta B)
       worksheet.mergeCells("A2:B2");
       worksheet.getCell("A2").value = tipoServicio === "S" 
-        ? "Centros poblados con cobertura de servicios de Establecimientos de Salud (EE.SS.) públicos dentro del rango de 10 km / 2 horas"
-        : "Centros poblados con cobertura de servicios de Institución Educativas (II.EE.) públicos de nivel secundaria dentro del rango de 10 km / 2 horas";
+        ? "Centros poblados con cobertura de servicios de Establecimientos de Salud (EE.SS.) públicos dentro del rango de " + distancia
+        : "Centros poblados con cobertura de servicios de Institución Educativas (II.EE.) públicos de nivel secundaria dentro del rango de " + distancia;
       worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center", wrapText: true };
       worksheet.getCell("A2").font = { bold: true, color: { argb: "000000" }, size: 10, name: 'Arial Narrow' };
       worksheet.getCell("A2").fill = {

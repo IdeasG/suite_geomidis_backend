@@ -1,7 +1,4 @@
 import { Op } from "sequelize";
-import { sequelize } from "../../config/postgres/sequelize.js";
-import Eess from "../../models/espaciales/eess.js";
-import Iiee from "../../models/espaciales/iiee.js";
 import EessIpresSaludGeog from "../../models/espaciales/eessIpresSaludGeog.js";
 import IieeEducacionGeog from "../../models/espaciales/iieeEducacionGeog.js";
 
@@ -25,7 +22,7 @@ export class ServiciosService {
               ]
             }))
           },
-          limit: 10,
+          limit: 20,
         });
       } else if (tipo == 'S') {
         const palabras = searchText.trim().split(/\s+/);
@@ -42,7 +39,7 @@ export class ServiciosService {
               ]
             }))
           },
-          limit: 10,
+          limit: 20,
         });
       }
       return {
