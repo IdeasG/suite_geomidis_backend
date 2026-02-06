@@ -1090,10 +1090,23 @@ export class CapasService {
         return [creado];
       }
 
-      // obtener columnas actuales de la tabla
+      // obtener columnas actuales de la tabla (excluye columnas que sean PRIMARY KEY)
       const [cols] = await sequelize.query(`
-        SELECT column_name, data_type FROM information_schema.columns
-        WHERE table_schema = '${c_nombre_esquema}' AND table_name = '${c_nombre_tabla_capa}'
+        SELECT c.column_name, c.data_type
+        FROM information_schema.columns c
+        WHERE c.table_schema = '${c_nombre_esquema}' AND c.table_name = '${c_nombre_tabla_capa}'
+          AND NOT EXISTS (
+            SELECT 1
+            FROM information_schema.table_constraints tc
+            JOIN information_schema.key_column_usage kcu
+              ON tc.constraint_name = kcu.constraint_name
+             AND tc.table_schema = kcu.table_schema
+             AND tc.table_name = kcu.table_name
+            WHERE tc.constraint_type = 'PRIMARY KEY'
+              AND kcu.column_name = c.column_name
+              AND tc.table_schema = c.table_schema
+              AND tc.table_name = c.table_name
+          )
       `);
 
       // construir arreglo nuevo de columnas filtrando geom/GID y similares (case-insensitive)
