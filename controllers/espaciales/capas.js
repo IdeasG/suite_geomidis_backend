@@ -2285,7 +2285,7 @@ async descargarExcelSeleccionArea(req, res) {
 
       // Subtítulo (A2:B2)
       worksheet.mergeCells('A2:B2');
-      worksheet.getCell('A2').value = `Cobertura de Servicios de ${tipoServicio === "S" ? "Establecimiento de Salud (E.S.)" : "Institución Educativa (I.E.E.)"} públicos de nivel ${datosResumen.nivelSeleccionado || datosResumen.selectedCategorias} dentro de ${datosResumen.labelDistanciaSeleccionado}`;
+      worksheet.getCell('A2').value = `Cobertura de Servicios de ${tipoServicio === "S" ? "Establecimiento de Salud (E.S.)" : "Institución Educativa (I.E.E.)"} públicos de ${tipoServicio === "S" ? 'categoría/s ' + datosResumen.selectedCategorias : 'nivel ' + datosResumen.nivelSeleccionado} dentro de ${datosResumen.labelDistanciaSeleccionado}`;
       worksheet.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
       worksheet.getCell('A2').font = { bold: true, color: { argb: '000000' }, size: 10, name: 'Arial Narrow' };
       worksheet.getCell('A2').fill = {

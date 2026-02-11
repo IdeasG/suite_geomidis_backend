@@ -54,6 +54,9 @@ export const createAuthenticateRouter = () => {
 
   AuthenticateRouter.post("/geoportal/internos", validarToken, authenticateController.createUsuariosInternoByGeoportal);
 
+  // Verifica si un usuario (username) está disponible en un geoportal (id_cliente)
+  AuthenticateRouter.get("/geoportal/usuario/disponible", authenticateController.checkUsuarioDisponible);
+
   AuthenticateRouter.post("/geoportal/rol", validarToken, authenticateController.createComponentByRol);
 
   AuthenticateRouter.post("/geoportal/solicitud", validarToken, authenticateController.createUsuariosBySolicitud);

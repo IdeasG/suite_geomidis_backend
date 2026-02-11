@@ -391,6 +391,27 @@ export class AuthenticateService {
     }
   }
 
+  async checkUsuarioDisponible(usuario, id_cliente, id_usuario = null) {
+    try {
+      if (!usuario || !id_cliente) return { available: false };
+
+      const where = {
+        usuario,
+        id_cliente,
+      };
+
+      if (id_usuario) {
+        where.id_usuario = { [Op.ne]: id_usuario };
+      }
+
+      const exists = await TgUsuario.findOne({ where });
+      return { available: !exists };
+    } catch (error) {
+      console.error(error);
+      throw new Error("Error al verificar disponibilidad de usuario.");
+    }
+  }
+
   async getUsuariosInternoByGeoportal(id, pageNumber, pageSize) {
     try {
       const roles = await Rol.findAll({
@@ -401,9 +422,8 @@ export class AuthenticateService {
         where: { fk_geoportal: id, estado: false},
       });
       const data = await TgUsuario.findAll({
-        where: {
-          id_cliente: id,
-        },
+        where: { id_cliente: id },
+        order: [['id_usuario', 'ASC']],
       });
       return {
         items: data,
@@ -460,21 +480,22 @@ export class AuthenticateService {
     id_rol_auditoria
   ) {
     try {
-      const usuario = await TgUsuario.update(
+      const [affectedCount, affectedRows] = await TgUsuario.update(
         {
           nombres,
           ape_paterno,
           ape_materno,
-          correo,
+          email: correo,
           dni,
           celular,
           rol_id: id_rol,
           id_usuario_auditoria,
           id_rol_auditoria,
         },
-        { where: { id_usuario: id_usuario } }
+        { where: { id_usuario: id_usuario }, returning: true }
       );
-      return usuario;
+      if (affectedRows && affectedRows.length > 0) return affectedRows[0];
+      return { affectedCount };
     } catch (error) {
       throw new Error("Error: " + error);
     }
@@ -572,20 +593,20 @@ export class AuthenticateService {
     id_rol_auditoria
   }) {
     try {
-      console.log(
-      {
-        dni,
-        nombres,
-        ape_paterno,
-        ape_materno,
-        email,
-        celular,
-        tipo_usuario,
-        rol_id,
-        id_cliente,
-        id_usuario_auditoria,
-        id_rol_auditoria
-      });
+      // console.log(
+      // {
+      //   dni,
+      //   nombres,
+      //   ape_paterno,
+      //   ape_materno,
+      //   email,
+      //   celular,
+      //   tipo_usuario,
+      //   rol_id,
+      //   id_cliente,
+      //   id_usuario_auditoria,
+      //   id_rol_auditoria
+      // });
       // Generar contraseña aleatoria
       const randomPassword = generateRandomPassword(12);
       // Buscar el rol para mostrar el nombre en el correo

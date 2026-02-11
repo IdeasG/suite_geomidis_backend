@@ -158,6 +158,23 @@ export class AuthenticateController {
     }
   }
 
+  async checkUsuarioDisponible(req, res) {
+    try {
+      const { usuario, id_usuario } = req.query;
+      // allow id_cliente from token (req.user) if not provided in query
+      const id_cliente = req.query.id_cliente || req.user?.id_cliente;
+      if (!usuario || !id_cliente) {
+        return res.status(400).json({ ok: false, message: "usuario and id_cliente required" });
+      }
+
+      const result = await authenticateService.checkUsuarioDisponible(usuario, id_cliente, id_usuario);
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ ok: false, message: "Internal server error" });
+    }
+  }
+
   async updateUsuariosInternoByGeoportal(req, res) {
     const { id, id_rol: id_rol_auditoria, id_cliente } = req.user;
     const { id_usuario } = req.params;
@@ -236,7 +253,7 @@ export class AuthenticateController {
       nombres,
       ape_paterno,
       ape_materno,
-      correo,
+      email,
       celular,
       tipo_usuario,
       id_rol,
@@ -247,7 +264,7 @@ export class AuthenticateController {
         nombres,
         ape_paterno,
         ape_materno,
-        email: correo,
+        email,
         celular,
         tipo_usuario,
         rol_id: id_rol,

@@ -19,7 +19,7 @@ const TgUsuario = sequelize.define(
     usuario: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: 'ux_usuario_id_cliente',
     },
     clave: {
       type: DataTypes.STRING,
@@ -79,6 +79,7 @@ const TgUsuario = sequelize.define(
     id_cliente: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      unique: 'ux_usuario_id_cliente',
     },
     id_usuario_auditoria:{
       type: DataTypes.INTEGER,
