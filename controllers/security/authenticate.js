@@ -162,11 +162,13 @@ export class AuthenticateController {
     try {
       const { usuario, id_usuario } = req.query;
       // allow id_cliente from token (req.user) if not provided in query
+      // console.log("Received checkUsuarioDisponible request with query params:", req.query);
       const id_cliente = req.query.id_cliente || req.user?.id_cliente;
+      // console.log("id_cliente:", id_cliente);
       if (!usuario || !id_cliente) {
         return res.status(400).json({ ok: false, message: "usuario and id_cliente required" });
       }
-
+      // console.log("Checking availability for usuario:", usuario, "id_cliente:", id_cliente, "id_usuario:", id_usuario);
       const result = await authenticateService.checkUsuarioDisponible(usuario, id_cliente, id_usuario);
       return res.status(200).json(result);
     } catch (error) {

@@ -417,7 +417,7 @@ export class AuthenticateService {
       const roles = await Rol.findAll({
         where: { id_cliente: id },
       });
-
+      // console.log(id)
       const solicitudes = await Solicitud.findAll({
         where: { fk_geoportal: id, estado: false},
       });
