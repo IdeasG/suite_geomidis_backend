@@ -503,8 +503,8 @@ export class ManagerController {
       // Send notification email to admin
       const htmlBody = compileNotificacionSolicitudAdminTemplate(nombres, apellidos, email, institucion, cargo);
       await sendMail({
-        // to: ["mdiaz@midis.gob.pe", "jorbezo@midis.gob.pe", "csanchez@midis.gob.pe"],
-        to: ["bcarbajal@ideasg.org"],
+        to: ["mdiaz@midis.gob.pe", "jorbezo@midis.gob.pe", "csanchez@midis.gob.pe"],
+        // to: ["bcarbajal@ideasg.org"],
         // to: "admin@geoportal.midis.gob.pe", // Change to actual admin email(s)
         name: nombres + " " + apellidos,
         subject: "Nueva solicitud de registro – Geoportal MIDIS",
