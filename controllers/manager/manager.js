@@ -512,6 +512,7 @@ export class ManagerController {
       });
       res.status(200).json({ message: "Solicitud enviada y correo de notificación enviado al administrador.", data });
     } catch (error) {
+      console.log('Error en adminNewUser:', error);
       res.status(500).json({ error: error.message });
     }
   }
