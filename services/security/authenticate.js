@@ -669,7 +669,7 @@ export class AuthenticateService {
           },
         });
         const usuario = await TgUsuario.create({
-          usuario: user,
+          usuario: user || dni,
           clave: password,
           dni,
           nombres,
