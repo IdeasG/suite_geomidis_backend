@@ -473,19 +473,20 @@ export class AuthenticateService {
     nombres,
     ape_paterno,
     ape_materno,
-    correo,
+    email,
     dni,
     celular,
     id_usuario_auditoria,
     id_rol_auditoria
   ) {
+
     try {
       const [affectedCount, affectedRows] = await TgUsuario.update(
         {
           nombres,
           ape_paterno,
           ape_materno,
-          email: correo,
+          email,
           dni,
           celular,
           rol_id: id_rol,
@@ -692,7 +693,7 @@ export class AuthenticateService {
             { where: { fk_geoportal: fk_geoportal, numero_documento: dni } }
           );
           // Send new user notification email
-          const htmlBody = compileNotificacionUsuarioAprobadoTemplate(nombres, user);
+          const htmlBody = compileNotificacionUsuarioAprobadoTemplate(nombres, user || dni);
           await sendMail({
             to: email,
             name: nombres,

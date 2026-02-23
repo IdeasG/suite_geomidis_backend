@@ -500,17 +500,29 @@ export class ManagerController {
         telefono
       );
       // console.log('institucion', institucion);
-      // Send notification email to admin
+      // Send notification email to admin (one-by-one to avoid relay limits)
       const htmlBody = compileNotificacionSolicitudAdminTemplate(nombres, apellidos, email, institucion, cargo);
-      await sendMail({
-        to: ["mdiaz@midis.gob.pe", "jorbezo@midis.gob.pe", "csanchez@midis.gob.pe"],
-        // to: ["bcarbajal@ideasg.org"],
-        // to: "admin@geoportal.midis.gob.pe", // Change to actual admin email(s)
-        name: nombres + " " + apellidos,
-        subject: "Nueva solicitud de registro – Geoportal MIDIS",
-        body: htmlBody
-      });
-      res.status(200).json({ message: "Solicitud enviada y correo de notificación enviado al administrador.", data });
+      const recipients = ["mdiaz@midis.gob.pe", "jorbezo@midis.gob.pe", "csanchez@midis.gob.pe"];
+      // const recipients = ["bcarbajal@ideasg.org", "whuamani@ideasg.org", "crysaor.andexca01@gmail.com"]; // PARA PRUEBAS, DESCOMENTAR ANTES DE PRODUCCIÓN
+      const results = [];
+      for (const recipient of recipients) {
+        try {
+          await sendMail({
+            to: recipient,
+            name: nombres + " " + apellidos,
+            subject: "Nueva solicitud de registro – Geoportal MIDIS",
+            body: htmlBody,
+          });
+          results.push({ to: recipient, status: 'sent' });
+        } catch (err) {
+          console.error('Error sending admin notification to', recipient, err);
+          results.push({ to: recipient, status: 'error', error: err && err.message ? err.message : String(err) });
+        }
+        // Espera 5 segundos antes de enviar al siguiente destinatario
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
+
+      res.status(200).json({ message: "Solicitud enviada; resultados de notificación:", results, data });
     } catch (error) {
       console.log('Error en adminNewUser:', error);
       res.status(500).json({ error: error.message });

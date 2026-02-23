@@ -180,8 +180,8 @@ export class AuthenticateController {
   async updateUsuariosInternoByGeoportal(req, res) {
     const { id, id_rol: id_rol_auditoria, id_cliente } = req.user;
     const { id_usuario } = req.params;
-    const { id_rol, nombres, ape_paterno, ape_materno, correo, dni, celular } =
-      req.body;
+    const { id_rol, nombres, ape_paterno, ape_materno, email, dni, celular } = req.body;
+    // console.log(req.body);
     try {
       const data = await authenticateService.updateUsuariosInternoByGeoportal(
         id_usuario,
@@ -189,7 +189,7 @@ export class AuthenticateController {
         nombres,
         ape_paterno,
         ape_materno,
-        correo,
+        email,
         dni,
         celular,
         id,
@@ -197,6 +197,7 @@ export class AuthenticateController {
       );
       res.status(201).json(data);
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error: "Error: " + error });
     }
   }

@@ -70,14 +70,13 @@ export async function sendMail({ to, name, subject, body }) {
   const port = SMTP_PORT ? parseInt(SMTP_PORT, 10) : 465;
   const secure = typeof SMTP_SECURE !== "undefined" ? SMTP_SECURE === "true" : port === 465;
 
-  // Force use of Gmail SMTP with credentials from SMTP_EMAIL / SMTP_PASSWORD.
-  // Ignore SMTP_HOST/PORT/SECURE/AUTH/SMTP_FROM in .env to ensure authenticated send.
-  const transportOptions = {
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // STARTTLS
-    auth: SMTP_EMAIL && SMTP_PASSWORD ? { user: SMTP_EMAIL, pass: SMTP_PASSWORD } : undefined,
-  };
+  const transportOptions = { host, port, secure };
+
+  // If explicit auth is disabled (SMTP_AUTH='false') or no password provided, do not include auth
+  const shouldAuth = SMTP_AUTH !== "false" && SMTP_PASSWORD;
+  if (shouldAuth) {
+    transportOptions.auth = { user: SMTP_EMAIL, pass: SMTP_PASSWORD };
+  }
 
   // Optional: small dev helper to skip TLS validation when debugging
   if (process.env.SMTP_DEBUG_TLS === "true") {
@@ -95,8 +94,7 @@ export async function sendMail({ to, name, subject, body }) {
     }
   });
 
-  // Use authenticated account as sender
-  const mailboxFrom = SMTP_EMAIL;
+  const mailboxFrom = SMTP_FROM || SMTP_EMAIL;
   const bulkDelay = parseInt(process.env.SMTP_BULK_DELAY_MS || "500", 10);
 
   const sendOne = async (recipient) => {
