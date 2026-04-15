@@ -22,6 +22,7 @@ export const createRouteCapas = () => {
   CapaRouter.get("/estructura", validarToken, capasController.getStructure);
   CapaRouter.get("/estructura/:id_geoportal", capasController.getStructureInvitado);
   CapaRouter.get("/visible/:id_capa/:id_rol", validarToken, capasController.getVisibles);
+  CapaRouter.get("/visible/roles/descarga/:id_capa/:id_rol", capasController.getVisiblesDescargasRol);
   CapaRouter.get("/visible/invitado/:id_capa/:id_cliente", capasController.getVisiblesInvitado);
   CapaRouter.get("/validaciondata", capasController.validacionData);
   CapaRouter.get("/json/fallido/:id", capasController.jsonFallido);

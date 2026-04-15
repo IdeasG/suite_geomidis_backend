@@ -831,9 +831,25 @@ export class AuthenticateService {
   async getRolPermitirDescarga(id_rol) {
     try {
       const roles = await Rol.findAll({
-        attributes: ["b_descargas"],
+        attributes: ["id_rol", "b_descargas"],
         where: {
           id_rol,
+        },
+      });
+      return { roles };
+    } catch (error) {
+      console.log(error);
+      throw new Error("Error al obtener el servicio.");
+    }
+  }
+
+  async getRolInvitadoPermitirDescarga(id_geoportal) {
+    try {
+      const roles = await Rol.findAll({
+        attributes: ["id_rol", "b_descargas"],
+        where: {
+          id_cliente: id_geoportal,
+          c_nombre_rol: { [Sequelize.Op.iLike]: "%invitado%" },
         },
       });
       return { roles };

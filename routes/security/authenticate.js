@@ -16,7 +16,8 @@ export const createAuthenticateRouter = () => {
   //ROLES
   AuthenticateRouter.get("/rol", validarToken, authenticateController.getRol);
   AuthenticateRouter.put("/rol/descarga", validarToken, authenticateController.putRolDescarga);
-  AuthenticateRouter.get("/rol/descarga", validarToken, authenticateController.getRolPermitirDescarga); 
+  AuthenticateRouter.get("/rol/descarga", validarToken, authenticateController.getRolPermitirDescarga);
+  AuthenticateRouter.get("/rol/descarga/invitado/:id_geoportal", authenticateController.getRolInvitadoPermitirDescarga);
   AuthenticateRouter.get("/rol/tools/:id", authenticateController.getToolsByRol);
   AuthenticateRouter.post("/rol", validarToken, authenticateController.saveRol);
   AuthenticateRouter.post("/rol/tools", authenticateController.saveRolTools);

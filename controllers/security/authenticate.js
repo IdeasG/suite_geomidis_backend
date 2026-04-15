@@ -392,6 +392,16 @@ export class AuthenticateController {
     }
   }
 
+  async getRolInvitadoPermitirDescarga(req, res) {
+    const { id_geoportal } = req.params;
+    try {
+      const data = await authenticateService.getRolInvitadoPermitirDescarga(id_geoportal);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async getToolsByRol(req, res) {
     const { id } = req.params;
     try {
