@@ -542,9 +542,7 @@ export class CapasController {
   }
 
   async getVisiblesDescargasRol(req, res) {
-    console.log('prueba campos');
     const { id_capa, id_rol } = req.params;
-    // console.log(id_capa,id_rol,id_rol_usuario);
     try {
       // sincronizar las columnas/JSON antes de devolver
       const dbResponse = await capasService.syncCapasVisibles(id_capa, id_rol);

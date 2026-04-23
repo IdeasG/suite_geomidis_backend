@@ -849,7 +849,7 @@ export class AuthenticateService {
         attributes: ["id_rol", "b_descargas"],
         where: {
           id_cliente: id_geoportal,
-          c_nombre_rol: { [Sequelize.Op.iLike]: "%invitado%" },
+          c_nombre_rol:"invitado",
         },
       });
       return { roles };
