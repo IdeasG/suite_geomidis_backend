@@ -40,6 +40,10 @@ app.use(express.urlencoded({ extended: true, limit: "500mb" }));
 app.use(corsMiddleware());
 app.use(express.static(path.join(__dirname, "")));
 
+app.get("/", (req, res) => {
+  res.type("text/plain").send("Geoportal V. 1.1");
+});
+
 // Ruta protegida para el monitor de estado
 // app.get("/status-monitor", validarToken, expressStatusMonitor().pageRoute);
 app.get("/status-monitor", expressStatusMonitor().pageRoute);
