@@ -2281,6 +2281,11 @@ async descargarExcelSeleccionArea(req, res) {
     }
 
     try {
+      const capitalizeFirstLetter = (string) => {
+        if (!string) return "";
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+      };
+
       let workbook = new excel.Workbook();
       let worksheet = workbook.addWorksheet('Resumen general');
 
@@ -2369,7 +2374,7 @@ async descargarExcelSeleccionArea(req, res) {
       worksheet.getCell(`A${currentRow + 3}`).value = codigoCampo;
       worksheet.getCell(`B${currentRow + 3}`).value = datosResumen.codigoEs || '';
       worksheet.getCell(`A${currentRow + 4}`).value = categoriaCampo;
-      worksheet.getCell(`B${currentRow + 4}`).value = datosResumen.categoriaEs || '';
+      worksheet.getCell(`B${currentRow + 4}`).value = capitalizeFirstLetter(datosResumen.categoriaEs) || '';
       worksheet.getCell(`A${currentRow + 5}`).value = `Localizado a:`;
       worksheet.getCell(`B${currentRow + 5}`).value = datosResumen.distanciaLocalizado || '';
       
