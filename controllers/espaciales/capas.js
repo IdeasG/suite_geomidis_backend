@@ -2283,8 +2283,33 @@ async descargarExcelSeleccionArea(req, res) {
     try {
       const capitalizeFirstLetter = (string) => {
         if (!string) return "";
-        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        const normalizedValue = String(string).trim().toLowerCase();
+        const titleCaseValues = ["inicial", "primaria", "secundaria"];
+
+        if (titleCaseValues.includes(normalizedValue)) {
+          return normalizedValue.charAt(0).toUpperCase() + normalizedValue.slice(1);
+        }
+
+        return String(string).trim().toUpperCase();
       };
+
+       const formatearNombreMinMan = (texto) => {
+        const minusculas = ["de", "la", "del", "y", "en"];
+
+        return texto
+          .toLowerCase()
+          .split(" ")
+          .map((palabra, index) => {
+            // Mantener en minúscula si está en la lista (y no es la primera palabra)
+            if (minusculas.includes(palabra) && index !== 0) {
+              return palabra;
+            }
+
+            // Capitalizar
+            return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+          })
+          .join(" ");
+      }
 
       let workbook = new excel.Workbook();
       let worksheet = workbook.addWorksheet('Resumen general');
@@ -2370,7 +2395,7 @@ async descargarExcelSeleccionArea(req, res) {
       worksheet.getCell(`A${currentRow + 1}`).alignment = { vertical: 'middle', horizontal: 'left' };
 
       worksheet.getCell(`A${currentRow + 2}`).value = `El ${serviceCampo} más cercano:`;
-      worksheet.getCell(`B${currentRow + 2}`).value = datosResumen.campoCercano || '';
+      worksheet.getCell(`B${currentRow + 2}`).value = formatearNombreMinMan(datosResumen.campoCercano) || '';
       worksheet.getCell(`A${currentRow + 3}`).value = codigoCampo;
       worksheet.getCell(`B${currentRow + 3}`).value = datosResumen.codigoEs || '';
       worksheet.getCell(`A${currentRow + 4}`).value = categoriaCampo;
