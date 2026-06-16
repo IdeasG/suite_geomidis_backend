@@ -1,0 +1,59 @@
+name: Deploy Backend to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          envs: GITHUB_TOKEN
+          script: |
+            set -e # Detener si hay algún error
+            
+            # Si no existe la carpeta, clonar por primera vez
+            if [ ! -d "/root/suite_backend" ]; then
+              echo "Clonando repositorio por primera vez..."
+              git clone https://x-access-token:$GITHUB_TOKEN@github.com/IdeasG/suite_geomidis_backend.git /root/suite_backend
+            fi
+            
+            cd /root/suite_backend
+            
+            # Autenticar usando el token temporal de GitHub Actions
+            git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/IdeasG/suite_geomidis_backend.git
+            
+            # Descartar cambios locales en el servidor y forzar la versión de GitHub
+            git fetch --all
+            git reset --hard origin/main
+            
+            # Instalar dependencias
+            npm install
+            
+            # Crear archivo .env si no existe, configurando el puerto de producción (4999)
+            if [ ! -f ".env" ]; then
+              echo "Creando archivo .env de producción..."
+              echo "PORT=4999" > .env
+              echo "DATABASE_URL=postgresql://postgres:mP7%23zX%409qT%21kR4%26vGd2%24hLnF8sWj@84.247.176.139:5432/bdcliente_base" >> .env
+              echo "REDIS_IP='localhost'" >> .env
+              echo "REDIS_PORT=6379" >> .env
+              echo "REDIS_TIME_CACHE=3600" >> .env
+              echo "JWT_SECRET=123456" >> .env
+              echo "COOKIE_SECRET=123456" >> .env
+            fi
+            
+            # Registrar y reiniciar en PM2
+            pm2 delete suite-backend || true
+            pm2 start app.js --name "suite-backend"
+            pm2 save
