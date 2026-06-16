@@ -41,17 +41,15 @@ jobs:
             # Instalar dependencias
             npm install
             
-            # Crear archivo .env si no existe, configurando el puerto de producción (4999)
-            if [ ! -f ".env" ]; then
-              echo "Creando archivo .env de producción..."
-              echo "PORT=4999" > .env
-              echo "DATABASE_URL=postgresql://postgres:mP7%23zX%409qT%21kR4%26vGd2%24hLnF8sWj@84.247.176.139:5432/bdcliente_base" >> .env
-              echo "REDIS_IP='localhost'" >> .env
-              echo "REDIS_PORT=6379" >> .env
-              echo "REDIS_TIME_CACHE=3600" >> .env
-              echo "JWT_SECRET=123456" >> .env
-              echo "COOKIE_SECRET=123456" >> .env
-            fi
+            # Crear/sobreescribir archivo .env de producción
+            echo "Creando/actualizando archivo .env de producción..."
+            echo "PORT=4999" > .env
+            echo "DATABASE_URL=postgresql://postgres:mP7%23zX%409qT%21kR4%26vGd2%24hLnF8sWj@localhost:5433/bdcliente_base" >> .env
+            echo "REDIS_IP='localhost'" >> .env
+            echo "REDIS_PORT=6379" >> .env
+            echo "REDIS_TIME_CACHE=3600" >> .env
+            echo "JWT_SECRET=123456" >> .env
+            echo "COOKIE_SECRET=123456" >> .env
             
             # Registrar y reiniciar en PM2
             pm2 delete suite-backend || true
