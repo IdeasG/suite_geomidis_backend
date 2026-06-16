@@ -44,7 +44,7 @@ jobs:
             # Crear/sobreescribir archivo .env de producción
             echo "Creando/actualizando archivo .env de producción..."
             echo "PORT=4999" > .env
-            echo "DATABASE_URL=postgresql://postgres:mP7%23zX%409qT%21kR4%26vGd2%24hLnF8sWj@localhost:5433/bdmidis" >> .env
+            echo "DATABASE_URL=postgresql://postgres:mP7%23zX%409qT%21kR4%26vGd2%24hLnF8sWj@localhost:5433/bdmdis" >> .env
             echo "REDIS_IP='localhost'" >> .env
             echo "REDIS_PORT=6379" >> .env
             echo "REDIS_TIME_CACHE=3600" >> .env
